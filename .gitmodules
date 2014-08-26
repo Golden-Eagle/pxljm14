@@ -1,3 +1,4 @@
-[submodule "ext/ge2d"]
-	path = ext/ge2d
-	url = https://www.github.com/bagedevimo/ge2d.git
+[submodule "ext/GE2D"]
+	path = ext/GE2D
+	url = http://www.github.com/bagedevimo/ge2d.git
+	branch = master
