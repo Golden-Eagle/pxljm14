@@ -1,0 +1,3 @@
+[submodule "ext/ge2d"]
+	path = ext/ge2d
+	url = https://www.github.com/bagedevimo/ge2d.git
