@@ -5,7 +5,7 @@
 
 #include "Window.hpp"
 
-namespace gecom {
+namespace ge2d {
 
 	namespace {
 		struct WindowData {
@@ -179,7 +179,7 @@ namespace gecom {
 		}
 
 		void callbackError(int error, const char *description) {
-			log("GLFW").error() << "Error " << error << " : " << description;
+			gecom::log("GLFW").error() << "Error " << error << " : " << description;
 		}
 
 		// init GLFW global state.
@@ -188,13 +188,13 @@ namespace gecom {
 		void init_glfw() {
 			static bool done = false;
 			if (!done) {
-				log("Window") % 0 << "GLFW initialising...";
+				gecom::log("Window") % 0 << "GLFW initialising...";
 				if (!glfwInit()) {
-					log("Window").error() << "GLFW initialisation failed";
+					gecom::log("Window").error() << "GLFW initialisation failed";
 					throw window_error("GLFW initialisation failed");
 				}
 				glfwSetErrorCallback(callbackError);
-				log("Window") % 0 << "GLFW initialised";
+				gecom::log("Window") % 0 << "GLFW initialised";
 				done = true;
 			}
 		}
@@ -237,23 +237,23 @@ namespace gecom {
 		glfwMakeContextCurrent(m_handle);
 		// init glew
 		if (!m_glew_init_done) {
-			log("Window") % 0 << "GLEW initialising...";
+			gecom::log("Window") % 0 << "GLEW initialising...";
 			glewExperimental = true;
 			GLenum glew_err = glewInit();
 			GLenum t_err = glGetError();
-			log("Window") << "GLEW t_err: " << t_err;
-			log("Window") << "GLEW initialisation returned " << glew_err;
+			gecom::log("Window") << "GLEW t_err: " << t_err;
+			gecom::log("Window") << "GLEW initialisation returned " << glew_err;
 			if (glew_err != GLEW_OK) {
-				log("Window").error() << "GLEW initialisation failed: " << glewGetErrorString(glew_err);
+				gecom::log("Window").error() << "GLEW initialisation failed: " << glewGetErrorString(glew_err);
 				glfwTerminate();
 				std::abort();
 			}
 			// clear any GL error from glew init
 			GLenum gl_err = glGetError();
-			log("Window") << "GLEW initialistion left GL error " << gl_err;
-			log("Window") << "GL Error: " << gluErrorString(gl_err);
-			log("Window") << "GL version string: " << glGetString(GL_VERSION);
-			log("Window") % 0 << "GLEW initialised";
+			gecom::log("Window") << "GLEW initialistion left GL error " << gl_err;
+			gecom::log("Window") << "GL Error: " << gluErrorString(gl_err);
+			gecom::log("Window") << "GL version string: " << glGetString(GL_VERSION);
+			gecom::log("Window") % 0 << "GLEW initialised";
 			m_glew_init_done = true;
 		}
 	}
@@ -288,21 +288,21 @@ namespace gecom {
 
 	// this should only be called from the main thread
 	create_window_args::operator Window * () {
-		log("Window") % 0 << "GLFW creating window... [title=" << m_title << "]";
+		gecom::log("Window") % 0 << "GLFW creating window... [title=" << m_title << "]";
 		init_glfw();
 		glfwDefaultWindowHints();
 		GLenum gl_err = glGetError();
-		log("Window") % 0 << "GLerror: " << gl_err;
+		gecom::log("Window") % 0 << "GLerror: " << gl_err;
 		for (auto me : m_hints) {
 			glfwWindowHint(me.first, me.second);
 		}
 		GLFWwindow *handle = glfwCreateWindow(m_size.w, m_size.h, m_title.c_str(), m_monitor, m_share ? m_share->handle() : nullptr);
 		glfwDefaultWindowHints();
 		if (!handle) {
-			log("Window").error() << "GLFW window creation failed";
+			gecom::log("Window").error() << "GLFW window creation failed";
 			throw window_error("GLFW window creation failed");
 		}
-		log("Window") % 0 << "GLFW window created";
+		gecom::log("Window") % 0 << "GLFW window created";
 		return new Window(handle);
 	}
 

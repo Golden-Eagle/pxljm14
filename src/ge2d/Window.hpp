@@ -12,22 +12,22 @@
 #include <map>
 
 // this is to enable multiple context support
-namespace gecom {
+namespace ge2d {
 	void * glewGetContextImpl();
 }
-#define glewGetContext() ((GLEWContext *) gecom::glewGetContextImpl())
+#define glewGetContext() ((GLEWContext *) ge2d::glewGetContextImpl())
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <ge_common/Log.hpp>
 #include <ge_common/Concurrent.hpp>
 
-namespace gecom {
+namespace ge2d {
 
 	inline void checkGL() {
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
-			log("GL").error() << "GL error: " << err;
+			gecom::log("GL").error() << "GL error: " << err;
 			throw std::runtime_error("BOOM!");
 		}
 	}
@@ -35,17 +35,17 @@ namespace gecom {
 	inline void checkFB() {
 		GLenum err = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
 		if (err != GL_FRAMEBUFFER_COMPLETE) {
-			log("GL").error() << "Framebuffer status: (" << err << ")" << gluErrorString(err);
-			log("GL").error() << "YOU BROKE THE FRAMEBUFFER!";
+			gecom::log("GL").error() << "Framebuffer status: (" << err << ")" << gluErrorString(err);
+			gecom::log("GL").error() << "YOU BROKE THE FRAMEBUFFER!";
 			throw std::runtime_error("OH NOES! THE FRAMEBUFFER IS BROKED");
 		}
 	}
 
 	inline void checkExtension(const std::string &ext_name) {
 		if (glfwExtensionSupported(ext_name.c_str())) {
-			log("GL") << "Extension " << ext_name << " detected.";
+			gecom::log("GL") << "Extension " << ext_name << " detected.";
 		} else {
-			log("GL").error() << "Extension " << ext_name << " not supported.";
+			gecom::log("GL").error() << "Extension " << ext_name << " not supported.";
 			throw std::runtime_error("unsupported extension");
 		}
 	}
@@ -164,7 +164,7 @@ namespace gecom {
 
 	// Thin wrapper around GLFW windowing.
 	// Each window can only be used on one thread at once.
-	class Window : private Uncopyable {
+	class Window : private gecom::Uncopyable {
 	private:
 		GLFWwindow* m_handle;
 		bool m_glew_init_done = false;
@@ -174,27 +174,27 @@ namespace gecom {
 
 	public:
 		// events
-		Event<window_pos_event> onMove;
-		Event<window_size_event> onResize;
-		Event<window_event> onClose;
-		Event<window_event> onRefresh;
-		Event<window_focus_event> onFocus;
-		Event<window_focus_event> onFocusGain;
-		Event<window_focus_event> onFocusLose;
-		Event<window_icon_event> onIcon;
-		Event<window_icon_event> onMinimise;
-		Event<window_icon_event> onRestore;
-		Event<mouse_button_event> onMouse;
-		Event<mouse_button_event> onMousePress;
-		Event<mouse_button_event> onMouseRelease;
-		Event<mouse_event> onMouseMove;
-		Event<mouse_event> onMouseEnter;
-		Event<mouse_event> onMouseExit;
-		Event<mouse_scroll_event> onScroll;
-		Event<key_event> onKey;
-		Event<key_event> onKeyPress;
-		Event<key_event> onKeyRelease;
-		Event<char_event> onChar;
+		gecom::Event<window_pos_event> onMove;
+		gecom::Event<window_size_event> onResize;
+		gecom::Event<window_event> onClose;
+		gecom::Event<window_event> onRefresh;
+		gecom::Event<window_focus_event> onFocus;
+		gecom::Event<window_focus_event> onFocusGain;
+		gecom::Event<window_focus_event> onFocusLose;
+		gecom::Event<window_icon_event> onIcon;
+		gecom::Event<window_icon_event> onMinimise;
+		gecom::Event<window_icon_event> onRestore;
+		gecom::Event<mouse_button_event> onMouse;
+		gecom::Event<mouse_button_event> onMousePress;
+		gecom::Event<mouse_button_event> onMouseRelease;
+		gecom::Event<mouse_event> onMouseMove;
+		gecom::Event<mouse_event> onMouseEnter;
+		gecom::Event<mouse_event> onMouseExit;
+		gecom::Event<mouse_scroll_event> onScroll;
+		gecom::Event<key_event> onKey;
+		gecom::Event<key_event> onKeyPress;
+		gecom::Event<key_event> onKeyRelease;
+		gecom::Event<char_event> onChar;
 
 		inline Window(GLFWwindow *handle_) : m_handle(handle_) {
 			if (m_handle == nullptr) throw window_error("GLFW window handle is null");
