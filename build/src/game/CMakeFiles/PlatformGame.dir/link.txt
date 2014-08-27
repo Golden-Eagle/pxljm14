@@ -1,0 +1,1 @@
+/usr/bin/c++       CMakeFiles/PlatformGame.dir/platform.cpp.o  -o PlatformGame -rdynamic ../ge2d/libGE2D.a ../ge_common/libGECommon.a 
