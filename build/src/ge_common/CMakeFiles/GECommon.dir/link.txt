@@ -1,2 +1,0 @@
-/usr/bin/ar cr libGECommon.a  
-/usr/bin/ranlib libGECommon.a

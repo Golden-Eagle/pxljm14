@@ -1,3 +1,0 @@
-/home/ben/src/platform/build/src/ge2d/CMakeFiles/GE2D.dir
-/home/ben/src/platform/build/src/ge_common/CMakeFiles/GECommon.dir
-/home/ben/src/platform/build/src/game/CMakeFiles/PlatformGame.dir

@@ -1,2 +1,0 @@
-/usr/bin/ar cr libGE2D.a  
-/usr/bin/ranlib libGE2D.a

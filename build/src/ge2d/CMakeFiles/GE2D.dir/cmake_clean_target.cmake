@@ -1,3 +1,0 @@
-FILE(REMOVE_RECURSE
-  "libGE2D.a"
-)

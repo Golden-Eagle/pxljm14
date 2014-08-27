@@ -1,10 +1,15 @@
-#include "ge2d/Game.hpp"
+#include <ge2d/Game.hpp>
 
-class PlatformGame : ge2d::Game {
-
+class InitState : public ge2d::State {
+	void init() { }
+	void cleanup() { }
+	void pause() { }
+	void resume() { }
+	void update(ge2d::Game* game) { }
+	void draw(ge2d::Game* game) { }
 };
 
 int main() {
-	PlatformGame game;
-	return game.run();
+	ge2d::Game platformGame;
+	platformGame.run(new InitState);
 }
