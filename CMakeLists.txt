@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(Platform CXX)
+project(Platform CXX C)
 
 #option(BUILD_DOCUMENTATION "Use Doxygen to generate HTML based API documentation" OFF)
 #if(BUILD_DOCUMENTATION)
