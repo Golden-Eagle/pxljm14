@@ -27,18 +27,15 @@ namespace gecom {
 	public:
 		Config(const std::string& path) : filepath(path) { parse_file(); }
 
-		// template<typename T>
-		// T get(std::string key) {
-		// 	if(configs.find(key) != configs.end())
-		// 		return static_cast<T>(configs[key]);
+		template<typename T>
+		T get(const std::string& key) {
+			// throw new std::runtime_error("Key not in config");
+		}
 
-		// 	throw new std::runtime_error("Key not in config");
-		// }
-
-		// template<>
-		// int get<int>(std::string key) {
-		// 	return std::stoi(get<std::string>(key));
-		// }
+		template<>
+		int get<int>(const std::string& key) {
+			return std::stoi(get<std::string>(key));
+		}
 	};
 }
 

@@ -8,6 +8,7 @@ SET(GE2D_HEADERS
 	Game.hpp
 	State.hpp
 	Window.hpp
+	Scene.hpp
 )
 
 source_group("Headers" FILES ${GE2D_HEADERS})
