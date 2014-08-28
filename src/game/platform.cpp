@@ -1,6 +1,7 @@
 #include <gegame/Game.hpp>
 #include <gegame/Window.hpp>
 #include <gegame/ResourceManager.hpp>
+#include <ge_common/Config.hpp>
 
 class InitState : public gegame::State {
 	void init() { }
@@ -12,6 +13,12 @@ class InitState : public gegame::State {
 };
 
 int main() {
+	gecom::Config config_test("res/config/PlatformGame.json");
+	int jump_key = config.get("keybindings").get("jump");
+	int jump_key = config.get("keybingings/jump");
+	int jump_key = config.get("keybingings.jump");
+
+
 	ResourceManager rm("res/");
 	rm.add_cache_file<Text>("example.txt");
 
@@ -24,8 +31,7 @@ int main() {
 	platformGame.run(new InitState);
 
 	// Test
-	gegame::Window *window = gegame::createWindow().size(1024, 768).title("Golden Eagle").visible(true);
-
+	gegame::createWindow().size(1024, 768).title("Golden Eagle").visible(true);
 
 	while(true) ;
 }

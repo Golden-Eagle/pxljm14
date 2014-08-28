@@ -1,0 +1,14 @@
+{
+	"graphics" : {
+		"x_res": 800,
+		"y_res": 600,
+		"fullscreen": true
+	},
+	"network" : {
+		"bind_address": "0.0.0.0",
+		"listen_port": 11031
+	},
+	"keybindings" : {
+		"jump": 27
+	}
+}

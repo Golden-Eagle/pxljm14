@@ -1,12 +1,14 @@
 SET(GECOM_SOURCES 
 	Log.cpp
 	Concurrent.cpp
+	json11.cpp
 )
 
 SET(GECOM_HEADERS
 	GECom.hpp
 	Log.hpp
 	Concurrent.hpp
+	json11.hpp
 )
 
 source_group("Headers" FILES ${GECOM_HEADERS})

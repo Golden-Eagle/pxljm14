@@ -35,7 +35,7 @@ public:
 	Text(const std::string& path) : Resource(path) {
 		in.open(path);
 		if(!in.good())
-			throw new resource_manager_error("File not found", path);
+			throw resource_manager_error("File not found", path);
 	}
 	~Text() { }
 	bool load_piece() {
