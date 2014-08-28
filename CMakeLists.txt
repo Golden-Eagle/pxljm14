@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 2.8)
 
 project(Platform CXX)
 
+#option(BUILD_DOCUMENTATION "Use Doxygen to generate HTML based API documentation" OFF)
+#if(BUILD_DOCUMENTATION)
+#	FIND_PACKAGE(Doxygen)
+#	if(NOT DOXYGEN_FOUND)
+#		message(FATAL_ERROR)
+
 # OpenGL
 include(FindOpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})

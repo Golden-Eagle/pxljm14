@@ -4,7 +4,6 @@ SET(GE2D_SOURCES
 
 SET(GE2D_HEADERS
 	GEGame.hpp
-	Fs.hpp
 	ResourceManager.hpp
 	Game.hpp
 	State.hpp

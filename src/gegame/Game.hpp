@@ -4,9 +4,11 @@
 #include <vector>
 
 #include "State.hpp"
+#include "ResourceManager.hpp"
 
 namespace gegame {
 	class Game {
+		// ResourceManager resorces;
 	public:
 		void run(State* initial_state) { }
 	};
