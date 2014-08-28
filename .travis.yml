@@ -4,7 +4,9 @@ compiler:
     - gcc
 
 before_script:
-    - mkdir build
+    - sudo apt-get install -qq
+    - sudo apt-get install -y libxxf86vm1 libxxf86vm1 libxxf86vm-dev x11proto-xf86vidmode-dev libxrandr-dev
+    - mkdir build 
     - cd build
     - cmake ..
 
