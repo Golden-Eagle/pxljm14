@@ -4,25 +4,25 @@
  *
  */
 
-#ifndef GE2D_WINDOW_HEADER
-#define GE2D_WINDOW_HEADER
+#ifndef GEGAME_WINDOW_HEADER
+#define GEGAME_WINDOW_HEADER
 
 #include <string>
 #include <stdexcept>
 #include <map>
 
 // this is to enable multiple context support
-namespace ge2d {
+namespace gegame {
 	void * glewGetContextImpl();
 }
-#define glewGetContext() ((GLEWContext *) ge2d::glewGetContextImpl())
+#define glewGetContext() ((GLEWContext *) gegame::glewGetContextImpl())
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <ge_common/Log.hpp>
 #include <ge_common/Concurrent.hpp>
 
-namespace ge2d {
+namespace gegame {
 
 	inline void checkGL() {
 		GLenum err = glGetError();

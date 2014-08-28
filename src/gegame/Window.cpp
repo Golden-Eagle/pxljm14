@@ -5,7 +5,7 @@
 
 #include "Window.hpp"
 
-namespace ge2d {
+namespace gegame {
 
 	namespace {
 		struct WindowData {

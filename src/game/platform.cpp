@@ -1,19 +1,22 @@
-#include <ge2d/Game.hpp>
-#include <ge2d/Window.hpp>
+#include <gegame/Game.hpp>
+#include <gegame/Window.hpp>
 
-class InitState : public ge2d::State {
+class InitState : public gegame::State {
 	void init() { }
 	void cleanup() { }
 	void pause() { }
 	void resume() { }
-	void update(ge2d::Game* game) { }
-	void draw(ge2d::Game* game) { }
+	void update(gegame::Game* game) { }
+	void draw(gegame::Game* game) { }
 };
 
 int main() {
-	ge2d::Game platformGame;
+	gegame::Game platformGame;
 	platformGame.run(new InitState);
 
 	// Test
-	ge2d::Window *window = ge2d::createWindow().size(1024, 768).title("Golden Eagle").visible(true);
+	gegame::Window *window = gegame::createWindow().size(1024, 768).title("Golden Eagle").visible(true);
+
+
+	while(true) ;
 }

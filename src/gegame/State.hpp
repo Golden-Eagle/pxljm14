@@ -1,9 +1,9 @@
-#ifndef GE2D_STATE_HEADER
-#define GE2D_STATE_HEADER
+#ifndef GEGAME_STATE_HEADER
+#define GEGAME_STATE_HEADER
 
 #include "Game.hpp"
 
-namespace ge2d {
+namespace gegame {
 	class Game;
 
 	class State {
