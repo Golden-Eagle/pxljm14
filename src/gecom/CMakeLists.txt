@@ -18,8 +18,10 @@ SET(GECOM_HEADERS
 	Window.hpp
 	Chrono.hpp
 	Shader.hpp
+	State.hpp
 	Resource.hpp
-	
+	Config.hpp
+
 	json11.hpp
 )
 
