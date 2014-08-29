@@ -1,5 +1,5 @@
-#ifndef GECOMMON_CONFIG_HEADER
-#define GECOMMON_CONFIG_HEADER
+#ifndef GECOM_CONFIG_HPP
+#define GECOM_CONFIG_HPP
 
 #include "json11.hpp"
 
@@ -7,6 +7,7 @@
 #include <sstream>
 
 namespace gecom {
+	
 	class Config {
 		std::string filepath;
 		std::ifstream in;

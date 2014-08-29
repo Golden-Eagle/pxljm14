@@ -1,5 +1,5 @@
-#ifndef AMBITION_LOG_HPP
-#define AMBITION_LOG_HPP
+#ifndef GECOM_LOG_HPP
+#define GECOM_LOG_HPP
 
 #include <iostream>
 #include <iomanip>
@@ -262,4 +262,4 @@ namespace gecom {
 
 }
 
-#endif // AMBITION_LOG_HPP
+#endif // GECOM_LOG_HPP

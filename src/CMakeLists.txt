@@ -1,3 +1,8 @@
-add_subdirectory(ge_common)
-add_subdirectory(gegame)
-add_subdirectory(game "${PROJECT_BINARY_DIR}/platform")
+
+# allow targets to include from each other
+include_directories("${PROJECT_SOURCE_DIR}/src")
+
+# this needs to be first
+add_subdirectory(gecom)
+
+add_subdirectory(platform)

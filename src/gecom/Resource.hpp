@@ -1,5 +1,5 @@
-#ifndef GEGAME_RESOURCE_HEADER
-#define GEGAME_RESOURCE_HEADER
+#ifndef GECOM_RESOURCE_HPP
+#define GECOM_RESOURCE_HPP
 
 #include <map>
 #include <memory>

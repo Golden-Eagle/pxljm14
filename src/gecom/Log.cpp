@@ -10,7 +10,7 @@ namespace gecom {
 
 	namespace termcolor {
 
-#ifdef AMBITION_NO_TERMCOLOR
+#ifdef GECOM_NO_TERMCOLOR
 		// Reset Color
 		std::ostream & reset(std::ostream &o) { return o; }
 

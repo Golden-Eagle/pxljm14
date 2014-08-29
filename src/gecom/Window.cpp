@@ -5,7 +5,7 @@
 
 #include "Window.hpp"
 
-namespace gegame {
+namespace gecom {
 
 	namespace {
 		struct WindowData {
@@ -201,7 +201,7 @@ namespace gegame {
 
 	}
 
-	void * glewGetContextImpl() {
+	void * getGlewContext() {
 		GLFWwindow *handle = glfwGetCurrentContext();
 		if (!handle) {
 			throw window_error("no current context");

@@ -1,28 +1,30 @@
 /*
  *
- * Ambition Window Management Header
+ * GECom Window Management Header
  *
  */
 
-#ifndef GEGAME_WINDOW_HEADER
-#define GEGAME_WINDOW_HEADER
+#ifndef GECOM_WINDOW_HPP
+#define GECOM_WINDOW_HPP
 
 #include <string>
 #include <stdexcept>
 #include <map>
 
 // this is to enable multiple context support
-namespace gegame {
-	void * glewGetContextImpl();
+namespace gecom {
+	void * getGlewContext();
 }
-#define glewGetContext() ((GLEWContext *) gegame::glewGetContextImpl())
+
+#define glewGetContext() ((GLEWContext *) gecom::getGlewContext())
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <ge_common/Log.hpp>
-#include <ge_common/Concurrent.hpp>
+#include "Log.hpp"
+#include "Concurrent.hpp"
 
-namespace gegame {
+namespace gecom {
 
 	inline void checkGL() {
 		GLenum err = glGetError();

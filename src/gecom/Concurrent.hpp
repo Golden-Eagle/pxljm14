@@ -1,5 +1,5 @@
-#ifndef GECOM_CONCURRENT_HEADER
-#define GECOM_CONCURRENT_HEADER
+#ifndef GECOM_CONCURRENT_HPP
+#define GECOM_CONCURRENT_HPP
 
 #include <cassert>
 #include <stdexcept>
@@ -17,13 +17,11 @@
 #include "Log.hpp"
 
 namespace gecom {
-
+	
+	// TODO interruption probably shouldnt derive from std::exception, now that i think about it
 	class interruption : public std::runtime_error {
 	public:
 		interruption() : runtime_error("condition variable wait interrupted") {};
-		// virtual const char * what() const override {
-		// 	return "";
-		// }
 	};
 
 	// High-level mechanism for providing interruption of condition variable waiting.
