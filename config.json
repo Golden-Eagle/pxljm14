@@ -1,4 +1,7 @@
 {
+	"system" : {
+		"resources_directory": "res/"
+	},
 	"graphics" : {
 		"x_res": 800,
 		"y_res": 600,

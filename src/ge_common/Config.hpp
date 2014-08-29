@@ -4,6 +4,7 @@
 #include "json11.hpp"
 
 #include <fstream>
+#include <sstream>
 
 namespace gecom {
 	class Config {
@@ -19,7 +20,7 @@ namespace gecom {
 			buf << in.rdbuf();
 			std::string json_parse_err;
 			json_obj = json11::Json::parse(buf.str(), json_parse_err);
-			if(json_obj.is_null()) std::cout << "Failed to parse: " << json_parse_err << std::endl;
+			if(json_obj.is_null()) throw std::runtime_error("Unable to parse JSON: " + json_parse_err);
 
 			// JSON object should be valid now, I guess.
 		}
@@ -40,9 +41,21 @@ namespace gecom {
 		}
 
 		const int get_int(const std::string& key) const {
-			if(!json_obj[key].is_number()) throw std::runtime_error("Requested key '" + key + "' is not an integer");
+			if(!json_obj[key].is_number()) throw std::runtime_error("Requested key '" + key + "' is not a number");
 			return json_obj[key].int_value();
 		}
+
+		const double get_double(const std::string& key) const {
+			if(!json_obj[key].is_number()) throw std::runtime_error("Requested key '" + key + "' is not a number");
+			return json_obj[key].double_value();
+		}
+
+		const bool get_bool(const std::string& key) const {
+			if(!json_obj[key].is_bool()) throw std::runtime_error("Requested key '" + key + "' is not a bool");
+			return json_obj[key].double_value();
+		}
+
+		// TODO: Arrays.
 	};
 }
 
