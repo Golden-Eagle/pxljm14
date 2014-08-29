@@ -47,12 +47,12 @@ namespace gecom {
 
 		const double get_double(const std::string& key) const {
 			if(!json_obj[key].is_number()) throw std::runtime_error("Requested key '" + key + "' is not a number");
-			return json_obj[key].double_value();
+			return json_obj[key].number_value();
 		}
 
 		const bool get_bool(const std::string& key) const {
 			if(!json_obj[key].is_bool()) throw std::runtime_error("Requested key '" + key + "' is not a bool");
-			return json_obj[key].double_value();
+			return json_obj[key].bool_value();
 		}
 
 		// TODO: Arrays.
