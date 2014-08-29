@@ -25,16 +25,23 @@ namespace gecom {
 		}
 
 	public:
+		Config(const char* cpath) : Config(std::string(cpath)) { }
 		Config(const std::string& path) : filepath(path) { parse_file(); }
+		Config(const json11::Json& no) : json_obj(no) { }
 
-		template<typename T>
-		T get(const std::string& key) {
-			// throw new std::runtime_error("Key not in config");
+		const Config* get(const std::string& key) const {
+			if(!json_obj[key].is_object()) throw std::runtime_error("Requested object is not an object");
+			return new Config(json_obj[key]);
 		}
 
-		template<>
-		int get<int>(const std::string& key) {
-			return std::stoi(get<std::string>(key));
+		const std::string& get_string(const std::string& key) const {
+			if(!json_obj[key].is_string()) throw std::runtime_error("Requested key '" + key + "' is not a string");
+			return json_obj[key].string_value();
+		}
+
+		const int get_int(const std::string& key) const {
+			if(!json_obj[key].is_number()) throw std::runtime_error("Requested key '" + key + "' is not an integer");
+			return json_obj[key].int_value();
 		}
 	};
 }

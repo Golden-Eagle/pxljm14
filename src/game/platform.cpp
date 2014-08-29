@@ -15,7 +15,8 @@ class InitState : public gegame::State {
 int main() {
 	gecom::Config config_test("res/config/PlatformGame.json");
 	// int jump_key = config.get("keybindings").get("jump");
-	int jump_key = config_test.get("keybingings/jump");
+	int jump_key = config_test.get("keybindings")->get_int("jump");
+	std::cout << "Jump key is: " << jump_key << std::endl;
 	// int jump_key = config.get("keybingings.jump");
 
 
