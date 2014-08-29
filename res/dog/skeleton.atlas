@@ -1,0 +1,195 @@
+
+skeleton.png
+size: 2046,2046
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Dog Character-assets/Back
+  rotate: true
+  xy: 2, 608
+  size: 834, 417
+  orig: 834, 417
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Back Ear
+  rotate: false
+  xy: 1002, 1121
+  size: 205, 377
+  orig: 205, 377
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Belly
+  rotate: false
+  xy: 1315, 1672
+  size: 672, 374
+  orig: 672, 374
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Foot (Foreleg Back)
+  rotate: true
+  xy: 757, 689
+  size: 97, 86
+  orig: 97, 86
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Foot (Foreleg Front)
+  rotate: false
+  xy: 1939, 1341
+  size: 107, 89
+  orig: 107, 89
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Foot (Rear Leg Back)
+  rotate: false
+  xy: 619, 2
+  size: 112, 112
+  orig: 112, 112
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Foot (Rear Leg Front)
+  rotate: true
+  xy: 1288, 1225
+  size: 113, 173
+  orig: 113, 173
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Frill
+  rotate: false
+  xy: 788, 951
+  size: 202, 153
+  orig: 202, 153
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Front Ear
+  rotate: false
+  xy: 788, 1106
+  size: 212, 392
+  orig: 212, 392
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Head
+  rotate: false
+  xy: 710, 1500
+  size: 603, 546
+  orig: 603, 546
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Nose Bottom
+  rotate: false
+  xy: 421, 687
+  size: 334, 253
+  orig: 334, 253
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Nose Top
+  rotate: false
+  xy: 446, 439
+  size: 300, 246
+  orig: 300, 246
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Rear
+  rotate: false
+  xy: 2, 1444
+  size: 706, 602
+  orig: 706, 602
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Shin (Foreleg Back)
+  rotate: true
+  xy: 2, 26
+  size: 63, 200
+  orig: 63, 200
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Shin (Foreleg Front)
+  rotate: false
+  xy: 1209, 1253
+  size: 77, 245
+  orig: 77, 245
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Shin (Rear Leg Back)
+  rotate: false
+  xy: 1752, 1432
+  size: 266, 238
+  orig: 266, 238
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Shin (Rear Leg Front)
+  rotate: false
+  xy: 619, 116
+  size: 175, 321
+  orig: 175, 321
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Shoulder (Foreleg Back)
+  rotate: false
+  xy: 446, 78
+  size: 171, 359
+  orig: 171, 359
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Shoulder (Foreleg Front)
+  rotate: true
+  xy: 1315, 1464
+  size: 206, 435
+  orig: 206, 435
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Tail1
+  rotate: true
+  xy: 1744, 1311
+  size: 119, 193
+  orig: 119, 193
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Tail2
+  rotate: true
+  xy: 1526, 1324
+  size: 138, 216
+  orig: 138, 216
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Tail3
+  rotate: true
+  xy: 1288, 1340
+  size: 122, 236
+  orig: 122, 236
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Tail4
+  rotate: false
+  xy: 757, 788
+  size: 89, 152
+  orig: 89, 152
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Tail5
+  rotate: false
+  xy: 848, 857
+  size: 109, 92
+  orig: 109, 92
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Tail6
+  rotate: false
+  xy: 710, 1465
+  size: 73, 33
+  orig: 73, 33
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Thigh (Rear Leg Back)
+  rotate: false
+  xy: 2, 91
+  size: 442, 515
+  orig: 442, 515
+  offset: 0, 0
+  index: -1
+Dog Character-assets/Thigh (Rear Leg Front)
+  rotate: false
+  xy: 421, 942
+  size: 365, 500
+  orig: 365, 500
+  offset: 0, 0
+  index: -1

@@ -1,0 +1,1145 @@
+{
+"skeleton": { "spine": "1.9.15", "hash": "110GOdlhSdIDeodwF2+vc+sPs0g", "width": 1659.17, "height": 1411.33 },
+"bones": [
+	{ "name": "root", "x": -3.48 },
+	{ "name": "Back", "parent": "root", "length": 550.02, "x": -245.31, "y": 1343.15, "rotation": 4.08 },
+	{ "name": "Head", "parent": "Back", "length": 305.66, "x": 539.41, "y": 0.83, "rotation": -33.16 },
+	{ "name": "Rear", "parent": "Back", "length": 297.04, "x": -2.79, "y": -2.41, "rotation": -126.5 },
+	{ "name": "Shoulder (Foreleg Front)", "parent": "Back", "length": 308.89, "x": 363.59, "y": -114.41, "rotation": -106.65 },
+	{ "name": "Shoulder (Foreleg Front)2", "parent": "Back", "length": 274.33, "x": 428.69, "y": -118.28, "rotation": -96.34 },
+	{ "name": "Back Ear", "parent": "Head", "length": 319.66, "x": 183.4, "y": 137.79, "rotation": 100.26 },
+	{ "name": "Frill", "parent": "Head", "length": 131.25, "x": 230.63, "y": -113.87, "rotation": -66.96 },
+	{ "name": "Front Ear", "parent": "Head", "length": 308.23, "x": -35.27, "y": 58.09, "rotation": 118.51 },
+	{ "name": "Nose Bottom", "parent": "Head", "length": 263.2, "x": 300.89, "y": -35.97, "rotation": -20.7 },
+	{ "name": "Nose Top", "parent": "Head", "length": 254.97, "x": 314.84, "y": -7.3, "rotation": -8.57 },
+	{
+		"name": "Shin (Foreleg Back)",
+		"parent": "Shoulder (Foreleg Front)2",
+		"length": 154.4,
+		"x": 263.79,
+		"y": -2.38,
+		"rotation": 6.78
+	},
+	{
+		"name": "Shin (Foreleg Front)",
+		"parent": "Shoulder (Foreleg Front)",
+		"length": 186.94,
+		"x": 300.4,
+		"y": -4.49,
+		"rotation": 19.51
+	},
+	{ "name": "Tail1", "parent": "Rear", "length": 78.34, "x": 371.46, "y": -73.58, "rotation": -4.05 },
+	{ "name": "Thigh (Rear Leg Back)", "parent": "Rear", "length": 450.26, "x": 241.66, "y": 82.21, "rotation": 62.18 },
+	{ "name": "Thigh (Rear Leg Front)", "parent": "Rear", "length": 349.72, "x": 291.23, "y": -0.76, "rotation": 50.94 },
+	{ "name": "Foot (Foreleg Back)", "parent": "Shin (Foreleg Back)", "length": 115.56, "x": 149.53, "y": -7.63, "rotation": 10.24 },
+	{ "name": "Foot (Foreleg Front)", "parent": "Shin (Foreleg Front)", "length": 119.16, "x": 180.42, "y": -0.7, "rotation": 36.79 },
+	{
+		"name": "Shin (Rear Leg Back)",
+		"parent": "Thigh (Rear Leg Back)",
+		"length": 238.26,
+		"x": 456.16,
+		"y": -2.12,
+		"rotation": -74.59
+	},
+	{ "name": "Shin (Rear Leg Front)", "parent": "Thigh (Rear Leg Front)", "length": 249.7, "x": 340.3, "y": -0.9, "rotation": -33.79 },
+	{ "name": "Tail2", "parent": "Tail1", "length": 101.71, "x": 68.94, "y": -1.01, "rotation": 7.18 },
+	{ "name": "Foot (Rear Leg Back)", "parent": "Shin (Rear Leg Back)", "length": 174.19, "x": 238.22, "y": 1.07, "rotation": 76.28 },
+	{
+		"name": "Foot (Rear Leg Front)",
+		"parent": "Shin (Rear Leg Front)",
+		"length": 208.08,
+		"x": 250.56,
+		"y": -2.14,
+		"rotation": 37.37
+	},
+	{ "name": "Tail3", "parent": "Tail2", "length": 168.48, "x": 94.88, "y": -3.68, "rotation": 10.26 },
+	{ "name": "Tail4", "parent": "Tail3", "length": 114.01, "x": 170.18, "y": -4.87, "rotation": -0.9 },
+	{ "name": "Tail5", "parent": "Tail4", "length": 116.47, "x": 106.65, "y": -3.02, "rotation": -27.46 },
+	{ "name": "Tail6", "parent": "Tail5", "length": 50.5, "x": 118.22, "y": 0.96, "rotation": -5.13 }
+],
+"ik": [],
+"slots": [
+	{ "name": "Thigh (Rear Leg Front)", "bone": "Thigh (Rear Leg Front)", "attachment": "Dog Character-assets/Thigh (Rear Leg Front)" },
+	{ "name": "Shin (Rear Leg Front)", "bone": "Shin (Rear Leg Front)", "attachment": "Dog Character-assets/Shin (Rear Leg Front)" },
+	{ "name": "Foot (Rear Leg Back)", "bone": "Foot (Rear Leg Back)", "attachment": "Dog Character-assets/Foot (Rear Leg Back)" },
+	{
+		"name": "Shoulder (Foreleg Back)",
+		"bone": "Shoulder (Foreleg Front)2",
+		"attachment": "Dog Character-assets/Shoulder (Foreleg Back)"
+	},
+	{ "name": "Shin (Foreleg Back)", "bone": "Shin (Foreleg Back)", "attachment": "Dog Character-assets/Shin (Foreleg Back)" },
+	{ "name": "Foot (Foreleg Back)", "bone": "Foot (Foreleg Back)", "attachment": "Dog Character-assets/Foot (Foreleg Back)" },
+	{ "name": "Back", "bone": "Back", "attachment": "Dog Character-assets/Back" },
+	{ "name": "Belly", "bone": "Back", "attachment": "Dog Character-assets/Belly" },
+	{ "name": "Rear", "bone": "Rear", "attachment": "Dog Character-assets/Rear" },
+	{ "name": "Back Ear", "bone": "Back Ear", "attachment": "Dog Character-assets/Back Ear" },
+	{ "name": "Nose Bottom", "bone": "Nose Bottom", "attachment": "Dog Character-assets/Nose Bottom" },
+	{ "name": "Nose Top", "bone": "Nose Top", "attachment": "Dog Character-assets/Nose Top" },
+	{ "name": "Frill", "bone": "Frill", "attachment": "Dog Character-assets/Frill" },
+	{ "name": "Head", "bone": "Head", "attachment": "Dog Character-assets/Head" },
+	{ "name": "Front Ear", "bone": "Front Ear", "attachment": "Dog Character-assets/Front Ear" },
+	{
+		"name": "Shoulder (Foreleg Front)",
+		"bone": "Shoulder (Foreleg Front)",
+		"attachment": "Dog Character-assets/Shoulder (Foreleg Front)"
+	},
+	{ "name": "Shin (Foreleg Front)", "bone": "Shin (Foreleg Front)", "attachment": "Dog Character-assets/Shin (Foreleg Front)" },
+	{ "name": "Foot (Foreleg Front)", "bone": "Foot (Foreleg Front)", "attachment": "Dog Character-assets/Foot (Foreleg Front)" },
+	{ "name": "Tail1", "bone": "Tail1", "attachment": "Dog Character-assets/Tail1" },
+	{ "name": "Tail2", "bone": "Tail2", "attachment": "Dog Character-assets/Tail2" },
+	{ "name": "Tail3", "bone": "Tail3", "attachment": "Dog Character-assets/Tail3" },
+	{ "name": "Tail4", "bone": "Tail4", "attachment": "Dog Character-assets/Tail4" },
+	{ "name": "Tail5", "bone": "Tail5", "attachment": "Dog Character-assets/Tail5" },
+	{ "name": "Tail6", "bone": "Tail6", "attachment": "Dog Character-assets/Tail6" },
+	{ "name": "Thigh (Rear Leg Back)", "bone": "Thigh (Rear Leg Back)", "attachment": "Dog Character-assets/Thigh (Rear Leg Back)" },
+	{ "name": "Shin (Rear Leg Back)", "bone": "Shin (Rear Leg Back)", "attachment": "Dog Character-assets/Shin (Rear Leg Back)" },
+	{ "name": "Foot (Rear Leg Front)", "bone": "Foot (Rear Leg Front)", "attachment": "Dog Character-assets/Foot (Rear Leg Front)" }
+],
+"skins": {
+	"default": {
+		"Head": {
+			"Dog Character-assets/Head": { "x": 135.89, "y": 13.12, "rotation": 29.08, "width": 603, "height": 546 }
+		},
+		"Tail1": {
+			"Dog Character-assets/Tail1": { "x": 45.75, "y": -10.38, "rotation": 126.47, "width": 119, "height": 193 }
+		},
+		"Tail2": {
+			"Dog Character-assets/Tail2": { "x": 42.45, "y": 1.09, "rotation": 119.29, "width": 138, "height": 216 }
+		},
+		"Tail3": {
+			"Dog Character-assets/Tail3": { "x": 85.49, "y": 4.12, "rotation": 109.02, "width": 122, "height": 236 }
+		},
+		"Rear": {
+			"Dog Character-assets/Rear": { "x": 101.88, "y": 95.74, "rotation": 122.42, "width": 706, "height": 602 }
+		},
+		"Tail5": {
+			"Dog Character-assets/Tail5": { "x": 57.33, "y": 1.51, "rotation": 137.39, "width": 109, "height": 92 }
+		},
+		"Tail6": {
+			"Dog Character-assets/Tail6": { "x": 21.02, "y": -1.97, "rotation": 167.28, "width": 73, "height": 33 }
+		},
+		"Back": {
+			"Dog Character-assets/Back": { "x": 299.33, "y": 35.53, "rotation": -4.08, "width": 834, "height": 417 }
+		},
+		"Nose Top": {
+			"Dog Character-assets/Nose Top": { "x": 123.66, "y": 4.82, "rotation": 37.65, "width": 300, "height": 246 }
+		},
+		"Foot (Rear Leg Back)": {
+			"Dog Character-assets/Foot (Rear Leg Back)": { "x": 22.17, "y": -9.48, "rotation": 58.54, "width": 112, "height": 112 }
+		},
+		"Shoulder (Foreleg Back)": {
+			"Dog Character-assets/Shoulder (Foreleg Back)": { "x": 136.5, "y": 5.79, "rotation": 92.25, "width": 171, "height": 359 }
+		},
+		"Shin (Foreleg Front)": {
+			"Dog Character-assets/Shin (Foreleg Front)": { "x": 89.19, "y": -2.82, "rotation": 83.06, "width": 77, "height": 245 }
+		},
+		"Tail4": {
+			"Dog Character-assets/Tail4": { "x": 55.42, "y": 4.6, "rotation": 109.93, "width": 89, "height": 152 }
+		},
+		"Foot (Foreleg Front)": {
+			"Dog Character-assets/Foot (Foreleg Front)": { "x": 43.1, "y": -3.64, "rotation": 46.26, "width": 107, "height": 89 }
+		},
+		"Shin (Rear Leg Back)": {
+			"Dog Character-assets/Shin (Rear Leg Back)": { "x": 98.59, "y": 9, "rotation": 134.82, "width": 266, "height": 238 }
+		},
+		"Nose Bottom": {
+			"Dog Character-assets/Nose Bottom": { "x": 112.09, "y": -3.94, "rotation": 49.78, "width": 334, "height": 253 }
+		},
+		"Back Ear": {
+			"Dog Character-assets/Back Ear": { "x": 151.78, "y": 23.35, "scaleY": 0.99, "rotation": -71.18, "width": 205, "height": 377 }
+		},
+		"Front Ear": {
+			"Dog Character-assets/Front Ear": { "x": 152.5, "y": -2.83, "rotation": -89.43, "width": 212, "height": 392 }
+		},
+		"Shin (Rear Leg Front)": {
+			"Dog Character-assets/Shin (Rear Leg Front)": { "x": 98.22, "y": 27.01, "rotation": 105.75, "width": 175, "height": 321 }
+		},
+		"Thigh (Rear Leg Back)": {
+			"Dog Character-assets/Thigh (Rear Leg Back)": { "x": 173.13, "y": -30.06, "rotation": 60.23, "width": 442, "height": 515 }
+		},
+		"Shin (Foreleg Back)": {
+			"Dog Character-assets/Shin (Foreleg Back)": { "x": 72.78, "y": -3.86, "rotation": 85.46, "width": 63, "height": 200 }
+		},
+		"Belly": {
+			"Dog Character-assets/Belly": { "x": 319.3, "y": -244.27, "rotation": -4.08, "width": 672, "height": 374 }
+		},
+		"Shoulder (Foreleg Front)": {
+			"Dog Character-assets/Shoulder (Foreleg Front)": { "x": 192.51, "y": 23.63, "rotation": 102.57, "width": 206, "height": 435 }
+		},
+		"Foot (Rear Leg Front)": {
+			"Dog Character-assets/Foot (Rear Leg Front)": { "x": 61.75, "y": 0.3, "rotation": 67.89, "width": 113, "height": 173 }
+		},
+		"Thigh (Rear Leg Front)": {
+			"Dog Character-assets/Thigh (Rear Leg Front)": { "x": 159.41, "y": -8.62, "rotation": 77.19, "width": 365, "height": 500 }
+		},
+		"Frill": {
+			"Dog Character-assets/Frill": { "x": 87.92, "y": -14.74, "rotation": 96.04, "width": 202, "height": 153 }
+		},
+		"Foot (Foreleg Back)": {
+			"Dog Character-assets/Foot (Foreleg Back)": { "x": 40.65, "y": -1.03, "rotation": 51.67, "width": 97, "height": 86 }
+		}
+	}
+},
+"animations": {
+	"Bark": {
+		"bones": {
+			"Back": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.6666,
+						"angle": -2.08,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				],
+				"translate": [
+					{
+						"time": 0,
+						"x": -10.05,
+						"y": -130.72,
+						"curve": [ 0.139, 0, 0.798, 1 ]
+					},
+					{
+						"time": 1.6666,
+						"x": 12.57,
+						"y": -13.87,
+						"curve": [ 0.139, 0, 0.798, 1 ]
+					},
+					{ "time": 3.3333, "x": -10.05, "y": -130.72 }
+				]
+			},
+			"Head": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.27, 0, 0.618, 0.41 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": 38.29,
+						"curve": [ 0.317, 0.28, 0.668, 0.67 ]
+					},
+					{
+						"time": 0.7333,
+						"angle": 9.11,
+						"curve": [ 0.382, 0.55, 0.739, 1 ]
+					},
+					{
+						"time": 1.1666,
+						"angle": -3.16,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				],
+				"translate": [
+					{ "time": 0, "x": 0, "y": 0, "curve": "stepped" },
+					{ "time": 1.1666, "x": 0, "y": 0, "curve": "stepped" },
+					{ "time": 3.3333, "x": 0, "y": 0 }
+				],
+				"scale": [
+					{ "time": 0, "x": 1, "y": 1, "curve": "stepped" },
+					{ "time": 1.1666, "x": 1, "y": 1, "curve": "stepped" },
+					{ "time": 3.3333, "x": 1, "y": 1 }
+				]
+			},
+			"Back Ear": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.295, 0, 0.632, 0.36 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": 21.43,
+						"curve": [ 0.307, 0.23, 0.646, 0.58 ]
+					},
+					{
+						"time": 0.7333,
+						"angle": -1.44,
+						"curve": [ 0.347, 0.38, 0.757, 1 ]
+					},
+					{
+						"time": 2.3333,
+						"angle": -5.66,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Front Ear": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.287, 0, 0.627, 0.37 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": -5.16,
+						"curve": [ 0.315, 0.26, 0.757, 1 ]
+					},
+					{
+						"time": 1.8333,
+						"angle": -2.89,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Frill": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.264, 0, 0.617, 0.42 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": -29.97,
+						"curve": [ 0.327, 0.31, 0.684, 0.72 ]
+					},
+					{
+						"time": 0.7333,
+						"angle": 6.14,
+						"curve": [ 0.38, 0.59, 0.726, 1 ]
+					},
+					{
+						"time": 1,
+						"angle": 7.71,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Nose Bottom": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.284, 0, 0.625, 0.38 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": -0.37,
+						"curve": [ 0.308, 0.25, 0.65, 0.61 ]
+					},
+					{
+						"time": 0.7333,
+						"angle": 6.35,
+						"curve": [ 0.368, 0.46, 0.753, 1 ]
+					},
+					{
+						"time": 1.6666,
+						"angle": -2.85,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Nose Top": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.284, 0, 0.625, 0.38 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": 28.26,
+						"curve": [ 0.308, 0.25, 0.65, 0.61 ]
+					},
+					{
+						"time": 0.7333,
+						"angle": 4.03,
+						"curve": [ 0.368, 0.46, 0.753, 1 ]
+					},
+					{
+						"time": 1.6666,
+						"angle": -3.58,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Tail1": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.275, 0, 0.62, 0.4 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": -27.26,
+						"curve": [ 0.333, 0.33, 0.757, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": 13.3,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Tail2": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.275, 0, 0.62, 0.4 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": -5.79,
+						"curve": [ 0.333, 0.33, 0.757, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": -5.46,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Tail3": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.275, 0, 0.62, 0.4 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": -10.67,
+						"curve": [ 0.333, 0.33, 0.757, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": -6.74,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Tail4": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.275, 0, 0.62, 0.4 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": 0.95,
+						"curve": [ 0.333, 0.33, 0.757, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": 7.01,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Tail5": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.275, 0, 0.62, 0.4 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": 25.48,
+						"curve": [ 0.333, 0.33, 0.757, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": 34.65,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Tail6": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.275, 0, 0.62, 0.4 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": 5.73,
+						"curve": [ 0.333, 0.33, 0.757, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": 11.3,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Thigh (Rear Leg Front)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.284, 0, 0.625, 0.38 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": 11.82,
+						"curve": [ 0.32, 0.28, 0.757, 1 ]
+					},
+					{
+						"time": 1.6666,
+						"angle": -1.86,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Shin (Rear Leg Front)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.284, 0, 0.625, 0.38 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": -30.03,
+						"curve": [ 0.32, 0.28, 0.757, 1 ]
+					},
+					{
+						"time": 1.6666,
+						"angle": 10.89,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Foot (Rear Leg Front)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.284, 0, 0.625, 0.38 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": 10.67,
+						"curve": [ 0.32, 0.28, 0.757, 1 ]
+					},
+					{
+						"time": 1.6666,
+						"angle": -13.51,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Thigh (Rear Leg Back)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.28, 0, 0.622, 0.39 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": 5.81,
+						"curve": [ 0.326, 0.3, 0.757, 1 ]
+					},
+					{
+						"time": 1.5,
+						"angle": -2.82,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Shin (Rear Leg Back)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.28, 0, 0.622, 0.39 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": -19.07,
+						"curve": [ 0.326, 0.3, 0.757, 1 ]
+					},
+					{
+						"time": 1.5,
+						"angle": 15.25,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Foot (Rear Leg Back)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.28, 0, 0.622, 0.39 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": 22.92,
+						"curve": [ 0.326, 0.3, 0.757, 1 ]
+					},
+					{
+						"time": 1.5,
+						"angle": -10.93,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Shoulder (Foreleg Front)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.275, 0, 0.62, 0.4 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": 19.45,
+						"curve": [ 0.333, 0.33, 0.757, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": 0.1,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Shin (Foreleg Front)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.275, 0, 0.62, 0.4 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": -26.35,
+						"curve": [ 0.333, 0.33, 0.757, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": 0.53,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Foot (Foreleg Front)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.275, 0, 0.62, 0.4 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": 6.03,
+						"curve": [ 0.333, 0.33, 0.757, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": -11.27,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Shoulder (Foreleg Front)2": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.287, 0, 0.627, 0.37 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": 3.3,
+						"curve": [ 0.315, 0.26, 0.757, 1 ]
+					},
+					{
+						"time": 1.8333,
+						"angle": 0.5,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Shin (Foreleg Back)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.287, 0, 0.627, 0.37 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": 10.19,
+						"curve": [ 0.315, 0.26, 0.757, 1 ]
+					},
+					{
+						"time": 1.8333,
+						"angle": -3.75,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Foot (Foreleg Back)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.287, 0, 0.627, 0.37 ]
+					},
+					{
+						"time": 0.3333,
+						"angle": 21.91,
+						"curve": [ 0.315, 0.26, 0.757, 1 ]
+					},
+					{
+						"time": 1.8333,
+						"angle": -13.26,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Rear": {
+				"rotate": [
+					{ "time": 0, "angle": 0 },
+					{ "time": 0.3333, "angle": 7.95 },
+					{ "time": 3.3333, "angle": 0 }
+				]
+			}
+		}
+	},
+	"Idle": {
+		"bones": {
+			"Back": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.6666,
+						"angle": -2.08,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				],
+				"translate": [
+					{
+						"time": 0,
+						"x": -10.05,
+						"y": -130.72,
+						"curve": [ 0.139, 0, 0.798, 1 ]
+					},
+					{
+						"time": 1.6666,
+						"x": 12.57,
+						"y": -13.87,
+						"curve": [ 0.139, 0, 0.798, 1 ]
+					},
+					{ "time": 3.3333, "x": -10.05, "y": -130.72 }
+				]
+			},
+			"Head": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.1666,
+						"angle": -3.16,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				],
+				"translate": [
+					{ "time": 0, "x": 0, "y": 0, "curve": "stepped" },
+					{ "time": 1.1666, "x": 0, "y": 0, "curve": "stepped" },
+					{ "time": 3.3333, "x": 0, "y": 0 }
+				],
+				"scale": [
+					{ "time": 0, "x": 1, "y": 1, "curve": "stepped" },
+					{ "time": 1.1666, "x": 1, "y": 1, "curve": "stepped" },
+					{ "time": 3.3333, "x": 1, "y": 1 }
+				]
+			},
+			"Back Ear": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 2.3333,
+						"angle": -5.66,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Front Ear": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.8333,
+						"angle": -2.89,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Frill": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1,
+						"angle": 7.71,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Nose Bottom": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.6666,
+						"angle": -2.85,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Nose Top": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.6666,
+						"angle": -3.58,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Tail1": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": 13.3,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Tail2": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": -5.46,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Tail3": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": -6.74,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Tail4": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": 7.01,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Tail5": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": 34.65,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Tail6": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": 11.3,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Thigh (Rear Leg Front)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.6666,
+						"angle": -1.86,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Shin (Rear Leg Front)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.6666,
+						"angle": 10.89,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Foot (Rear Leg Front)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.6666,
+						"angle": -13.51,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Thigh (Rear Leg Back)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.5,
+						"angle": -2.82,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Shin (Rear Leg Back)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.5,
+						"angle": 15.25,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Foot (Rear Leg Back)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.5,
+						"angle": -10.93,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Shoulder (Foreleg Front)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": 0.1,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Shin (Foreleg Front)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": 0.53,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Foot (Foreleg Front)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.3333,
+						"angle": -11.27,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Shoulder (Foreleg Front)2": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.8333,
+						"angle": 0.5,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Shin (Foreleg Back)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.8333,
+						"angle": -3.75,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			},
+			"Foot (Foreleg Back)": {
+				"rotate": [
+					{
+						"time": 0,
+						"angle": 0,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{
+						"time": 1.8333,
+						"angle": -13.26,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 3.3333, "angle": 0 }
+				]
+			}
+		}
+	}
+}
+}
