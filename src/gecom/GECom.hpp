@@ -27,7 +27,7 @@ namespace gecom {
 
 	// real std::make_unique is c++14, so this will do for the moment
 	template <typename T, typename... ArgTR>
-	std::unique_ptr<T> make_unique(ArgTR && ...args) {
+	inline std::unique_ptr<T> make_unique(ArgTR && ...args) {
 		return std::unique_ptr<T>(new T(std::forward<ArgTR>(args)...));
 	}
 	
