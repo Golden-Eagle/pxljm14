@@ -21,6 +21,7 @@ SET(GECOM_HEADERS
 	State.hpp
 	Resource.hpp
 	Config.hpp
+	SnapIn.hpp
 
 	json11.hpp
 )
