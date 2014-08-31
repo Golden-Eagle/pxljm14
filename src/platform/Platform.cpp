@@ -6,6 +6,7 @@
 #include <gecom/Window.hpp>
 #include <gecom/Resource.hpp>
 #include <gecom/Config.hpp>
+#include <gecom/Game.hpp>
 #include <gecom/State.hpp>
 #include <gecom/Concurrent.hpp>
 
@@ -162,11 +163,8 @@ int main() {
 		}
 	}
 
-	StateManager sm;
-	sm.init<StartupState>(42);
-	while (!sm.done()) {
-		sm.update();
-		sm.draw();
-	}
 
+	Game platform_game;
+	platform_game.init<StartupState>(42);
+	platform_game.run();
 }
