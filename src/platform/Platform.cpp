@@ -1,8 +1,13 @@
 
+#include <thread>
+#include <chrono>
+#include <iostream>
+
 #include <gecom/Window.hpp>
 #include <gecom/Resource.hpp>
 #include <gecom/Config.hpp>
 #include <gecom/State.hpp>
+#include <gecom/Concurrent.hpp>
 
 using namespace gecom;
 using namespace std;
@@ -127,6 +132,35 @@ public:
 
 
 int main() {
+
+	Event<int> e1;
+
+	// test auto-cancel on subscription destruction
+	{
+		auto sub1 = e1.subscribe([](int a) {
+			cout << "Event happened: " << a << endl;
+			return false;
+		});
+		e1.notify(42);
+		e1.notify(43);
+	}
+	// you wont see this
+	e1.notify(44);
+
+	// test safe cancel after event destruction
+	{
+		// when this goes out of scope nothing breaks
+		subscription sub2;
+		{
+			Event<int> e2;
+			sub2 = e2.subscribe([](int a) {
+				cout << "Other event happened: " << a << endl;
+				return false;
+			});
+			e2.notify(9001);
+			e2.notify(9002);
+		}
+	}
 
 	StateManager sm;
 	sm.init<StartupState>(42);
