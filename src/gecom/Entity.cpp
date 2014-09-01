@@ -1,5 +1,6 @@
 
 #include <atomic>
+#include <cstdint>
 #include <memory>
 #include <vector>
 
@@ -7,7 +8,7 @@
 
 namespace gecom {
 
-	std::atomic< int > Entity::sm_ID( 1 );
+	std::atomic< Entity::entity_id_t > Entity::sm_ID(1);
 
 	void Entity::initiliseID() {
 		if ( m_ID == 0 ) {
@@ -22,7 +23,7 @@ namespace gecom {
 		}
 	}
 
-	int Entity::getID() {
+	Entity::entity_id_t Entity::getID() {
 		initiliseID();
 		return m_ID;
 	}
