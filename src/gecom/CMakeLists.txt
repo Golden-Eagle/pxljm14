@@ -6,6 +6,7 @@ SET(GECOM_SOURCES
 	Concurrent.cpp
 	Window.cpp
 	Chrono.cpp
+	Entity.cpp
 	
 	json11.cpp
 )
@@ -22,6 +23,7 @@ SET(GECOM_HEADERS
 	Resource.hpp
 	Config.hpp
 	EngineComponent.hpp
+	Entity.hpp
 
 	json11.hpp
 )
