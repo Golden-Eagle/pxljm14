@@ -54,8 +54,11 @@ namespace gecom {
 
 	};
 
-	// TODO redocument
-	// as thread-safe as the cancellation function.
+	// generic subscription class. wraps a cancellation function, and automatically
+	// calls it when destroyed. individual subscription objects should not be shared
+	// between threads, but cancellation itself is as threadsafe as the supplied function.
+	// in the case of Event classes, cancellation is threadsafe, and does not require
+	// the event to not have been deleted.
 	class subscription {
 	public:
 		using cancel_t = std::function<bool()>;
@@ -64,10 +67,10 @@ namespace gecom {
 		cancel_t m_cancel;
 
 	public:
-		// default ctor, has no cancellation function
+		// default ctor: has no cancellation function
 		inline subscription() { }
 
-		// used by event
+		// ctor: provide cancellation function
 		inline subscription(const cancel_t &cancel_) : m_cancel(cancel_) { }
 
 		// not copyable
@@ -88,12 +91,21 @@ namespace gecom {
 		// returns true iff cancellation actually happened.
 		inline bool cancel() {
 			if (m_cancel) {
-				return m_cancel();
+				bool r = m_cancel();
+				m_cancel = cancel_t();
+				return r;
 			}
 			return false;
 		}
 
-		// dtor: automatically relinquishes responsiblity for detaching; see release()
+		// remove the cancellation function (if any) without calling it.
+		// in the case of Event subscriptions, the associated observer can no longer
+		// be detached; it will live as long as the event does.
+		inline void forever() {
+			m_cancel = cancel_t();
+		}
+
+		// dtor: cancel current subscription (if any)
 		inline ~subscription() {
 			cancel();
 		}
