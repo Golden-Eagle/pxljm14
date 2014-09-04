@@ -143,6 +143,13 @@ int main() {
 	ShaderManager shaderman("./res/shader");
 	shaderman.getProgram("showtex.glsl");
 
+	// make an error
+	try {
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 9001);
+	} catch (gl_error &e) {
+		log() << "DID I JUST CATCH A GL ERROR?";
+	}
+
 	Event<int> e1;
 
 	// test auto-cancel on subscription destruction

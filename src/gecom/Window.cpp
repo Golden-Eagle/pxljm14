@@ -2,12 +2,16 @@
 #include <cstdlib>
 #include <map>
 #include <bitset>
+#include <sstream>
 
 #include "Window.hpp"
+
+using namespace std;
 
 namespace gecom {
 
 	namespace {
+
 		struct WindowData {
 			Window *window;
 			GLEWContext context;
@@ -178,7 +182,7 @@ namespace gecom {
 			win->onChar.notify(e);
 		}
 
-		void callbackError(int error, const char *description) {
+		void callbackErrorGLFW(int error, const char *description) {
 			gecom::log("GLFW").error() << "Error " << error << " : " << description;
 		}
 
@@ -188,9 +192,9 @@ namespace gecom {
 		void init_glfw() {
 			static bool done = false;
 			if (!done) {
-				gecom::log("Window") % 0 << "GLFW initialising...";
+				gecom::log("Window") << "GLFW initialising...";
 				// this is safe to call before glfwInit()
-				glfwSetErrorCallback(callbackError);
+				glfwSetErrorCallback(callbackErrorGLFW);
 				if (!glfwInit()) {
 					gecom::log("Window").error() << "GLFW initialisation failed";
 					// screw catching this, ever
@@ -199,6 +203,114 @@ namespace gecom {
 				gecom::log("Window") % 0 << "GLFW initialised";
 				done = true;
 			}
+		}
+
+		// GL callback for debug information
+		void APIENTRY callbackDebugGL(
+			GLenum source,
+			GLenum type,
+			GLuint id,
+			GLenum severity,
+			GLsizei length,
+			const GLchar *message,
+			void *userParam
+		){
+			// enum documentation:
+			// https://www.opengl.org/sdk/docs/man4/html/glDebugMessageControl.xhtml
+			
+			// message source within GL -> log source
+			string log_source = "GL";
+			switch (source) {
+			case GL_DEBUG_SOURCE_API:
+				log_source = "GL:API";
+				break;
+			case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+				log_source = "GL:Window";
+				break;
+			case GL_DEBUG_SOURCE_SHADER_COMPILER:
+				log_source = "GL:Shader";
+				break;
+			case GL_DEBUG_SOURCE_THIRD_PARTY:
+				log_source = "GL:ThirdParty";
+				break;
+			case GL_DEBUG_SOURCE_APPLICATION:
+				log_source = "GL:App";
+				break;
+			case GL_DEBUG_SOURCE_OTHER:
+				log_source = "GL:Other";
+				break;
+			default:
+				break;
+			}
+
+			// piecewise construct log message
+			auto logs = log(log_source);
+			bool exceptional = false;
+
+			// message type -> log type
+			switch (type) {
+			case GL_DEBUG_TYPE_ERROR:
+				logs.error();
+				logs << "Error";
+				exceptional = true;
+				break;
+			case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+				logs.warning();
+				logs << "Deprecated Behaviour";
+				break;
+			case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+				logs.warning();
+				logs << "Undefined Behaviour";
+				break;
+			case GL_DEBUG_TYPE_PORTABILITY:
+				logs.warning();
+				logs << "Portability";
+				break;
+			case GL_DEBUG_TYPE_PERFORMANCE:
+				logs.warning();
+				logs << "Performance";
+				break;
+			case GL_DEBUG_TYPE_MARKER:
+				logs << "Marker";
+				break;
+			case GL_DEBUG_TYPE_PUSH_GROUP:
+				logs << "Push Group";
+				break;
+			case GL_DEBUG_TYPE_POP_GROUP:
+				logs << "Pop Group";
+				break;
+			case GL_DEBUG_TYPE_OTHER:
+				logs << "Other";
+				break;
+			}
+
+			// severity -> log verbosity
+			switch (severity) {
+			case GL_DEBUG_SEVERITY_NOTIFICATION:
+				logs % 2;
+				break;
+			case GL_DEBUG_SEVERITY_LOW:
+				logs % 2;
+				break;
+			case GL_DEBUG_SEVERITY_MEDIUM:
+				logs % 1;
+				break;
+			case GL_DEBUG_SEVERITY_HIGH:
+				logs % 0;
+				break;
+			}
+
+			// actual message. id = as returned by glGetError()
+			ostringstream oss;
+			oss << " [" << id << "] : " << message;
+			logs << oss.str();
+			
+#ifndef GECOM_GL_NO_EXCEPTIONS
+			if (exceptional) {
+				throw gl_error(oss.str());
+			}
+#endif
+
 		}
 
 	}
@@ -239,7 +351,7 @@ namespace gecom {
 		glfwMakeContextCurrent(m_handle);
 		// init glew
 		if (!m_glew_init_done) {
-			gecom::log("Window") % 0 << "GLEW initialising...";
+			gecom::log("Window") << "GLEW initialising...";
 			glewExperimental = true;
 			GLenum glew_err = glewInit();
 			//GLenum t_err = glGetError();
@@ -250,13 +362,34 @@ namespace gecom {
 				glfwTerminate();
 				std::abort();
 			}
-			// clear any GL error from glew init
+			// clear any GL errors from glew init
 			GLenum gl_err = glGetError();
-			gecom::log("Window") << "GLEW initialistion left GL error " << gl_err;
+			while (gl_err) {
+				gecom::log("Window") << "GLEW initialistion left GL error " << gl_err;
+				gl_err = glGetError();
+			}
 			//gecom::log("Window") << "GL Error: " << gluErrorString(gl_err);
 			gecom::log("Window") << "GL version string: " << glGetString(GL_VERSION);
 			gecom::log("Window") % 0 << "GLEW initialised";
 			m_glew_init_done = true;
+			// enable GL_ARB_debug_output if available
+			if (glfwExtensionSupported("GL_ARB_debug_output")) {
+				// this allows the error location to be determined from a stacktrace
+				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+				// set the callback
+				glDebugMessageCallback(callbackDebugGL, this);
+				glDebugMessageControl(
+					GL_DONT_CARE,
+					GL_DONT_CARE,
+					GL_DONT_CARE,
+					0,
+					nullptr,
+					true
+				);
+				log("Window") << "GL debug callback installed";
+			} else {
+				log("Window") << "GL_ARB_debug_output not available";
+			}
 		}
 	}
 

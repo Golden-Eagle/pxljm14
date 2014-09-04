@@ -4,6 +4,9 @@
  *
  */
 
+// define GECOM_GL_NO_EXCEPTIONS globally
+// to prevent GL debug callbacks from throwing exceptions
+
 #ifndef GECOM_WINDOW_HPP
 #define GECOM_WINDOW_HPP
 
@@ -37,7 +40,7 @@ namespace gecom {
 	inline void checkFB() {
 		GLenum err = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
 		if (err != GL_FRAMEBUFFER_COMPLETE) {
-			gecom::log("GL").error() << "Framebuffer status: (" << err << ")" << gluErrorString(err);
+			gecom::log("GL").error() << "Framebuffer status: " << err;
 			gecom::log("GL").error() << "YOU BROKE THE FRAMEBUFFER!";
 			throw std::runtime_error("OH NOES! THE FRAMEBUFFER IS BROKED");
 		}
@@ -51,6 +54,12 @@ namespace gecom {
 			throw std::runtime_error("unsupported extension");
 		}
 	}
+
+	// exception thrown by GL debug callback on error if GECOM_GL_NO_EXCEPTIONS is not defined
+	class gl_error : public std::runtime_error {
+	public:
+		gl_error(const std::string &what_ = "GL error") : runtime_error(what_) { }
+	};
 
 	//
 	// Point2
@@ -320,6 +329,10 @@ namespace gecom {
 			m_hints[GLFW_OPENGL_FORWARD_COMPAT] = true;
 			m_hints[GLFW_SAMPLES] = 0;
 			m_hints[GLFW_VISIBLE] = false;
+#ifndef NDEBUG
+			// hint for debug context in debug build
+			m_hints[GLFW_OPENGL_DEBUG_CONTEXT] = true;
+#endif
 		}
 
 		inline create_window_args & width(int w) { m_size.w = w; return *this; }
