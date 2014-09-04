@@ -189,11 +189,13 @@ namespace gecom {
 			static bool done = false;
 			if (!done) {
 				gecom::log("Window") % 0 << "GLFW initialising...";
+				// this is safe to call before glfwInit()
+				glfwSetErrorCallback(callbackError);
 				if (!glfwInit()) {
 					gecom::log("Window").error() << "GLFW initialisation failed";
-					throw window_error("GLFW initialisation failed");
+					// screw catching this, ever
+					std::abort();
 				}
-				glfwSetErrorCallback(callbackError);
 				gecom::log("Window") % 0 << "GLFW initialised";
 				done = true;
 			}
@@ -240,8 +242,8 @@ namespace gecom {
 			gecom::log("Window") % 0 << "GLEW initialising...";
 			glewExperimental = true;
 			GLenum glew_err = glewInit();
-			GLenum t_err = glGetError();
-			gecom::log("Window") << "GLEW t_err: " << t_err;
+			//GLenum t_err = glGetError();
+			//gecom::log("Window") << "GLEW t_err: " << t_err;
 			gecom::log("Window") << "GLEW initialisation returned " << glew_err;
 			if (glew_err != GLEW_OK) {
 				gecom::log("Window").error() << "GLEW initialisation failed: " << glewGetErrorString(glew_err);
@@ -251,7 +253,7 @@ namespace gecom {
 			// clear any GL error from glew init
 			GLenum gl_err = glGetError();
 			gecom::log("Window") << "GLEW initialistion left GL error " << gl_err;
-			gecom::log("Window") << "GL Error: " << gluErrorString(gl_err);
+			//gecom::log("Window") << "GL Error: " << gluErrorString(gl_err);
 			gecom::log("Window") << "GL version string: " << glGetString(GL_VERSION);
 			gecom::log("Window") % 0 << "GLEW initialised";
 			m_glew_init_done = true;
@@ -291,8 +293,8 @@ namespace gecom {
 		gecom::log("Window") % 0 << "GLFW creating window... [title=" << m_title << "]";
 		init_glfw();
 		glfwDefaultWindowHints();
-		GLenum gl_err = glGetError();
-		gecom::log("Window") % 0 << "GLerror: " << gl_err;
+		//GLenum gl_err = glGetError();
+		//gecom::log("Window") % 0 << "GLerror: " << gl_err;
 		for (auto me : m_hints) {
 			glfwWindowHint(me.first, me.second);
 		}
