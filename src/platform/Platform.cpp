@@ -9,6 +9,7 @@
 #include <gecom/Game.hpp>
 #include <gecom/State.hpp>
 #include <gecom/Concurrent.hpp>
+#include <gecom/Shader.hpp>
 
 using namespace gecom;
 using namespace std;
@@ -20,7 +21,7 @@ using namespace std;
 class PauseState : public State<> {
 public:
 	virtual action_ptr updateForeground() override {
-		std::cout << "Pause: pause is a lie, exceptioning" << std::endl;
+		log("Pause").warning() << "pause is a lie, exceptioning";
 		throw std::runtime_error("fooled you!");
 	}
 };
@@ -28,7 +29,7 @@ public:
 class PlayState : public State<std::string> {
 public:
 	virtual void onInit() override {
-		std::cout << "NOW PLAYING" << std::endl;
+		log("Play") << "NOW PLAYING";
 	}
 	
 	virtual action_ptr updateForeground() override {
@@ -49,14 +50,14 @@ public:
 			if (s == "p") {
 				return callback(callAction<PauseState>(),
 					[](int r) {
-						std::cout << "Play: pause returned normally" << std::endl;
+						log("Play") << "pause returned normally";
 						return nullAction();
 					},
 					[this](const rethrow_t &rethrow) {
 						try {
 							rethrow();
 						} catch (std::exception &e) {
-							std::cout << "Play: pause exceptioned, returning 'error'" << std::endl;
+							log("Play").error() << "pause exceptioned, returning 'error'";
 							return returnAction("error");
 						}
 						return returnAction("");
@@ -85,15 +86,15 @@ public:
 		if (!std::cin.fail()) {
 			if (a == 1) return callback(callAction<PlayState>(),
 				[](const std::string &r) {
-					std::cout << "MainMenu: Play returned " << r << std::endl;
+					log("MainMenu") << "Play returned " << r;
 					if (r == "error") {
-						std::cout << "MainMenu: play returned 'error', exceptioning" << std::endl;
+						log("MainMenu") << "Play returned 'error', exceptioning";
 						throw std::runtime_error("thrown by a callback from an action returned by an exception handler");
 					}
 					return nullAction();
 				},
 				[](const rethrow_t &rethrow) {
-					std::cout << "MainMenu: I CANT HANDLE THIS!" << std::endl;
+					log("MainMenu").warning() << "I CANT HANDLE THIS!" << std::endl;
 					return nullAction();
 					// note - this will not stop main menu from being popped
 				}
@@ -114,7 +115,7 @@ public:
 	virtual action_ptr updateForeground() override {
 		return callback(callAction<MainMenuState>(9001, "hello world"),
 			[this](const int &r) {
-				std::cout << "Startup: MainMenu returned " << r << std::endl;
+				log("Startup") << "MainMenu returned " << r;
 				return returnAction(0);
 				// now, think about what happens if you return a callAction() from a callback...
 			},
@@ -122,7 +123,7 @@ public:
 				try {
 					rethrow();
 				} catch (std::exception &e) {
-					std::cout << "Startup: BUT I CAN!: exception: " << e.what() << std::endl;
+					log("Startup") << "BUT I CAN!: exception: " << e.what();
 				}
 				return returnAction(1);
 			}
@@ -134,12 +135,20 @@ public:
 
 int main() {
 
+	AsyncExecutor::start();
+
+	Window *win = createWindow();
+	win->makeContextCurrent();
+
+	ShaderManager shaderman("./res/shader");
+	shaderman.getProgram("showtex.glsl");
+
 	Event<int> e1;
 
 	// test auto-cancel on subscription destruction
 	{
 		auto sub1 = e1.subscribe([](int a) {
-			cout << "Event happened: " << a << endl;
+			log() << "Event happened: " << a;
 			return false;
 		});
 		e1.notify(42);
@@ -155,7 +164,7 @@ int main() {
 		{
 			Event<int> e2;
 			sub2 = e2.subscribe([](int a) {
-				cout << "Other event happened: " << a << endl;
+				log() << "Other event happened: " << a;
 				return false;
 			});
 			e2.notify(9001);
@@ -167,4 +176,6 @@ int main() {
 	Game platform_game;
 	platform_game.init<StartupState>(42);
 	platform_game.run();
+
+	AsyncExecutor::stop();
 }

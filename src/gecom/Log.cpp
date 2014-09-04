@@ -169,25 +169,24 @@ namespace gecom {
 		std::string ts = std::string(ctime(&tt));
 		ts.pop_back();
 
+		// prepare the header
 		std::ostringstream ss;
 		ss << ts;
 		ss << " [" << std::setw(15) << source << "] ";
 		ss << std::setw(11) << typestr[type] << " : ";
 
-		if (msg.find_first_of("\r\n") != std::string::npos) {
-			// msg contains a CR or LF - start on a new line
+		if (msg.find_first_of("\r\n") != std::string::npos || msg.length() > 50) {
+			// message contains a CR or LF or is longer than 50 characters, start on a new line
 			ss << std::endl;
 		}
 
-		ss << msg;
-
 		// write to stderr and stdout
-		m_cerr->write(verbosity, type, ss.str());
-		m_cout->write(verbosity, type, ss.str());
+		m_cerr->write(verbosity, type, ss.str(), msg);
+		m_cout->write(verbosity, type, ss.str(), msg);
 
 		// write to all others
 		for (LogOutput *out : m_outputs) {
-			out->write(verbosity, type, ss.str());
+			out->write(verbosity, type, ss.str(), msg);
 		}
 		
 	}

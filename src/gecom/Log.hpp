@@ -52,7 +52,7 @@ namespace gecom {
 
 	protected:
 		// this is responsible for newlines
-		virtual void write_impl(unsigned verbosity, unsigned type, const std::string &str) = 0;
+		virtual void write_impl(unsigned verbosity, unsigned type, const std::string &hdr, const std::string &msg) = 0;
 
 	public:
 		LogOutput(bool mute_ = false) : m_mute(mute_) { }
@@ -73,8 +73,8 @@ namespace gecom {
 			m_mute = b;
 		}
 
-		inline void write(unsigned verbosity, unsigned type, const std::string &str) {
-			if (!m_mute && verbosity <= m_verbosity) write_impl(verbosity, type, str);
+		inline void write(unsigned verbosity, unsigned type, const std::string &hdr, const std::string &msg) {
+			if (!m_mute && verbosity <= m_verbosity) write_impl(verbosity, type, hdr, msg);
 		}
 
 		virtual ~LogOutput() { }
@@ -127,8 +127,8 @@ namespace gecom {
 		std::ostream *m_out;
 
 	protected:
-		virtual void write_impl(unsigned, unsigned, const std::string &str) override {
-			(*m_out) << str << std::endl;
+		virtual void write_impl(unsigned, unsigned, const std::string &hdr, const std::string &msg) override {
+			(*m_out) << hdr << msg << std::endl;
 		}
 
 		inline std::ostream & getStream() {
@@ -142,7 +142,7 @@ namespace gecom {
 	// log output for writing to std::cout or std::cerr (as they are the only streams with reliable color support)
 	class ColoredStreamLogOutput : public StreamLogOutput {
 	protected:
-		virtual void write_impl(unsigned verbosity, unsigned type, const std::string &str) override {
+		virtual void write_impl(unsigned verbosity, unsigned type, const std::string &hdr, const std::string &msg) override {
 			std::ostream &out = getStream();
 			using namespace std;
 			if (verbosity == 0) {
@@ -152,7 +152,7 @@ namespace gecom {
 				case Log::error:
 					out << termcolor::boldRed; break;
 				default:
-					out << termcolor::boldCyan;
+					out << termcolor::boldGreen;
 				}
 			} else {
 				switch (type) {
@@ -161,11 +161,12 @@ namespace gecom {
 				case Log::error:
 					out << termcolor::red; break;
 				default:
-					out << termcolor::reset;
+					out << termcolor::green;
 				}
 			}
-			out << str;
+			out << hdr;
 			out << termcolor::reset;
+			out << msg;
 			out << endl;
 		}
 
