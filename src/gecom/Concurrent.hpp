@@ -100,7 +100,8 @@ namespace gecom {
 
 		// remove the cancellation function (if any) without calling it.
 		// in the case of Event subscriptions, the associated observer can no longer
-		// be detached; it will live as long as the event does.
+		// be detached from 'outside'; it will live as long as the event does, unless
+		// the observer function itself requests to be detached by returning true.
 		inline void forever() {
 			m_cancel = cancel_t();
 		}
