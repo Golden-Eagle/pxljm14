@@ -14,6 +14,8 @@
  *								- tess_control
  *								- tess_evaluation
  *
+ * These extra directives are processed regardless of #if etc.
+ *
  * The line numbers reported in compiler messages should be correct provided the compiler
  * follows the GLSL spec for the version in question regarding the #line directive.
  * The spec changed regarding this with GLSL 330 (to the best of my knowledge).
@@ -22,16 +24,17 @@
  *
  * @author Ben Allen
  *
- * TODO supply GLSL preprocessor definitions somehow
  * TODO suppose I link multiple frag shaders together, how do i tell them apart in program info log?
  * TODO better unload functions?
- * TODO #include, #shader and #version are processed regardless of #if etc
+ * TODO #include, #shader and #version are processed regardless of #if etc - probably wontfix
+ * TODO this code has gradually 'evolved' to the point that it's not very clean anymore
+ * TODO shader binaries with extension GL_ARB_get_program_binary ?
  *
  */
 
 //
 // If (eg with an AMD GPU) shader compilation fails regarding #line
-// #define AMBITION_SHADER_NO_LINE_DIRECTIVES
+// #define GECOM_SHADER_NO_LINE_DIRECTIVES
 // before including this file to prevent #line directives.
 // This will mean line numbers will not be correct.
 //
@@ -46,13 +49,20 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <set>
+#include <map>
 #include <algorithm>
 #include <stdexcept>
+#include <chrono>
+#include <mutex>
 
-#include "Window.hpp"
+#include "GECom.hpp"
+#include "GL.hpp"
 #include "Log.hpp"
 
 namespace gecom {
+
+	class ShaderManager;
 
 	class shader_error : public std::runtime_error {
 	public:
@@ -156,66 +166,129 @@ namespace gecom {
 		printProgramInfoLog(prog, false);
 	}
 
-	struct shader_version {
-		unsigned id;
-		std::string profile;
+	class shader_profile {
+	public:
+		unsigned version;
+		std::string name;
 		
-		inline explicit shader_version(unsigned id_, std::string profile_ = "") : id(id_), profile(profile_) { }
+		inline explicit shader_profile(unsigned version_, std::string name_ = "") : version(version_), name(name_) { }
 		
-		inline bool operator==(const shader_version &rhs) const {
-			return id == rhs.id && profile == rhs.profile;
+		inline bool operator==(const shader_profile &rhs) const {
+			return version == rhs.version && name == rhs.name;
 		}
 		
-		inline bool operator!=(const shader_version &rhs) const {
+		inline bool operator!=(const shader_profile &rhs) const {
 			return !(*this == rhs);
 		}
 		
-		inline friend std::ostream & operator<<(std::ostream &out, const shader_version &ver) {
-			out << ver.id;
-			if (!ver.profile.empty()) out << " " << ver.profile;
+		inline friend std::ostream & operator<<(std::ostream &out, const shader_profile &profile) {
+			out << profile.version;
+			if (!profile.name.empty()) out << " " << profile.name;
 			return out;
 		}
 	};
 
-	class ShaderManager {
+	class shader_program_spec {
+		friend class ShaderManager;
 	private:
-		// not copyable etc
-		ShaderManager(const ShaderManager &);
-		ShaderManager & operator=(const ShaderManager &);
+		std::set<std::string> m_sources;
+		std::map<std::string, std::string> m_definitions;
 
+		// cached information if this spec has already been compiled
+		const ShaderManager *m_shaderman = nullptr;
+		std::chrono::steady_clock::time_point m_timestamp;
+		GLuint m_prog;
+
+	public:
+		inline shader_program_spec & source(const std::string &name) {
+			// trim leading / trailing whitespace, internal is allowed
+			std::string name2 = trim(name);
+			if (!name2.empty()) {
+				m_sources.insert(name2);
+			}
+			return *this;
+		}
+
+		template <typename T>
+		inline shader_program_spec & define(const std::string &symbol, const T &value) {
+			// whitespace is not allowed in the symbol token
+			std::istringstream iss(symbol);
+			std::string symbol2;
+			iss >> symbol2;
+			if (!iss.fail()) {
+				std::ostringstream oss;
+				oss << value;
+				m_definitions[symbol2] = oss.str();
+			}
+			return *this;
+		}
+
+		inline shader_program_spec & define(const std::string &symbol) {
+			return define(symbol, "");
+		}
+
+		inline const std::set<std::string> & sources() const {
+			return m_sources;
+		}
+
+		inline const std::map<std::string, std::string> & definitions() const {
+			return m_definitions;
+		}
+
+		inline bool operator==(const shader_program_spec &other) const {
+			return m_sources == other.m_sources && m_definitions == other.m_definitions;
+		}
+
+		inline bool operator!=(const shader_program_spec &other) const {
+			return !(*this == other);
+		}
+
+		inline friend std::ostream & operator<<(std::ostream &out, const shader_program_spec &spec) {
+			std::ostringstream oss;
+			for (auto s : spec.sources()) {
+				oss << s << " ";
+			}
+			for (auto def : spec.definitions()) {
+				oss << "-D" << def.first;
+				if (!def.second.empty()) {
+					oss << "=" << def.second;
+				}
+				oss << " ";
+			}
+			out << trim(oss.str());
+			return out;
+		}
+
+	};
+
+	class ShaderManager : private Uncopyable {
+	private:
+		// shader cache entry
 		struct shader_t {
 			GLenum type;
 			std::string name;
+			std::map<std::string, std::string> defs;
 			GLuint id;
 		};
 
+		// program cache entry
 		struct program_t {
-			std::string cname;
+			shader_program_spec spec;
 			GLuint id;
 		};
+
+		// thread-safety
+		std::recursive_mutex m_mutex;
+
+		// timestamp to determine if external cached ids are valid
+		// set by ctor, reset by unload functions
+		std::chrono::steady_clock::time_point m_timestamp;
 
 		// TODO use more intelligent data structures (maps)
+		// that might be hard since it involves using a map as a key...
 		std::vector<std::string> m_shader_dirs;
-		std::vector<std::string> m_auto_link;
 		std::vector<shader_t> m_shaders;
 		std::vector<program_t> m_programs;
-
-		inline static void disassembleProgramName(const std::string &name, std::vector<std::string> &out) {
-			size_t i = 0;
-			while (i != std::string::npos) {
-				size_t j = name.find(';', i);
-				out.push_back(name.substr(i, j - i));
-				if (j != std::string::npos) j++;
-				i = j;
-			}
-		}
-
-		inline static std::string strip(const std::string &str) {
-			size_t offset = str.find_first_not_of(" \t\r\n");
-			if (offset == std::string::npos) return "";
-			size_t count = str.find_last_not_of(" \t\r\n") + 1 - offset;
-			return str.substr(offset, count);
-		}
 
 		inline static std::string shaderTypeString(GLenum type) {
 			switch (type) {
@@ -235,14 +308,14 @@ namespace gecom {
 		}
 		
 		// make a line directive string, using pre-330 behaviour
-		inline static std::string lineDirective(const shader_version &ver, unsigned line, unsigned source) {
+		inline static std::string lineDirective(const shader_profile &profile, unsigned line, unsigned source) {
 			// to set next line to 1
 			// by glsl-spec-1.30.8: #line 0
 			// by glsl-spec-4.20.8: #line 1
 			// changeover seems to be at version 330
 			std::ostringstream oss;
-#ifndef AMBITION_SHADER_NO_LINE_DIRECTIVES
-			if (ver.id < 330) {
+#ifndef GECOM_SHADER_NO_LINE_DIRECTIVES
+			if (profile.version < 330) {
 				oss << "#line " << line << " " << source;
 			} else {
 				oss << "#line " << (line + 1) << " " << source;
@@ -252,33 +325,9 @@ namespace gecom {
 		}
 
 	public:
-		// resolve duplicates, strip whitespace, ordering etc. does not account for auto-linking.
-		inline static std::string canonicalProgramName(const std::string &name) {
-			// remove duplicates and blanks
-			std::vector<std::string> names, names2;
-			disassembleProgramName(name, names);
-			for (auto it = names.cbegin(); it != names.cend(); it++) {
-				std::string name_stripped = strip(*it);
-				if (!name_stripped.empty()) {
-					// has non-whitespace
-					if (std::find(names2.cbegin(), names2.cend(), name_stripped) == names2.cend()) {
-						// not a dup
-						names2.push_back(name_stripped);
-					}
-				}
-			}
-			// need to sort to avoid permutations
-			std::sort(names2.begin(), names2.end());
-			std::string cname;
-			for (auto it = names2.cbegin(); it != names2.cend(); it++) {
-				(cname += *it) += ';';
-			}
-			if (cname.length() > 0) cname = cname.substr(0, cname.length() - 1);
-			return cname;
-		}
-
 		// assumed to always use '/' as separator
 		inline void addSourceDirectory(const std::string &dir) {
+			std::lock_guard<std::recursive_mutex> lock(m_mutex);
 			// FIXME more robust
 			if (dir[dir.length() - 1] == '/') {
 				m_shader_dirs.push_back(dir);
@@ -287,19 +336,14 @@ namespace gecom {
 			}
 		}
 
-		// dont use this
-		inline void autoLinkShader(const std::string &name) {
-			m_auto_link.push_back(strip(name));
-		}
-
-		std::string resolveSourcePath(const std::string &name) {
+		inline std::string resolveSourcePath(const std::string &name) {
+			std::lock_guard<std::recursive_mutex> lock(m_mutex);
 			// find file
 			for (auto it = m_shader_dirs.cbegin(); it != m_shader_dirs.cend(); it++) {
 				std::string path = *it + name;
-				std::ifstream ifs(path.c_str());
+				std::ifstream ifs(path);
 				if (ifs.good()) {
 					// found it
-					ifs.close();
 					return path;
 				}
 			}
@@ -314,22 +358,24 @@ namespace gecom {
 		// returns the version number from this file
 		// "" style includes are handled relative to the directory containing the shader being compiled
 		// <> style includes are handled relative to source directories known to the ShaderManager
-		inline shader_version preprocessShader(
+		inline shader_profile preprocessShader(
 			const std::string &path,
 			std::ostream &text_os,
 			std::vector<std::string> &source_names,
 			std::vector<GLenum> &shader_types,
 			std::ostream &log_os
 		) {
+			std::lock_guard<std::recursive_mutex> lock(m_mutex);
+
 			char cbuf[1024];
-			shader_version ver = shader_version(110);
+			shader_profile profile(110);
 			bool have_ver = false;
 			int source_id = source_names.size();
 			source_names.push_back(path);
 			int line_number = 1;
 
 			// open file
-			std::ifstream ifs(path.c_str());
+			std::ifstream ifs(path);
 			if (!ifs.good()) {
 				std::string msg;
 				msg += "Error opening file '";
@@ -359,42 +405,42 @@ namespace gecom {
 				if (std::sscanf(line.c_str(), " #version %d %s", &v, cbuf) == 1 && !have_ver) {
 					// deal with #version version-id
 					// this strips all #version directives, and only remembers the first
-					ver.id = v;
-					ver.profile = "";
+					profile.version = v;
+					profile.name = "";
 					have_ver = true;
 					// init line numbers
-					text_os << lineDirective(ver, line_number, source_id) << '\n';
+					text_os << lineDirective(profile, line_number, source_id) << '\n';
 
 				} else if (std::sscanf(line.c_str(), " #version %d %s", &v, cbuf) == 2 && !have_ver) {
 					// deal with #version version-id profile-name
 					// this strips all #version directives, and only remembers the first
-					ver.id = v;
-					ver.profile = cbuf;
+					profile.version = v;
+					profile.name = cbuf;
 					have_ver = true;
 					// init line numbers
-					text_os << lineDirective(ver, line_number, source_id) << '\n';
+					text_os << lineDirective(profile, line_number, source_id) << '\n';
 
 				} else if (std::sscanf(line.c_str(), " #include \"%[^\"]\"", cbuf) > 0) {
 					// deal with #include "..."
 					// the negated charset is C99
-					std::string path_inc = cwd + strip(cbuf);
-					shader_version ver_inc = preprocessShader(path_inc, text_os, source_names, shader_types, log_os);
-					if (ver != ver_inc) {
-						log_os << "WARNING: \n'" << path_inc << "' (version " << ver_inc
-							<< ") included by\n'" << path << "' (version " << ver << ")" << std::endl;
+					std::string path_inc = cwd + trim(cbuf);
+					shader_profile profile_inc = preprocessShader(path_inc, text_os, source_names, shader_types, log_os);
+					if (profile != profile_inc) {
+						log_os << "WARNING: \n'" << path_inc << "' (" << profile_inc
+							<< ") included by\n'" << path << "' (" << profile << ")" << std::endl;
 					}
-					text_os << lineDirective(ver, line_number, source_id) << '\n';
+					text_os << lineDirective(profile, line_number, source_id) << '\n';
 
 				} else if (std::sscanf(line.c_str(), " #include <%[^>]>", cbuf) > 0) {
 					// deal with #include <...>
 					// the negated charset is C99
 					std::string path_inc = resolveSourcePath(cbuf);
-					shader_version ver_inc = preprocessShader(path_inc, text_os, source_names, shader_types, log_os);
-					if (ver != ver_inc) {
-						log_os << "WARNING: \n'" << path_inc << "' (version " << ver_inc
-							<< ") included by\n'" << path << "' (version " << ver << ")" << std::endl;
+					shader_profile profile_inc = preprocessShader(path_inc, text_os, source_names, shader_types, log_os);
+					if (profile != profile_inc) {
+						log_os << "WARNING: \n'" << path_inc << "' (" << profile_inc
+							<< ") included by\n'" << path << "' (" << profile << ")" << std::endl;
 					}
-					text_os << lineDirective(ver, line_number, source_id) << '\n';
+					text_os << lineDirective(profile, line_number, source_id) << '\n';
 
 				} else if (std::sscanf(line.c_str(), " #shader %s", cbuf) > 0) {
 					// deal with #shader - specifies shader type to compile as
@@ -414,15 +460,18 @@ namespace gecom {
 
 				line_number++;
 			}
-			return ver;
+			return profile;
 		}
 
-		inline GLuint getShader(GLenum type, const std::string &name, bool force_type = false) {
-			std::string name_stripped = strip(name);
+		// compile shader or return cached shader id
+		inline GLuint shader(GLenum type, const std::string &name, const std::map<std::string, std::string> &definitions, bool force_type = false) {
+			std::lock_guard<std::recursive_mutex> lock(m_mutex);
+
+			std::string name_stripped = trim(name);
 
 			// is it already compiled?
 			for (auto it = m_shaders.cbegin(); it != m_shaders.cend(); it++) {
-				if (it->type == type && it->name == name_stripped) {
+				if (it->type == type && it->name == name_stripped && it->defs == definitions) {
 					// yes, return id
 					return it->id;
 				}
@@ -436,7 +485,7 @@ namespace gecom {
 			std::vector<std::string> source_names;
 			std::vector<GLenum> shader_types;
 			std::ostringstream log_os;
-			shader_version version = preprocessShader(path, text_os_main, source_names, shader_types, log_os);
+			shader_profile profile = preprocessShader(path, text_os_main, source_names, shader_types, log_os);
 			
 			if (!force_type && std::find(shader_types.cbegin(), shader_types.cend(), type) == shader_types.cend()) {
 				// type being compiled was not declared (and the type isnt being forced)
@@ -451,7 +500,7 @@ namespace gecom {
 					compile_log.warning();
 				}
 
-				compile_log << "Compiling " << shaderTypeString(type) << " (" << version << ") '" << path << "'..." << std::endl;
+				compile_log << "Compiling " << shaderTypeString(type) << " (" << profile << ") '" << path << "'..." << std::endl;
 
 				// display source string info
 				for (size_t i = 0; i < source_names.size(); i++) {
@@ -462,9 +511,9 @@ namespace gecom {
 				compile_log << log_os.str();
 			}
 			
-			// specify version and define type
+			// specify version / profile and define type
 			std::ostringstream text_os;
-			text_os << "#version " << version << '\n';
+			text_os << "#version " << profile << '\n';
 			switch(type) {
 			case GL_VERTEX_SHADER:
 				text_os << "#define _VERTEX_\n";
@@ -485,6 +534,11 @@ namespace gecom {
 				throw shader_error("Unknown shader type.");
 			}
 
+			// append supplied definitions
+			for (auto it = definitions.cbegin(); it != definitions.cend(); it++) {
+				text_os << "#define " << it->first << " " << it->second << "\n";
+			}
+
 			// append preprocessed source
 			text_os << text_os_main.str();
 			
@@ -495,28 +549,25 @@ namespace gecom {
 			shader_t shader;
 			shader.type = type;
 			shader.name = name_stripped;
+			shader.defs = definitions;
 			shader.id = id;
 			m_shaders.push_back(shader);
 			return id;
 		}
 
-		// name is a semicolon separated list of shader names
-		inline GLuint getProgram(const std::string &name) {
-			std::string full_name = name;
-			// assemble name including auto-links
-			for (auto it = m_auto_link.cbegin(); it != m_auto_link.cend(); it++) {
-				(full_name += ';') += *it;
-			}
-			return getProgramNoAutoLink(full_name);
-		}
+		// compile shader program or return cached program id
+		inline GLuint program(const shader_program_spec &spec) {
+			std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
-		// name is a semicolon separated list of shader names, no shaders will be automagically linked
-		inline GLuint getProgramNoAutoLink(const std::string & name) {
-			std::string cname = canonicalProgramName(name);
+			// is it cached in the spec object?
+			if (spec.m_shaderman == this && spec.m_timestamp > m_timestamp) {
+				// yes, and its valid (newer than last external cache invalidation)
+				return spec.m_prog;
+			}
 
 			// is it already linked?
 			for (auto it = m_programs.cbegin(); it != m_programs.cend(); it++) {
-				if (it->cname == cname) {
+				if (it->spec == spec) {
 					// yes, return id
 					return it->id;
 				}
@@ -524,18 +575,16 @@ namespace gecom {
 
 			// nope, compile as necessary then link
 			GLuint id = glCreateProgram();
-			std::vector<std::string> shader_names;
-			disassembleProgramName(cname, shader_names);
-			for (auto it = shader_names.cbegin(); it != shader_names.cend(); it++) {
+			for (auto it = spec.sources().cbegin(); it != spec.sources().cend(); it++) {
 				size_t i = it->find_last_of(".");
 				std::string ext = it->substr(i);
 				// if the ext is for a specific type, only compile as that type
 				if (ext == ".vert") {
-					glAttachShader(id, getShader(GL_VERTEX_SHADER, *it, true));
+					glAttachShader(id, shader(GL_VERTEX_SHADER, *it, spec.definitions(), true));
 				} else if (ext == ".frag") {
-					glAttachShader(id, getShader(GL_FRAGMENT_SHADER, *it, true));
+					glAttachShader(id, shader(GL_FRAGMENT_SHADER, *it, spec.definitions(), true));
 				} else if (ext == ".geom") {
-					glAttachShader(id, getShader(GL_GEOMETRY_SHADER, *it, true));
+					glAttachShader(id, shader(GL_GEOMETRY_SHADER, *it, spec.definitions(), true));
 				} else {
 					// unable to determine type from extension, try everything
 					static const std::vector<GLenum> types {
@@ -547,7 +596,7 @@ namespace gecom {
 					};
 					for (GLenum type : types) {
 						try {
-							glAttachShader(id, getShader(type, *it, false));
+							glAttachShader(id, shader(type, *it, spec.definitions(), false));
 						} catch (shader_type_error &e) {
 							// type wasnt declared in source, skip
 						}
@@ -555,20 +604,31 @@ namespace gecom {
 				}
 			}
 
-			log("ShaderMan") << "Linking shader program '" << cname << "'...";
+			log("ShaderMan") << "Linking shader program '" << spec << "'...";
 			linkShaderProgram(id);
 			log("ShaderMan") << "Shader program compiled and linked successfully.";
 
 			// cache it
 			program_t program;
-			program.cname = cname;
+			program.spec = spec;
 			program.id = id;
 			m_programs.push_back(program);
 			return id;
 		}
 
+		// compile shader program or return cached program id, caching id in the supplied spec
+		inline GLuint program(shader_program_spec &spec) {
+			std::lock_guard<std::recursive_mutex> lock(m_mutex);
+			GLuint prog = program(static_cast<const shader_program_spec &>(spec));
+			spec.m_prog = prog;
+			spec.m_shaderman = this;
+			spec.m_timestamp = std::chrono::steady_clock::now();
+			return prog;
+		}
+
 		// unload / delete all shaders and programs
 		inline void unloadAll() {
+			std::lock_guard<std::recursive_mutex> lock(m_mutex);
 			glUseProgram(0);
 			// delete programs
 			for (auto it = m_programs.cbegin(); it != m_programs.cend(); it++) {
@@ -581,20 +641,24 @@ namespace gecom {
 			// clear cache
 			m_shaders.clear();
 			m_programs.clear();
+			// set timestamp
+			m_timestamp = std::chrono::steady_clock::now();
 		}
 		
-		// get a vector of all loaded program names
-		std::vector<std::string> getLoadedProgramNames() {
-			std::vector<std::string> prog_names;
+		// get a vector of all loaded program spec(ification)s
+		std::vector<shader_program_spec> loadedProgramSpecs() {
+			std::lock_guard<std::recursive_mutex> lock(m_mutex);
+			std::vector<shader_program_spec> prog_specs;
 			for (const program_t & prog : m_programs) {
-				prog_names.push_back(prog.cname);
+				prog_specs.push_back(prog.spec);
 			}
-			return prog_names;
+			return prog_specs;
 		}
 
 		// ctor takes a source directory
 		inline ShaderManager(const std::string &dir) {
 			addSourceDirectory(dir);
+			m_timestamp = std::chrono::steady_clock::now();
 		}
 	};
 
