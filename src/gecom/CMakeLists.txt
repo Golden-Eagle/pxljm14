@@ -26,7 +26,7 @@ SET(GECOM_HEADERS
 	Entity.hpp
 	Render.hpp
 	Box2D.hpp
-
+	Scene.hpp
 	json11.hpp
 )
 
