@@ -136,23 +136,12 @@ public:
 };
 
 class SquareDrawableComponent : public DrawableComponent {
-	float verts[6] = {
-		0.0, 0.5f,
-		0.5f, -0.5f
-		-0.5f, -0.5f
-	};
-	GLuint vbo;
 public:
 	SquareDrawableComponent() {
-		glGenBuffers(1, &vbo);	
 	}
 	
 
 	void draw() {
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		// convert from local to world 
-		glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
 	}
 };
 
