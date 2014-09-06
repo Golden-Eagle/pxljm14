@@ -6,7 +6,6 @@ SET(GECOM_SOURCES
 	Concurrent.cpp
 	Window.cpp
 	Chrono.cpp
-	Entity.cpp
 	
 	json11.cpp
 )
