@@ -22,7 +22,6 @@ SET(GECOM_HEADERS
 	State.hpp
 	Resource.hpp
 	Config.hpp
-	EngineComponent.hpp
 	Entity.hpp
 	Render.hpp
 
@@ -33,7 +32,7 @@ add_library(gecom ${GECOM_SOURCES} ${GECOM_HEADERS})
 
 # list libs that must be linked with gecom
 # cryptopp ${CRYPTOPP_LIBRARIES}
-list(APPEND GECOM_LIBRARIES_impl glew ${GLEW_LIBRARIES} glfw ${GLFW_LIBRARIES})
+list(APPEND GECOM_LIBRARIES_impl glew ${GLEW_LIBRARIES} glfw ${GLFW_LIBRARIES} Box2D)
 if(WIN32)
 	# netcode, and cryptopp depends on wsock
 	list(APPEND GECOM_LIBRARIES_impl wsock32 ws2_32)

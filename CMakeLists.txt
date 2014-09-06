@@ -23,6 +23,10 @@ include_directories("${PROJECT_SOURCE_DIR}/ext/glfw-3.0.3/include")
 add_subdirectory("${PROJECT_SOURCE_DIR}/ext/glew-1.10.0" "${PROJECT_BINARY_DIR}/ext/glew")
 include_directories("${PROJECT_SOURCE_DIR}/ext/glew-1.10.0/include")
 
+# Box2D
+add_subdirectory("${PROJECT_SOURCE_DIR}/ext/box2d-2.3.1/Box2D" "${PROJECT_BINARY_DIR}/ext/box2d")
+include_directories("${PROJECT_SOURCE_DIR}/ext/box2d-2.3.1/Box2D")
+
 # CRYPTOPP
 # turned off because its not friendly in VS atm and we dont need it yet either
 #add_subdirectory("${PROJECT_SOURCE_DIR}/ext/cryptopp-5.6.2" "${PROJECT_BINARY_DIR}/ext/cryptopp")
@@ -30,6 +34,7 @@ include_directories("${PROJECT_SOURCE_DIR}/ext/glew-1.10.0/include")
 
 # GTEST
 add_subdirectory("${PROJECT_SOURCE_DIR}/ext/gtest" "${PROJECT_BINARY_DIR}/ext/gtest")
+
 
 # compiler flags 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")

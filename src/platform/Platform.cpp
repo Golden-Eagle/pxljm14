@@ -13,6 +13,7 @@
 #include <gecom/Render.hpp>
 #include <gecom/Scene.hpp>
 #include <gecom/Entity.hpp>
+#include <gecom/Box2D.hpp>
 
 using namespace gecom;
 using namespace std;
@@ -166,7 +167,7 @@ public:
 		myScene.add(e);
 
 		// some kind of call to game->render(myScene);
-		
+
 		return nullAction();
 	}
 };
@@ -179,10 +180,10 @@ int main() {
 
 	win->shaderManager()->addSourceDirectory("./res/shader");
 
-	// auto spec = shader_program_spec().source("showtex.glsl").define("MY_MACRO", 3);
+	auto spec = shader_program_spec().source("showtex.glsl").define("MY_MACRO", 3);
 
-	// win->shaderManager()->program(spec);
-	// win->shaderManager()->program(spec);
+	win->shaderManager()->program(spec);
+	win->shaderManager()->program(spec);
 
 	// // make an error
 	// try {
@@ -222,6 +223,7 @@ int main() {
 
 
 	Game platform_game;
+	platform_game.create<Box2DGameComponent>();
 	platform_game.init<TestState>();
 	platform_game.run();
 

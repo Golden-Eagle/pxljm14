@@ -6,6 +6,7 @@
 class Scene {
 public:
 	virtual void add(std::shared_ptr<gecom::Entity>) =0;
+	virtual std::vector<std::shared_ptr<gecom::Entity>>& get_all() =0;
 };
 
 // delete me once sexy quadtree implementation is done
@@ -16,10 +17,18 @@ public:
 	void add(std::shared_ptr<gecom::Entity> ne) {
 		m_entities.push_back(ne);
 	}
+
+	std::vector<std::shared_ptr<gecom::Entity>>& get_all() {
+		return m_entities;
+	}
 };
 
 class Scene2D : Scene {
 	// this has the sexy quadtree instead of m_entities
+};
+
+class Scene3D : Scene {
+	// this would be for future sexy 3d octree
 };
 
 #endif
