@@ -10,6 +10,7 @@
 #include <gecom/State.hpp>
 #include <gecom/Concurrent.hpp>
 #include <gecom/Shader.hpp>
+#include <gecom/Render.hpp>
 
 using namespace gecom;
 using namespace std;
@@ -134,7 +135,7 @@ public:
 
 
 int main() {
-
+	DrawQueue dq;
 	AsyncExecutor::start();
 
 	Window *win = createWindow();

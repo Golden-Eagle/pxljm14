@@ -24,6 +24,7 @@ SET(GECOM_HEADERS
 	Config.hpp
 	EngineComponent.hpp
 	Entity.hpp
+	Render.hpp
 
 	json11.hpp
 )

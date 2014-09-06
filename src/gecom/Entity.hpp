@@ -7,6 +7,8 @@
 #include <vector>
 
 namespace gecom {
+	using entity_id_t = uint32_t;
+	
 	class EntityComponent { };
 	class DrawableComponent : public EntityComponent {
 	public:
@@ -14,26 +16,24 @@ namespace gecom {
 	};
 
 	class Entity {
-		i3d::vec3 m_position;
-		i3d::vec3 m_velocity;
-		i3d::vec3 m_rotation;
-		i3d::vec3 m_angl_vel;
+		i3d::vec3d m_position;
+		i3d::vec3d m_velocity;
+		i3d::vec3d m_rotation;
+		i3d::vec3d m_angl_vel;
 
 		std::map<std::type_index, std::vector<std::shared_ptr<EntityComponent>>> components;
 
-		using entity_id_t = uint32_t;
-	private:
-		static std::atomic< entity_id_t > sm_ID(1);
+		static std::atomic<entity_id_t> sm_ID;
 		entity_id_t m_ID = 0;
-		std::vector< std::shared_ptr< Entity > > m_children;
+		std::vector< std::shared_ptr<Entity>> m_children;
 	public:
-		Entity() : m_ID(sm_ID.fetch_add(1)) { }
+		Entity() { m_ID = Entity::sm_ID.fetch_add(1); }
 
-		entity_id_t getID() { return m_ID; }
-		void addChild( std::shared_ptr< Entity > i_child ) {
-			m_children.push_back(std::weak_ptr< Entity >(i_child));
+		entity_id_t getID() const { return m_ID; }
+		void addChild(std::shared_ptr<Entity>& i_child) {
+			m_children.push_back(i_child);
 		}
-		const std::vector< std::shared_ptr< Entity > > & getChildren() {
+		const std::vector< std::shared_ptr< Entity > > & getChildren() const {
 			return m_children;
 		}
 
@@ -45,18 +45,18 @@ namespace gecom {
 
 		template <typename T>
 		std::vector<std::shared_ptr<T>> getComponents() {
-		std::type_index et(typeid(T));
-		std::vector<std::shared_ptr<T>> rets;
-		auto it = components.find(et);
-		if(it != components.end()) {		
-			for(auto c = it->second.begin(); c != it->second.end(); c++) {
-				rets.push_back(std::static_pointer_cast<T>(*c));
+			std::type_index et(typeid(T));
+			std::vector<std::shared_ptr<T>> rets;
+			auto it = components.find(et);
+			if(it != components.end()) {		
+				for(auto c = it->second.begin(); c != it->second.end(); c++) {
+					rets.push_back(std::static_pointer_cast<T>(*c));
+				}
 			}
-		}
-		return rets;
-	}
+			return rets;		}
 	};
 
+	std::atomic<entity_id_t> Entity::sm_ID(1);
 }
 
 #endif
