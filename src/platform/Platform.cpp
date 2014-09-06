@@ -11,7 +11,7 @@
 #include <gecom/Concurrent.hpp>
 #include <gecom/Shader.hpp>
 #include <gecom/Render.hpp>
-// #include <gecom/Scene.hpp>
+#include <gecom/Scene.hpp>
 #include <gecom/Entity.hpp>
 
 using namespace gecom;
@@ -158,16 +158,18 @@ public:
 class TestState : public State<> {
 public:
 	TestState() { }
-	// Scene myScene;
+	InefficentScene myScene;
 
 	virtual action_ptr updateForeground() override {
-		Entity e;
-		e.addComponent<DrawableComponent>(std::make_shared<SquareDrawableComponent>());
-		// myScene.add()
+		auto e = std::make_shared<Entity>();
+		e->addComponent<DrawableComponent>(std::make_shared<SquareDrawableComponent>());
+		myScene.add(e);
+
+		// some kind of call to game->render(myScene);
+		
 		return nullAction();
 	}
 };
-
 
 int main() {
 	AsyncExecutor::start();
