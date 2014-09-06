@@ -151,9 +151,10 @@ public:
 	InefficentScene myScene;
 
 	virtual action_ptr updateForeground() override {
-		auto e = std::make_shared<Entity>();
-		e->addComponent<DrawableComponent>(std::make_shared<SquareDrawableComponent>());
-		myScene.add(e);
+		// WTF?!
+		// auto e = std::make_shared<Entity>();
+		// e->addComponent<DrawableComponent>(std::make_shared<SquareDrawableComponent>());
+		// myScene.add(e);
 
 		// some kind of call to game->render(myScene);
 
