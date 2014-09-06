@@ -11,6 +11,8 @@
 #include <gecom/Concurrent.hpp>
 #include <gecom/Shader.hpp>
 #include <gecom/Render.hpp>
+// #include <gecom/Scene.hpp>
+#include <gecom/Entity.hpp>
 
 using namespace gecom;
 using namespace std;
@@ -132,10 +134,42 @@ public:
 	}
 };
 
+class SquareDrawableComponent : public DrawableComponent {
+	float verts[6] = {
+		0.0, 0.5f,
+		0.5f, -0.5f
+		-0.5f, -0.5f
+	};
+	GLuint vbo;
+public:
+	SquareDrawableComponent() {
+		glGenBuffers(1, &vbo);	
+	}
+	
+
+	void draw() {
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		// convert from local to world 
+		glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
+};
+
+class TestState : public State<> {
+public:
+	TestState() { }
+	// Scene myScene;
+
+	virtual action_ptr updateForeground() override {
+		Entity e;
+		e.addComponent<DrawableComponent>(std::make_shared<SquareDrawableComponent>());
+		// myScene.add()
+		return nullAction();
+	}
+};
 
 
 int main() {
-	DrawQueue dq;
 	AsyncExecutor::start();
 
 	Window *win = createWindow();
@@ -143,50 +177,50 @@ int main() {
 
 	win->shaderManager()->addSourceDirectory("./res/shader");
 
-	auto spec = shader_program_spec().source("showtex.glsl").define("MY_MACRO", 3);
+	// auto spec = shader_program_spec().source("showtex.glsl").define("MY_MACRO", 3);
 
-	win->shaderManager()->program(spec);
-	win->shaderManager()->program(spec);
+	// win->shaderManager()->program(spec);
+	// win->shaderManager()->program(spec);
 
-	// make an error
-	try {
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 9001);
-	} catch (gl_error &e) {
-		log() << "DID I JUST CATCH A GL ERROR?";
-	}
+	// // make an error
+	// try {
+	// 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 9001);
+	// } catch (gl_error &e) {
+	// 	log() << "DID I JUST CATCH A GL ERROR?";
+	// }
 
-	Event<int> e1;
+	// Event<int> e1;
 
-	// test auto-cancel on subscription destruction
-	{
-		auto sub1 = e1.subscribe([](int a) {
-			log() << "Event happened: " << a;
-			return false;
-		});
-		e1.notify(42);
-		e1.notify(43);
-	}
-	// you wont see this
-	e1.notify(44);
+	// // test auto-cancel on subscription destruction
+	// {
+	// 	auto sub1 = e1.subscribe([](int a) {
+	// 		log() << "Event happened: " << a;
+	// 		return false;
+	// 	});
+	// 	e1.notify(42);
+	// 	e1.notify(43);
+	// }
+	// // you wont see this
+	// e1.notify(44);
 
-	// test safe cancel after event destruction
-	{
-		// when this goes out of scope nothing breaks
-		subscription sub2;
-		{
-			Event<int> e2;
-			sub2 = e2.subscribe([](int a) {
-				log() << "Other event happened: " << a;
-				return false;
-			});
-			e2.notify(9001);
-			e2.notify(9002);
-		}
-	}
+	// // test safe cancel after event destruction
+	// {
+	// 	// when this goes out of scope nothing breaks
+	// 	subscription sub2;
+	// 	{
+	// 		Event<int> e2;
+	// 		sub2 = e2.subscribe([](int a) {
+	// 			log() << "Other event happened: " << a;
+	// 			return false;
+	// 		});
+	// 		e2.notify(9001);
+	// 		e2.notify(9002);
+	// 	}
+	// }
 
 
 	Game platform_game;
-	platform_game.init<StartupState>(42);
+	platform_game.init<TestState>();
 	platform_game.run();
 
 	AsyncExecutor::stop();
