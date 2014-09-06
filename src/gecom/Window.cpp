@@ -15,6 +15,7 @@ namespace gecom {
 		struct WindowData {
 			Window *window;
 			GLEWContext context;
+			bool glew_init_done = false;
 			std::bitset<GLFW_KEY_LAST + 1> vk;
 			std::bitset<GLFW_MOUSE_BUTTON_LAST + 1> mb;
 			WindowData(Window *window_) : window(window_) { }
@@ -343,14 +344,16 @@ namespace gecom {
 	}
 
 	void Window::destroy() {
+		// must only be called from the main thread
 		delete getWindowData(m_handle);
 		glfwDestroyWindow(m_handle);
 	}
 
 	void Window::makeContextCurrent() {
 		glfwMakeContextCurrent(m_handle);
+		WindowData *wd = getWindowData(m_handle);
 		// init glew
-		if (!m_glew_init_done) {
+		if (!wd->glew_init_done) {
 			gecom::log("Window") << "GLEW initialising...";
 			glewExperimental = true;
 			GLenum glew_err = glewInit();
@@ -371,21 +374,14 @@ namespace gecom {
 			//gecom::log("Window") << "GL Error: " << gluErrorString(gl_err);
 			gecom::log("Window") << "GL version string: " << glGetString(GL_VERSION);
 			gecom::log("Window") % 0 << "GLEW initialised";
-			m_glew_init_done = true;
+			wd->glew_init_done = true;
 			// enable GL_ARB_debug_output if available
 			if (glfwExtensionSupported("GL_ARB_debug_output")) {
 				// this allows the error location to be determined from a stacktrace
 				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 				// set the callback
 				glDebugMessageCallback(callbackDebugGL, this);
-				glDebugMessageControl(
-					GL_DONT_CARE,
-					GL_DONT_CARE,
-					GL_DONT_CARE,
-					0,
-					nullptr,
-					true
-				);
+				glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
 				log("Window") << "GL debug callback installed";
 			} else {
 				log("Window") << "GL_ARB_debug_output not available";
@@ -438,7 +434,7 @@ namespace gecom {
 			throw window_error("GLFW window creation failed");
 		}
 		gecom::log("Window") % 0 << "GLFW window created";
-		return new Window(handle);
+		return new Window(handle, m_share);
 	}
 
 

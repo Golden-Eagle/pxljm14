@@ -140,8 +140,12 @@ int main() {
 	Window *win = createWindow();
 	win->makeContextCurrent();
 
-	ShaderManager shaderman("./res/shader");
-	shaderman.getProgram("showtex.glsl");
+	win->shaderManager()->addSourceDirectory("./res/shader");
+
+	auto spec = shader_program_spec().source("showtex.glsl").define("MY_MACRO", 3);
+
+	win->shaderManager()->program(spec);
+	win->shaderManager()->program(spec);
 
 	// make an error
 	try {

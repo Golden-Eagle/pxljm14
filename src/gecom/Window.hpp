@@ -13,17 +13,10 @@
 #include <string>
 #include <stdexcept>
 #include <map>
+#include <memory>
 
-// this is to enable multiple context support
-namespace gecom {
-	void * getGlewContext();
-}
-
-#define glewGetContext() ((GLEWContext *) gecom::getGlewContext())
-
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
+#include "GL.hpp"
+#include "Shader.hpp"
 #include "Log.hpp"
 #include "Concurrent.hpp"
 
@@ -177,8 +170,11 @@ namespace gecom {
 	// Each window can only be used on one thread at once.
 	class Window : private gecom::Uncopyable {
 	private:
+		// the wrapped window
 		GLFWwindow* m_handle;
-		bool m_glew_init_done = false;
+
+		// shader manager, shared (potentially) with other windows
+		std::shared_ptr<ShaderManager> m_shaderman;
 
 		void initialise();
 		void destroy();
@@ -207,8 +203,14 @@ namespace gecom {
 		gecom::Event<key_event> onKeyRelease;
 		gecom::Event<char_event> onChar;
 
-		inline Window(GLFWwindow *handle_) : m_handle(handle_) {
+		// ctor: takes ownership of a GLFW window handle
+		inline Window(GLFWwindow *handle_, const Window *share = nullptr) : m_handle(handle_) {
 			if (m_handle == nullptr) throw window_error("GLFW window handle is null");
+			if (share) {
+				m_shaderman = share->shaderManager();
+			} else {
+				m_shaderman = std::make_shared<ShaderManager>(".");
+			}
 			initialise();
 		}
 
@@ -294,6 +296,13 @@ namespace gecom {
 			return glfwGetWindowAttrib(m_handle, a);
 		}
 
+		// the returned shader manager has the process's cwd as its first source directory.
+		// it is shared with all other windows whose contexts share GL object namespaces.
+		// as such, adding a source directory can affect code obtaining shaders from sharing windows.
+		const std::shared_ptr<ShaderManager> & shaderManager() const {
+			return m_shaderman;
+		}
+
 		// get current state of a key
 		bool getKey(int key);
 
@@ -306,6 +315,7 @@ namespace gecom {
 		// get the current state of a mouse button, then clear it
 		bool pollMouseButton(int button);
 
+		// windows must only be destroyed from the main thread
 		inline ~Window() {
 			destroy();
 		}

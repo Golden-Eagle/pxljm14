@@ -12,6 +12,7 @@ SET(GECOM_SOURCES
 
 SET(GECOM_HEADERS
 	GECom.hpp
+	GL.hpp
 	Initial3D.hpp
 	Log.hpp
 	Concurrent.hpp
