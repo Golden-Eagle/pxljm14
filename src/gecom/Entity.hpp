@@ -5,6 +5,10 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include <map>
+#include <typeindex>
+
+#include "GECom.hpp"
 
 namespace gecom {
 	using entity_id_t = uint32_t;
@@ -55,8 +59,6 @@ namespace gecom {
 			}
 			return rets;		}
 	};
-
-	std::atomic<entity_id_t> Entity::sm_ID(1);
 }
 
 #endif

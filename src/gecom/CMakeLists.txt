@@ -7,6 +7,7 @@ SET(GECOM_SOURCES
 	Window.cpp
 	Chrono.cpp
 	
+	Entity.cpp
 	json11.cpp
 )
 
@@ -24,6 +25,7 @@ SET(GECOM_HEADERS
 	Config.hpp
 	Entity.hpp
 	Render.hpp
+	Box2D.hpp
 
 	json11.hpp
 )
