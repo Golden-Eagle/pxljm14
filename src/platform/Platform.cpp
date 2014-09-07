@@ -138,6 +138,7 @@ public:
 class SquareDrawableComponent : public DrawableComponent {
 public:
 	SquareDrawableComponent() {
+
 	}
 	
 
@@ -146,9 +147,22 @@ public:
 };
 
 class TestState : public State<> {
-public:
-	TestState() { }
 	InefficentScene myScene;
+	std::shared_ptr<b2World> sceneWorld;
+
+public:
+	TestState() { 
+		// sceneWorld = game.getComponent<Box2DGameComponent>().addWorld(i3d::vec3f(0.0f, -10.0f, 0.0f));
+
+		auto e = std::make_shared<Entity>();
+		e->addComponent<DrawableComponent>(std::make_shared<SquareDrawableComponent>());
+
+		// auto physComp = std::make_shared<Box2DGameComponent>(sceneWorld);
+		// e->addComponent<PhysicsComponent>(physComp);
+
+		myScene.add(e);
+	}
+	
 
 	virtual action_ptr updateForeground() override {
 		// WTF?!
