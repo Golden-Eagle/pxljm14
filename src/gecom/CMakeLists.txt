@@ -15,6 +15,8 @@ SET(GECOM_HEADERS
 	GECom.hpp
 	GL.hpp
 	Initial3D.hpp
+	Bound.hpp
+	Quadtree.hpp
 	Log.hpp
 	Concurrent.hpp
 	Window.hpp

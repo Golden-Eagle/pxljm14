@@ -15,6 +15,8 @@
 #include <gecom/Entity.hpp>
 #include <gecom/Box2D.hpp>
 
+#include <gecom/Quadtree.hpp>
+
 using namespace gecom;
 using namespace std;
 
@@ -174,6 +176,10 @@ int main() {
 
 	win->shaderManager()->program(spec);
 	win->shaderManager()->program(spec);
+
+	i3d::mat4d() * aabbd() * 3;
+
+	quadtree<shared_ptr<Entity>> etree;
 
 	// // make an error
 	// try {
