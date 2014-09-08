@@ -178,7 +178,7 @@ public:
 		return nullAction();
 	}
 	
-	virtual void draw() override {
+	virtual void drawForeground() override {
 		log("Test") << "drawing";
 	}
 };

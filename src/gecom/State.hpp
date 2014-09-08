@@ -121,15 +121,19 @@ namespace gecom {
 		}
 	
 		inline void exit() {
+			// as for enter()
 			onExit();
 		}
 	
-		// pure virtual because not implementing this is like a missing return statement
-		virtual action_ptr updateForeground() = 0;
+		virtual inline action_ptr updateForeground() {
+			return make_unique<NullAction>();
+		}
 	
 		virtual inline void updateBackground() { }
 		
-		virtual inline void draw() { }
+		virtual inline void drawForeground() { }
+
+		virtual inline void drawBackground() { }
 		
 		// will this state completely obscure anything drawn underneath it?
 		virtual inline bool opaque() {
@@ -252,7 +256,7 @@ namespace gecom {
 			
 				try {
 					// update background states
-					for (; it < sm.m_states.end() - 1; it++) {
+					for (; it < sm.m_states.end() - 1; ++it) {
 						(*it)->updateBackground();
 					}
 				
@@ -273,7 +277,6 @@ namespace gecom {
 				}
 			
 				// update foreground state
-				sm.m_states.back()->updateBackground();
 				return sm.m_states.back()->updateForeground();
 			}
 		};
@@ -290,12 +293,12 @@ namespace gecom {
 					for (; it --> sm.m_states.begin(); ) {
 						if ((*it)->opaque()) break;
 					}
-				
-					// draw from topmost opaque state upwards
-					for (; it < sm.m_states.end(); ++it) {
-						(*it)->draw();
+					
+					// draw from topmost opaque state upwards, but only background states
+					for (; it < sm.m_states.end() - 1; ++it) {
+						(*it)->drawBackground();
 					}
-				
+					
 				} catch (...) {
 					// if opaque() or draw() fails, kill all states on top of the failed one
 					// it points to the state that failed, and where exception handling begins
@@ -312,6 +315,9 @@ namespace gecom {
 					throw;
 					
 				}
+
+				// draw foreground state
+				sm.m_states.back()->drawForeground();
 				
 				return make_unique<NullAction>();
 			}
