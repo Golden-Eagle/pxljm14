@@ -191,7 +191,7 @@ int main() {
 
 	win->shaderManager()->addSourceDirectory("./res/shader");
 
-	auto spec = shader_program_spec().source("showtex.glsl").define("MY_MACRO", 3);
+	auto spec = shader_program_spec().source("showtex.glsl").define("MY_MACRO", 3.0f);
 
 	win->shaderManager()->program(spec);
 	win->shaderManager()->program(spec);

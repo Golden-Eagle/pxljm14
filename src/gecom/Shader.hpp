@@ -44,6 +44,7 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <cstdint>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -55,6 +56,8 @@
 #include <stdexcept>
 #include <chrono>
 #include <mutex>
+#include <type_traits>
+#include <limits>
 
 #include "GECom.hpp"
 #include "GL.hpp"
@@ -198,7 +201,7 @@ namespace gecom {
 		const ShaderManager *m_shaderman = nullptr;
 		std::chrono::steady_clock::time_point m_timestamp;
 		GLuint m_prog;
-
+		
 	public:
 		inline shader_program_spec & source(const std::string &name) {
 			// trim leading / trailing whitespace, internal is allowed
@@ -209,18 +212,45 @@ namespace gecom {
 			return *this;
 		}
 
-		template <typename T>
-		inline shader_program_spec & define(const std::string &symbol, const T &value) {
+		inline shader_program_spec & define(const std::string &symbol, const std::string &value) {
 			// whitespace is not allowed in the symbol token
 			std::istringstream iss(symbol);
 			std::string symbol2;
 			iss >> symbol2;
 			if (!iss.fail()) {
-				std::ostringstream oss;
-				oss << value;
-				m_definitions[symbol2] = oss.str();
+				m_definitions[symbol2] = value;
 			}
 			return *this;
+		}
+
+		inline shader_program_spec & define(const std::string &symbol, uint_least32_t value) {
+			std::ostringstream oss;
+			oss << value << "u";
+			return define(symbol, oss.str());
+		}
+
+		inline shader_program_spec & define(const std::string &symbol, int_least32_t value) {
+			std::ostringstream oss;
+			oss << value;
+			return define(symbol, oss.str());
+		}
+
+		inline shader_program_spec & define(const std::string &symbol, bool value) {
+			std::ostringstream oss;
+			oss << std::boolalpha << value;
+			return define(symbol, oss.str());
+		}
+
+		inline shader_program_spec & define(const std::string &symbol, float value) {
+			std::ostringstream oss;
+			oss << std::showpoint << std::setprecision(std::numeric_limits<float>::digits10 + 2) << value;
+			return define(symbol, oss.str());
+		}
+
+		inline shader_program_spec & define(const std::string &symbol, double value) {
+			std::ostringstream oss;
+			oss << std::showpoint << std::setprecision(std::numeric_limits<double>::digits10 + 2) << value << "lf";
+			return define(symbol, oss.str());
 		}
 
 		inline shader_program_spec & define(const std::string &symbol) {
