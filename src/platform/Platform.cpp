@@ -110,6 +110,7 @@ public:
 		std::cin.clear();
 		return nullAction();
 	}
+
 };
 
 class StartupState : public State<> {
@@ -175,6 +176,10 @@ public:
 		// some kind of call to game->render(myScene);
 
 		return nullAction();
+	}
+	
+	virtual void draw() override {
+		log("Test") << "drawing";
 	}
 };
 

@@ -128,6 +128,13 @@ namespace gecom {
 		virtual action_ptr updateForeground() = 0;
 	
 		virtual inline void updateBackground() { }
+		
+		virtual inline void draw() { }
+		
+		// will this state completely obscure anything drawn underneath it?
+		virtual inline bool opaque() {
+			return true;
+		}
 	
 		virtual action_ptr handleException(const std::exception_ptr &pex) {
 			std::rethrow_exception(pex);
@@ -233,12 +240,14 @@ namespace gecom {
 	
 	private:
 		// call stack
-		// be careful not to try copying the unique_ptrs (this means no for-each)
+		// be careful not to try copying the unique_ptrs (use references in for-each)
 		std::vector<std::unique_ptr<StateBase>> m_states;
 	
 		class UpdateAction : public Action {
 		public:
 			virtual inline std::unique_ptr<Action> execute(StateManager &sm) override {
+				if (sm.m_states.empty()) return make_unique<NullAction>();
+				
 				auto it = sm.m_states.begin();
 			
 				try {
@@ -272,7 +281,38 @@ namespace gecom {
 		class DrawAction : public Action {
 		public:
 			virtual inline std::unique_ptr<Action> execute(StateManager &sm) override {
-				// TODO draw logic
+				if (sm.m_states.empty()) return make_unique<NullAction>();
+				
+				auto it = sm.m_states.end();
+				
+				try {
+					// find topmost opaque state
+					for (; it --> sm.m_states.begin(); ) {
+						if ((*it)->opaque()) break;
+					}
+				
+					// draw from topmost opaque state upwards
+					for (; it < sm.m_states.end(); ++it) {
+						(*it)->draw();
+					}
+				
+				} catch (...) {
+					// if opaque() or draw() fails, kill all states on top of the failed one
+					// it points to the state that failed, and where exception handling begins
+					
+					// move to last state to kill
+					it++;
+					
+					// pop dead states
+					while (it < sm.m_states.end()) {
+						sm.m_states.pop_back();
+					}
+					
+					// now let the exception be handled
+					throw;
+					
+				}
+				
 				return make_unique<NullAction>();
 			}
 		};
