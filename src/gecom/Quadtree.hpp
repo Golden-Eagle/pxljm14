@@ -298,49 +298,86 @@ namespace gecom {
 		Node *m_root = nullptr;
 		
 		// kill the z dimension of an aabb so this actually functions as a quadtree
-		inline aabb_t sanitize(const aabb_t &a) {
-		
+		static inline aabb_t sanitize(const aabb_t &a) {
+			// TODO
+		}
+
+		inline void destroy() {
+			if (m_root) delete m_root;
+			m_root = nullptr;
 		}
 
 	public:
-		inline quadtree() {
-			m_root = new Node(aabb_t::fromPoints(vec3_t(-1, -1, 0), vec3_t(1, 1, 0)));
-		}
+		inline quadtree() { }
 		
 		inline quadtree(const aabb_t &rootbb) {
-		
+			m_root = new Node(sanitize(rootbb));
 		}
 		
 		inline quadtree(const quadtree &other) {
-		
+			if (other.m_root) m_root = new Node(other.m_root);
 		}
 		
 		inline quadtree(quadtree &&other) {
-		
+			m_root = other.m_root;
+			other.m_root = nullptr;
 		}
 		
 		inline quadtree & operator=(const quadtree &other) {
-		
+			destroy();
+			if (other.m_root) m_root = new Node(other.m_root);
+			return *this;
 		}
 		
 		inline quadtree & operator=(quadtree &&other) {
-		
+			m_root = other.m_root;
+			other.m_root = nullptr;
 		}
 		
 		inline bool insert(const T &value, const aabb_t &valuebb) {
-		
+			if (!m_root) m_root = new Node(sanitize(valuebb));
+			try {
+				m_root->insert(value, valuebb);
+			} catch (out_of_bounds &) {
+				// make new root
+				Node * const oldroot = m_root;
+				const aabb_t a = m_root->bound();
+				// vector from centre to max of new root
+				const vec3_t vr = 2.0 * a.halfsize();
+				// vector from centre of current root to centre of new element
+				const vec3_t vct = valuebb.center() - a.center();
+				// vector from current root to corner nearest centre of new element
+				vec3_t corner = vr * 0.5;
+				if (vct.x() < 0) corner.x() = -corner.x();
+				if (vct.y() < 0) corner.y() = -corner.y();
+				// centre of new root
+				const vec3_t newcentre = a.center() + corner;
+				m_root = new Node(sanitize(aabb_t(newcentre, vr)));
+				if (oldroot->count() > 0) {
+					// only preserve old root if it had elements
+					m_root->putChild(oldroot);
+				} else {
+					delete oldroot;
+				}
+				// re-attempt to add
+				return insert(value, valuebb);
+			}
 		}
 		
 		inline bool erase(const T &value, const aabb_t &searchbb) {
-		
+			if (!m_root) return false;
+			// TODO root reduction
+			return m_root->erase(value, sanitize(searchbb));
 		}
 		
 		inline bool contains(const T &value, const aabb_t &searchbb) const {
-		
+			if (!m_root) return false;
+			return m_root->contains(value, sanitize(searchbb));
 		}
 		
 		inline void search(const aabb_t &searchbb, const found_t &found) const {
-		
+			if (!m_root) return;
+			m_root->search(sanitize(searchbb), found);
 		}
 		
 		inline std::vector<value_t> search(const aabb_t &searchbb) const {
@@ -352,43 +389,48 @@ namespace gecom {
 		}
 		
 		inline void print() const {
-		
+			if (!m_root) return;
+			m_root->print();
 		}
 		
 		inline size_t height() const {
-		
+			if (!m_root) return 0;
+			return m_root->height();
 		}
 		
 		inline double heightAvg() const {
-		
+			if (!m_root) return 0;
+			return m_root->heightAvg();
 		}
 		
 		inline size_t count() const {
-		
+			if (!m_root) return 0;
+			return m_root->count();
 		}
 		
 		inline size_t countRecursively() const {
-		
+			if (!m_root) return 0;
+			return m_root->countRecursively();
 		}
 		
 		inline bool empty() {
-		
+			return !count();
 		}
 		
 		inline ~quadtree() {
-			if (m_root) delete m_root;
+			destroy();
 		}
 
 	};
 	
 	template <typename T, typename CoordT, typename HashT, typename EqualToT>
 	inline void quadtree<T, CoordT, HashT, EqualToT>::Node::unleafify() {
-	
+		// TODO
 	}
 	
 	template <typename T, typename CoordT, typename HashT, typename EqualToT>
 	inline void quadtree<T, CoordT, HashT, EqualToT>::Node::leafify() {
-	
+		// TODO
 	}
 
 }
