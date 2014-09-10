@@ -34,7 +34,7 @@ namespace gecom {
 		using aabb_t = aabb<coord_t>;
 		using hash_t = HashT;
 		using equal_to_t = EqualToT;
-		using found_t = std::function<void(const value_t &)>;
+		using found_t = std::function<void(const value_t &, const aabb_t &)>;
 
 	private:
 		using map_t = std::unordered_map<T, aabb_t, HashT, EqualToT>;
@@ -224,7 +224,7 @@ namespace gecom {
 			inline void search(const aabb_t &a, const found_t &found) {
 				if (m_bound.intersects(a)) {
 					for (auto it = m_values.begin(); it != m_values.end(); ++it) {
-						if (a.intersects(it->second)) found(it.first);
+						if (a.intersects(it->second)) found(it->first, it->second);
 					}
 					if (m_isleaf) return;
 					unsigned cid_min = childID(a.min());
@@ -295,12 +295,127 @@ namespace gecom {
 
 		};
 
-		Node *m_root;
+		Node *m_root = nullptr;
+		
+		// kill the z dimension of an aabb so this actually functions as a quadtree
+		inline aabb_t sanitize(const aabb_t &a) {
+		
+		}
 
 	public:
+		inline quadtree() {
+			m_root = new Node(aabb_t::fromPoints(vec3_t(-1, -1, 0), vec3_t(1, 1, 0)));
+		}
+		
+		inline quadtree(const aabb_t &rootbb) {
+		
+		}
+		
+		inline quadtree(const quadtree &other) {
+		
+		}
+		
+		inline quadtree(quadtree &&other) {
+		
+		}
+		
+		inline quadtree & operator=(const quadtree &other) {
+		
+		}
+		
+		inline quadtree & operator=(quadtree &&other) {
+		
+		}
+		
+		inline bool insert(const T &value, const aabb_t &valuebb) {
+		
+		}
+		
+		inline bool erase(const T &value, const aabb_t &searchbb) {
+		
+		}
+		
+		inline bool contains(const T &value, const aabb_t &searchbb) const {
+		
+		}
+		
+		inline void search(const aabb_t &searchbb, const found_t &found) const {
+		
+		}
+		
+		inline std::vector<value_t> search(const aabb_t &searchbb) const {
+			std::vector<value_t> r;
+			search(searchbb, [&](const value_t &v, const aabb_t &) {
+				r.push_back(v);
+			});
+			return r;
+		}
+		
+		inline void print() const {
+		
+		}
+		
+		inline size_t height() const {
+		
+		}
+		
+		inline double heightAvg() const {
+		
+		}
+		
+		inline size_t count() const {
+		
+		}
+		
+		inline size_t countRecursively() const {
+		
+		}
+		
+		inline bool empty() {
+		
+		}
+		
+		inline ~quadtree() {
+			if (m_root) delete m_root;
+		}
 
 	};
+	
+	template <typename T, typename CoordT, typename HashT, typename EqualToT>
+	inline void quadtree<T, CoordT, HashT, EqualToT>::Node::unleafify() {
+	
+	}
+	
+	template <typename T, typename CoordT, typename HashT, typename EqualToT>
+	inline void quadtree<T, CoordT, HashT, EqualToT>::Node::leafify() {
+	
+	}
 
 }
 
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
