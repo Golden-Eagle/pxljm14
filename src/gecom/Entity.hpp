@@ -9,6 +9,7 @@
 #include <typeindex>
 
 #include "GECom.hpp"
+#include "Bound.hpp"
 
 namespace gecom {
 	class Entity;
@@ -50,6 +51,14 @@ namespace gecom {
 		}
 
 		i3d::vec3d getPosition() { return m_position; }
+
+		virtual aabbd getWorldAABB() {
+			return aabbd();
+		}
+
+		virtual void recomputeWorldAABB() {
+
+		}
 
 		template <typename B, typename T>
 		void addComponent(const std::shared_ptr<T> comp) {
