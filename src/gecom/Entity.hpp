@@ -19,6 +19,7 @@ namespace gecom {
 		std::shared_ptr<Entity> m_parent;
 	public:
 		EntityComponent(std::shared_ptr<Entity> parent) : m_parent(parent) { }
+		std::shared_ptr<Entity>& getParent() { return m_parent; }
 	};
 	class DrawableComponent : public EntityComponent {
 	public:
@@ -47,6 +48,8 @@ namespace gecom {
 		const std::vector< std::shared_ptr< Entity > > & getChildren() const {
 			return m_children;
 		}
+
+		i3d::vec3d getPosition() { return m_position; }
 
 		template <typename B, typename T>
 		void addComponent(const std::shared_ptr<T> comp) {
