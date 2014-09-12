@@ -12,18 +12,86 @@ using namespace gecom;
 
 namespace pxljm {
 
-	ChunkDrawableComponent::ChunkDrawableComponent(shared_ptr<Chunk> i_chunk) : DrawableComponent(i_chunk){
+	ChunkDrawableComponent::ChunkDrawableComponent(shared_ptr<Chunk> i_chunk) : DrawableComponent(i_chunk), m_instances(0){
+		//generate tile
+		glGenVertexArrays(1, &m_vaoID);
+		glBindVertexArray(m_vaoID);
+		glGenBuffers(1, &m_vbo_v); //vertex information
+		glGenBuffers(1, &m_vbo_t); //tile information
 
+		//for all tiles (for now)
+		float pos[] = {
+			0, 0, 0, 0,
+			0, 1, 0, 0,
+			1, 0, 0, 0,
+			1, 1, 0, 0
+		};
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_vbo_v);
+		glBufferData(GL_ARRAY_BUFFER, 4 * 4 * sizeof(float), pos, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+		vector<GLuint> tileTypeArray;
+		unsigned x = 0;
+		for (const tile_column &col : i_chunk->getTileGrid()) {
+			unsigned y = 0;
+			for (Tile tile : col) {
+				if (tile.solid) {
+					tileTypeArray.push_back(x);
+					tileTypeArray.push_back(y);
+					tileTypeArray.push_back(0);
+					tileTypeArray.push_back(0);
+
+					++m_instances;
+				}
+				++y;
+			}
+			++x;
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_vbo_t);
+		glBufferData(GL_ARRAY_BUFFER, tileTypeArray.size() * sizeof(GLuint), &tileTypeArray[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 4, GL_UNSIGNED_INT, GL_FALSE, 0, nullptr);
+
+		glVertexAttribDivisor(1,1);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
+	void ChunkDrawableComponent::draw()
+	{
+		glBindVertexArray(m_vaoID);
+		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_instances);
+		glBindVertexArray(0);
+	}
+
+	void ChunkDrawableComponent::pushDrawCalls(draw_queue &q, unsigned dt) {
+		i3d::vec3d p = getParent()->getPosition();
+		switch (dt)
+		{
+		case draw_type::standard:
+			q.push(draw_call(Technique::singleton<ChunkStandardTechnique>(), i3d::mat4d::translate(p), [=] {
+				draw();
+			}));
+			break;
+		default:
+			break;
+		}
 	}
 
 
-
-
 	//TODO
-	Chunk::Chunk(int i_xpos, int i_ypos, tile_grid i_grid) : gecom::Entity() {
+	Chunk::Chunk(int i_xpos, int i_ypos, tile_grid i_grid) : gecom::Entity(), m_tileGrid(i_grid) {
+		setPosition(i3d::vec3d(double(i_xpos), double(i_ypos), 0.0));
 		// e->addComponent<B2PhysicsComponent>(std::make_shared<B2PhysicsComponent>(e));
 
 		//iterate over the grid and create bounds for the grid
+	}
+
+	const tile_grid & Chunk::getTileGrid(){
+		return m_tileGrid;
 	}
 
 
@@ -34,7 +102,15 @@ namespace pxljm {
 		m_chunks.push_back(i_chunk);
 	}
 
+	void Level::load(Scene &scene){
+		for (shared_ptr<Chunk> c : m_chunks) {
+			scene.add(c);
+		}
+	}
 
+	void Level::unload(Scene &scene){
+
+	}
 
 	LevelGenerator::LevelGenerator() : m_chunkSize(16) {  }
 
@@ -46,7 +122,7 @@ namespace pxljm {
 		m_chunkSize = std::max(i_size, 1);
 	}
 
-	std::shared_ptr<Level> LevelGenerator::getTestLevel() {
+	shared_ptr<Level> LevelGenerator::getTestLevel() {
 		int height = 32;
 		int width = 32;
 
@@ -55,6 +131,7 @@ namespace pxljm {
 
 		for (int x = 0; x < width; x++){
 			grid[x][0].solid = true;
+			grid[x][x].solid = true; //WHY NOT!!!
 		}
 
 
@@ -63,7 +140,8 @@ namespace pxljm {
 		//compile platforms into level...
 
 		//to compile for now
-		return std::shared_ptr<Level>(new Level());
+		//return std::shared_ptr<Level>(new Level());
+		return compileLevel(grid);
 	}
 
 	std::shared_ptr<Level> LevelGenerator::getLevel() {
@@ -102,7 +180,7 @@ namespace pxljm {
 				level->addChunk(chunk);
 			}
 		}
-		return shared_ptr<Level>(new Level());
+		return level;
 	}
 }
 

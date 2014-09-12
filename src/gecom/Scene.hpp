@@ -275,7 +275,7 @@ namespace gecom{
 	};
 
 	// this has the sexy quadtree instead of m_entities
-	class Scene2D : Scene {
+	class Scene2D : public Scene {
 	private:
 		std::vector<std::shared_ptr<gecom::Entity>> m_dynamicEntities;
 		quadtree<std::shared_ptr<gecom::Entity>> m_staticEntities;

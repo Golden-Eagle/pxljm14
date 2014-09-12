@@ -48,12 +48,6 @@ namespace gecom {
 		}
 	}
 
-	// exception thrown by GL debug callback on error if GECOM_GL_NO_EXCEPTIONS is not defined
-	class gl_error : public std::runtime_error {
-	public:
-		gl_error(const std::string &what_ = "GL error") : runtime_error(what_) { }
-	};
-
 	//
 	// Point2
 	//

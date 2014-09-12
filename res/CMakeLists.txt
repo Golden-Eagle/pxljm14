@@ -3,6 +3,7 @@
 SET(SHADERS
 	"shader/fullscreen.glsl"
 	"shader/scene_default.glsl"
+	"shader/chunk_standard.glsl"
 )
 
 add_custom_target(

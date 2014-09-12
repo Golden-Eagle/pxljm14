@@ -123,7 +123,9 @@ namespace gecom {
 		GLuint shader = glCreateShader(type);
 		const char *text_c = text.c_str();
 		glShaderSource(shader, 1, &text_c, nullptr);
-		glCompileShader(shader);
+		try {
+			glCompileShader(shader);
+		} catch (gl_error &) { }
 		GLint compile_status;
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
 		if (!compile_status) {
@@ -158,7 +160,9 @@ namespace gecom {
 	}
 
 	inline void linkShaderProgram(GLuint prog) {
-		glLinkProgram(prog);
+		try {
+			glLinkProgram(prog);
+		} catch (gl_error &) { }
 		GLint link_status;
 		glGetProgramiv(prog, GL_LINK_STATUS, &link_status);
 		if (!link_status) {
