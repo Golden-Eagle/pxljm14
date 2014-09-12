@@ -5,6 +5,7 @@
 #include <gecom/Box2D.hpp>
 #include <gecom/Bound.hpp>
 #include <gecom/Scene.hpp>
+#include <gecom/Window.hpp>
 
 
 

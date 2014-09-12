@@ -88,6 +88,9 @@ namespace pxljm {
 		// e->addComponent<B2PhysicsComponent>(std::make_shared<B2PhysicsComponent>(e));
 
 		//iterate over the grid and create bounds for the grid
+
+		//fillGrid and compute bounding everything
+		//TODO
 	}
 
 	const tile_grid & Chunk::getTileGrid(){
