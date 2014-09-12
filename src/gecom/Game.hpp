@@ -71,8 +71,8 @@ namespace gecom {
 		Window* win;
 
 	public:
-		template <typename FirstStateT, typename... ArgTR>
-		void init(ArgTR && ...args) {
+		template <typename FirstStateT>
+		void init() {
 			
 
 			win = createWindow().visible(true);
@@ -80,7 +80,10 @@ namespace gecom {
 
 			win->shaderManager()->addSourceDirectory("./res/shader");
 
-			state_manager.init<FirstStateT>(std::forward<ArgTR>(args)...);
+			// init
+			ec_manager.init();
+
+			state_manager.init<FirstStateT>(*this);
 
 			#ifndef GECOM_NO_DEFAULT_EC
 				// add audiomanager ?
@@ -94,11 +97,11 @@ namespace gecom {
 			if(!game_init)
 				throw std::runtime_error("Must call game::init() before game::run()");
 
-			// init
-			ec_manager.init();
-
 			while(!state_manager.done()) {
 				// update
+
+				AsyncExecutor::execute(std::chrono::milliseconds(1));
+
 				ec_manager.update();
 				state_manager.update();
 
@@ -107,6 +110,8 @@ namespace gecom {
 				win->swapBuffers();
 			}
 		}
+
+		GameComponentManager& getGCM() { return ec_manager; }
 
 		template <typename T>
 		void create() {

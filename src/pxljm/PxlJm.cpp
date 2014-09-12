@@ -143,22 +143,21 @@ public:
 };
 
 class TestState : public State<> {
-	InefficentScene myScene;
-	std::shared_ptr<b2World> sceneWorld;
 	std::shared_ptr<Entity> e;
+	std::shared_ptr<WorldProxy> world;
 
 public:
-	TestState() { 
+	TestState(Game& game) {
 		// sceneWorld = game.getComponent<Box2DGameComponent>().addWorld(i3d::vec3f(0.0f, -10.0f, 0.0f));
-
 		e = std::make_shared<Entity>();
+		world = game.getGCM().get<Box2DGameComponent>()->addWorld(i3d::vec3d(0.0, -10.0, 0.0));
 		e->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(e));
-		e->addComponent<B2PhysicsComponent>(std::make_shared<B2PhysicsComponent>(e));
+		auto phs = std::make_shared<B2PhysicsComponent>(e, world);
+		phs->doShit();
+		e->addComponent<B2PhysicsComponent>(phs);
 
 		// auto physComp = std::make_shared<Box2DGameComponent>(sceneWorld);
 		// e->addComponent<PhysicsComponent>(physComp);
-
-		myScene.add(e);
 	}
 	
 
