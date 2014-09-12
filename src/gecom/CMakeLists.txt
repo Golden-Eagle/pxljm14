@@ -9,6 +9,7 @@ SET(GECOM_SOURCES
 	
 	Entity.cpp
 	json11.cpp
+	perlin.cpp
 )
 
 SET(GECOM_HEADERS
@@ -30,6 +31,7 @@ SET(GECOM_HEADERS
 	Box2D.hpp
 	Scene.hpp
 	json11.hpp
+	Perlin.hpp
 )
 
 add_library(gecom ${GECOM_SOURCES} ${GECOM_HEADERS})
