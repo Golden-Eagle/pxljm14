@@ -9,19 +9,28 @@
 
 namespace pxljm {
 
-	class ChunkDrawableComponent : gecom::DrawableComponent {
-		ChunkDrawableComponent(shared_ptr<Chunk> i_chunk);
-		virtual void draw();
+	struct Tile {
+		bool solid;
+		Tile() : solid(false) {}
 	};
 
-	class ChunkPhysicsComponent : gecom::EntityComponent{
-		
-	};
+	using tile_column = std::vector<Tile>;
+	using tile_grid = std::vector<tile_column>;
 
 	class Chunk : public gecom::Entity {
 	public:
-		Chunk(int i_xpos, int i_ypos, LevelGenerator::tile_grid i_grid);
+		Chunk(int i_xpos, int i_ypos, tile_grid i_grid);
 	private:
+	};
+
+	class ChunkDrawableComponent : public gecom::DrawableComponent {
+	public:
+		ChunkDrawableComponent(std::shared_ptr<Chunk> i_chunk);
+		virtual void draw() {}
+	};
+
+	class ChunkPhysicsComponent : public gecom::EntityComponent{
+	public:
 	};
 
 	class Level {
@@ -34,16 +43,8 @@ namespace pxljm {
 		std::vector<std::shared_ptr<Chunk>> m_chunks;
 	};
 
-	struct Tile {
-		bool solid;
-		Tile() : solid(false) {}
-	};
-
 	class LevelGenerator {
 	public:
-		using tile_column = std::vector<Tile>;
-		using tile_grid = std::vector<tile_column>;
-
 		LevelGenerator();
 		int getChunkSize();
 		void setChunkSize(int i_size);
@@ -53,7 +54,6 @@ namespace pxljm {
 	private:
 		int m_chunkSize;
 
-		tile_grid makeTileGrid(int i_width, int i_height); //helper method
 		std::shared_ptr<Level> compileLevel(tile_grid i_tiles);
 
 
@@ -67,6 +67,7 @@ namespace pxljm {
 				}
 				grid.push_back(col);
 			}
+			return grid;
 		}
 	};
 }

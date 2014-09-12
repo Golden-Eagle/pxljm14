@@ -20,7 +20,7 @@ namespace pxljm {
 
 
 	//TODO
-	Chunk::Chunk(int i_xpos, int i_ypos, LevelGenerator::tile_grid i_grid) : gecom::Entity() {
+	Chunk::Chunk(int i_xpos, int i_ypos, tile_grid i_grid) : gecom::Entity() {
 		// e->addComponent<B2PhysicsComponent>(std::make_shared<B2PhysicsComponent>(e));
 
 		//iterate over the grid and create bounds for the grid
@@ -68,6 +68,7 @@ namespace pxljm {
 
 	std::shared_ptr<Level> LevelGenerator::getLevel() {
 		//perform complex calculations to get a list of components
+		return nullptr;
 	}
 
 	std::shared_ptr<Level> LevelGenerator::compileLevel(tile_grid i_tiles)
