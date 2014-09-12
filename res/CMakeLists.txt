@@ -2,6 +2,7 @@
 
 SET(SHADERS
 	"shader/fullscreen.glsl"
+	"shader/scene_default.glsl"
 )
 
 add_custom_target(

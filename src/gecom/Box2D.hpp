@@ -7,7 +7,6 @@
 #include <Box2D/Box2D.h>
 
 #include "Game.hpp"
-#include "Box2D.hpp"
 #include "Concurrent.hpp"
 #include "Entity.hpp"
 
@@ -74,12 +73,12 @@ namespace gecom {
 		}
 
 		std::thread::id getThreadID() {
-			log("phys-thread::getThreadID()") << m_worker.get_id() << std::endl;
+			//log("phys-thread::getThreadID()") << m_worker.get_id() << std::endl;
 			return m_worker.get_id();
 		}
 
 		void createBody(uint32_t n_world_id, uint32_t n_body_id, const b2BodyDef& def) {
-			log("phys::createBody") << "got here!" << std::endl;
+			//log("phys::createBody") << "got here!" << std::endl;
 			b2Body* w = worlds[n_world_id].first->CreateBody(&def);
 			w->SetUserData((void*)n_body_id);
 		}
@@ -126,7 +125,10 @@ namespace gecom {
 		}
 
 		void recieveFrame(gecom::PhysicsFrameData pfd) {
-			log("phys-test") << pfd.getPos() << std::endl;
+			// TODO pass by reference more often neo
+			//log("phys-test") << pfd.getPos() << std::endl;
+			// TODO - NOT THIS
+			getParent()->setPosition(pfd.getPos());
 		}
 	};
 
@@ -136,11 +138,11 @@ namespace gecom {
 
 			for (auto world : worlds) {
 				auto n_pf = std::make_shared<PhysicsFrame>();
-				log("phys-thread") << "# phys bodies: " << world.second.first->GetBodyCount();
+				//log("phys-thread") << "# phys bodies: " << world.second.first->GetBodyCount();
 				world.second.first->Step(m_time_step, m_velocity_iterations, m_position_iterations);
 				auto body = world.second.first->GetBodyList();
 				while (body != nullptr) {
-					log("phys-thread") << "body is not nullptr";
+					//log("phys-thread") << "body is not nullptr";
 					// GetUserData is set when body is constructed
 					// It's a void*
 					n_pf->add((uint32_t)body->GetUserData(), PhysicsFrameData(from_b2Vec(body->GetPosition()), from_b2Vec(body->GetLinearVelocity()), body->GetAngle(), body->GetAngularVelocity()));

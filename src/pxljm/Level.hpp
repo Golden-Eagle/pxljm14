@@ -4,6 +4,7 @@
 #include <gecom/Entity.hpp>
 #include <gecom/Box2D.hpp>
 #include <gecom/Bound.hpp>
+#include <gecom/Scene.hpp>
 
 
 

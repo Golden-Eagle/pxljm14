@@ -13,9 +13,9 @@ uint32_t gecom::WorldProxy::createBody(const b2BodyDef& def, std::shared_ptr<B2P
 }
 
 void gecom::WorldProxy::receivePFO(std::shared_ptr<PhysicsFrame> pfo) {
-	log("phys-thread") << "got that physics frame on the main thread";
+	//log("phys-thread") << "got that physics frame on the main thread";
 	for (auto p : pfo->getAll()) {
-		log("phys-thread") << "p.first: " << p.first << "\tpfo->getAll().count:" << pfo->getAll().size();
+		//log("phys-thread") << "p.first: " << p.first << "\tpfo->getAll().count:" << pfo->getAll().size();
 		auto target_body = m_bodies.find(p.first);
 		if (target_body != m_bodies.end()) {
 			target_body->second->recieveFrame(p.second);

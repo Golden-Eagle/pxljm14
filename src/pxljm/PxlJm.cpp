@@ -145,6 +145,7 @@ public:
 class TestState : public State<> {
 	std::shared_ptr<Entity> e;
 	std::shared_ptr<WorldProxy> world;
+	Scene2D m_scene;
 
 public:
 	TestState(Game *game) {
@@ -155,6 +156,8 @@ public:
 		auto phs = std::make_shared<B2PhysicsComponent>(e, world);
 		phs->doShit();
 		e->addComponent<B2PhysicsComponent>(phs);
+
+		m_scene.add(e);
 
 		// auto physComp = std::make_shared<Box2DGameComponent>(sceneWorld);
 		// e->addComponent<PhysicsComponent>(physComp);
@@ -176,6 +179,12 @@ public:
 	
 	virtual void drawForeground() override {
 		//log("Test") << "drawing";
+
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		draw_queue q = m_scene.makeDrawQueue(aabbd(vec3d(), vec3d::one() * 20));
+		q.execute();
+
 	}
 };
 
@@ -212,5 +221,7 @@ int main() {
 	delete win;
 
 	glfwTerminate();
+
+	cin.get();
 
 }

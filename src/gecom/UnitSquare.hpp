@@ -4,6 +4,7 @@
 #include "gecom/GL.hpp"
 
 #include "Entity.hpp"
+#include "Scene.hpp"
 
 namespace gecom {
 	class UnitSquare : public DrawableComponent {
@@ -33,6 +34,13 @@ namespace gecom {
 			glBindVertexArray(vaoID);
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 			glBindVertexArray(0);
+		}
+
+		virtual void pushDrawCalls(draw_queue &q) {
+			i3d::vec3d p = getParent()->getPosition();
+			q.push(draw_call(Technique::singleton<DefaultTechnique>(), i3d::mat4d::translate(p), [=] {
+				draw();
+			}));
 		}
 	};
 }

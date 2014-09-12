@@ -22,12 +22,8 @@ namespace gecom {
 		EntityComponent(std::shared_ptr<Entity> parent) : m_parent(parent) { }
 		std::shared_ptr<Entity>& getParent() { return m_parent; }
 	};
-	class DrawableComponent : public EntityComponent {
-	public:
-		DrawableComponent(std::shared_ptr<Entity> parent) : EntityComponent(parent) { }
-		virtual void draw() =0;
-	};
 
+	
 	class Entity {
 		// TODO physics data interpolation?
 		i3d::vec3d m_position;
@@ -40,18 +36,26 @@ namespace gecom {
 		static std::atomic<entity_id_t> sm_ID;
 		entity_id_t m_ID = 0;
 		std::vector< std::shared_ptr<Entity>> m_children;
+
 	public:
 		Entity() { m_ID = Entity::sm_ID.fetch_add(1); }
 
 		entity_id_t getID() const { return m_ID; }
+
 		void addChild(std::shared_ptr<Entity>& i_child) {
 			m_children.push_back(i_child);
 		}
+
 		const std::vector< std::shared_ptr< Entity > > & getChildren() const {
 			return m_children;
 		}
 
 		i3d::vec3d getPosition() { return m_position; }
+
+		// TODO - NOT THIS
+		void setPosition(const i3d::vec3d &p) {
+			m_position = p;
+		}
 
 		virtual aabbd getWorldAABB() {
 			return aabbd();
