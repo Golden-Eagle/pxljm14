@@ -28,8 +28,8 @@ namespace gecom {
 		// TODO physics data interpolation?
 		i3d::vec3d m_position;
 		i3d::vec3d m_velocity;
-		i3d::vec3d m_rotation;
-		i3d::vec3d m_angl_vel;
+		double m_rotation;
+		double m_angl_vel;
 
 		std::map<std::type_index, std::vector<std::shared_ptr<EntityComponent>>> components;
 
@@ -51,10 +51,16 @@ namespace gecom {
 		}
 
 		i3d::vec3d getPosition() { return m_position; }
+		double getRotation() { return m_rotation; }
 
 		// TODO - NOT THIS
 		void setPosition(const i3d::vec3d &p) {
 			m_position = p;
+		}
+		
+		// TODO - NOT THIS
+		void setRotation(const double r) {
+			m_rotation = r;
 		}
 
 		virtual aabbd getWorldAABB() {
