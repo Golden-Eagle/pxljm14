@@ -182,7 +182,7 @@ public:
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		draw_queue q = m_scene.makeDrawQueue(aabbd(vec3d(), vec3d::one() * 20));
+		draw_queue q = m_scene.makeDrawQueue(aabbd(vec3d(), vec3d::one() * 20), draw_type::standard);
 		q.execute();
 
 	}

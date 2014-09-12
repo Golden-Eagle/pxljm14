@@ -69,6 +69,15 @@ namespace gecom{
 		}
 	};
 
+	struct draw_type {
+		enum type {
+			standard,
+			shadow,
+			colorpick,
+			bound
+		};
+	};
+
 	class draw_call {
 	private:
 		Technique *m_tech = nullptr;
@@ -209,7 +218,7 @@ namespace gecom{
 	public:
 		DrawableComponent(std::shared_ptr<Entity> parent) : EntityComponent(parent) { }
 
-		virtual void pushDrawCalls(draw_queue &q) { }
+		virtual void pushDrawCalls(draw_queue &q, unsigned dt) { }
 
 		virtual void draw() =0;
 
@@ -299,14 +308,14 @@ namespace gecom{
 			return search(bb);
 		}
 
-		draw_queue makeDrawQueue(const aabbd &bb) {
+		draw_queue makeDrawQueue(const aabbd &bb, unsigned dt) {
 			// TODO draw 'types'
 			draw_queue q(this);
 			auto v = search(bb);
 			for (auto &e : v) {
 				auto vd = e->getComponents<DrawableComponent>();
 				for (auto &d : vd) {
-					d->pushDrawCalls(q);
+					d->pushDrawCalls(q, dt);
 				}
 			}
 			return q;

@@ -36,11 +36,18 @@ namespace gecom {
 			glBindVertexArray(0);
 		}
 
-		virtual void pushDrawCalls(draw_queue &q) {
+		virtual void pushDrawCalls(draw_queue &q, unsigned dt) {
 			i3d::vec3d p = getParent()->getPosition();
-			q.push(draw_call(Technique::singleton<DefaultTechnique>(), i3d::mat4d::translate(p), [=] {
-				draw();
-			}));
+			switch (dt)
+			{
+			case draw_type::standard : 
+				q.push(draw_call(Technique::singleton<DefaultTechnique>(), i3d::mat4d::translate(p), [=] {
+					draw();
+				}));
+				break;
+			default:
+				break;
+			}
 		}
 	};
 }
