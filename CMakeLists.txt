@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 2.8.3)
 # enable IDE project folders
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
-project(Platform CXX C)
+project(PXLJM14 CXX C)
 
 #option(BUILD_DOCUMENTATION "Use Doxygen to generate HTML based API documentation" OFF)
 #if(BUILD_DOCUMENTATION)
