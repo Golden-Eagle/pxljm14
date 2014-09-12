@@ -383,6 +383,9 @@ namespace gecom {
 						log("StateManager").error() << "exception handler called for non-exception. wat?";
 					} catch (std::exception &e) {
 						log("StateManager").error() << "exception: " << e.what();
+#ifndef NDEBUG
+						throw;
+#endif
 					}
 					return make_unique<NullAction>();
 				}
