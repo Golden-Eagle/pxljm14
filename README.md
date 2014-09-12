@@ -20,7 +20,7 @@ on linux, you need to build then move to pxljm14 before running
 ```
 make
 cd ..
-./build/bin/platform
+./build/bin/pxljm
 ```
 
 Instructions will surely change as names change in project.
