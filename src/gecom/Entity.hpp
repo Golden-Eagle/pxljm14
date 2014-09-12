@@ -9,7 +9,6 @@
 #include <typeindex>
 
 #include "GECom.hpp"
-#include "Entity.hpp"
 
 namespace gecom {
 	class Entity;

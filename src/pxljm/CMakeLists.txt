@@ -1,10 +1,11 @@
 
 SET(PXLJM_SOURCES
 	PxlJm.cpp
+	Level.cpp
 )
 
 SET(PXLJM_HEADERS
-
+	Level.hpp
 )
 
 add_executable(pxljm ${PXLJM_SOURCES} ${PXLJM_HEADERS})
