@@ -85,14 +85,14 @@ namespace gecom {
 			return m_center + m_halfsize;
 		}
 
-		inline bool contains(const vec3_t &p) {
+		inline bool contains(const vec3_t &p) const {
 			vec3_t dist = p - m_center;
 			return (std::abs(dist.x()) <= m_halfsize.x()
 				&& std::abs(dist.y()) <= m_halfsize.y()
 				&& std::abs(dist.z()) <= m_halfsize.z());
 		}
 
-		inline bool contains(const aabb &a) {
+		inline bool contains(const aabb &a) const {
 			vec3_t dist = a.m_center - m_center;
 			vec3_t size_diff = m_halfsize - a.m_halfsize;
 			return (std::abs(dist.x()) <= size_diff.x()
@@ -100,7 +100,7 @@ namespace gecom {
 				&& std::abs(dist.z()) <= size_diff.z());
 		}
 
-		inline bool intersects(const aabb &a) {
+		inline bool intersects(const aabb &a) const {
 			vec3_t dist = a.m_center - m_center;
 			vec3_t size_sum = m_halfsize + a.m_halfsize;
 			return (std::abs(dist.x()) <= size_sum.x()

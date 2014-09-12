@@ -262,13 +262,18 @@ namespace gecom {
 				assert(!m_children[cid]);
 				m_children[cid] = child;
 				m_count += child->count();
+				// need to ensure the child is added properly
 				unleafify();
+				if (m_count <= GECOM_QUADTREE_MAX_LEAF_ELEMENTS) {
+					// if this should actually be a leaf after all
+					leafify();
+				}
 			}
 
-			inline void print(const std::string &indent) {
-				std::cout << indent << m_bound << std::endl;
+			inline void print(const std::string &indent = "") {
+				std::cout << indent << m_bound << " (node)" << std::endl;
 				for (auto it = m_values.begin(); it != m_values.end(); ++it) {
-					std::cout << indent << "    " << **it << std::endl;
+					std::cout << indent << "    " << it->second << " : " << it->first << std::endl;
 				}
 				for (Node **pn = m_children + 4; pn --> m_children; ) {
 					if (*pn) (*pn)->print(indent + "    ");
@@ -480,28 +485,3 @@ namespace gecom {
 }
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
