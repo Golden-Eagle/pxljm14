@@ -262,7 +262,12 @@ namespace gecom {
 				assert(!m_children[cid]);
 				m_children[cid] = child;
 				m_count += child->count();
+				// need to ensure the child is added properly
 				unleafify();
+				if (m_count <= GECOM_QUADTREE_MAX_LEAF_ELEMENTS) {
+					// if this should actually be a leaf after all
+					leafify();
+				}
 			}
 
 			inline void print(const std::string &indent = "") {
