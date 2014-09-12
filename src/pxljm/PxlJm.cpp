@@ -169,9 +169,9 @@ public:
 		// myScene.add(e);
 
 		// some kind of call to game->render(myScene);
-		DrawQueue dq;
-		dq.insert(make_shared<DrawCall>(0, e->getComponents<DrawableComponent>()[0], i3d::mat4d()));
-		dq.execute();
+		//DrawQueue dq;
+		//dq.insert(make_shared<DrawCall>(0, e->getComponents<DrawableComponent>()[0], i3d::mat4d()));
+		//dq.execute();
 		return nullAction();
 	}
 	

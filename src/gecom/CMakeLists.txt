@@ -6,7 +6,7 @@ SET(GECOM_SOURCES
 	Concurrent.cpp
 	Window.cpp
 	Chrono.cpp
-	
+	Render.cpp
 	Entity.cpp
 	json11.cpp
 	perlin.cpp
