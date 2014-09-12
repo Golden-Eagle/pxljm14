@@ -20,6 +20,8 @@
 
 #include <gecom/Quadtree.hpp>
 
+#include "Level.hpp";
+
 using namespace std;
 using namespace gecom;
 using namespace i3d;
@@ -158,6 +160,12 @@ public:
 		e->addComponent<B2PhysicsComponent>(phs);
 
 		m_scene.add(e);
+
+		pxljm::LevelGenerator lg;
+		auto level = lg.getTestLevel();
+		level->load(m_scene);
+
+
 
 		// auto physComp = std::make_shared<Box2DGameComponent>(sceneWorld);
 		// e->addComponent<PhysicsComponent>(physComp);
