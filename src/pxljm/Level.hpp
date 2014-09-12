@@ -1,69 +1,72 @@
-
-
 #include <memory>
 #include <vector>
 
 #include <gecom/Entity.hpp>
 #include <gecom/Box2D.hpp>
+#include <gecom/Bound.hpp>
 
 
 
 namespace pxljm {
 
 	class ChunkDrawableComponent : gecom::DrawableComponent {
-
+		ChunkDrawableComponent(shared_ptr<Chunk> i_chunk);
+		virtual void draw();
 	};
 
 	class ChunkPhysicsComponent : gecom::EntityComponent{
-
+		
 	};
 
-
-	class Chunk : gecom::Entity {
-		Chunk() : gecom::Entity() {
-			//create enttity components and register to me
-
-
-			// e->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(e));
-			// e->addComponent<B2PhysicsComponent>(std::make_shared<B2PhysicsComponent>(e));
-		}
+	class Chunk : public gecom::Entity {
+	public:
+		Chunk(int i_xpos, int i_ypos, LevelGenerator::tile_grid i_grid);
+	private:
 	};
 
-
-
-
-
-
-
-
-
-
-
-
-	struct Level {
-		std::vector<std::shared_ptr<Chunk>> chunks;
-		Level() : chunks() {
-			//level init
-		}
+	class Level {
+	public:
+		Level();
+		void addChunk(std::shared_ptr<Chunk>);
+		void load();
+		void unload();
+	private:
+		std::vector<std::shared_ptr<Chunk>> m_chunks;
 	};
 
+	struct Tile {
+		bool solid;
+		Tile() : solid(false) {}
+	};
 
 	class LevelGenerator {
-	private:
-
 	public:
-		LevelGenerator(long i_seed = 0l) { }
+		using tile_column = std::vector<Tile>;
+		using tile_grid = std::vector<tile_column>;
 
-		std::shared_ptr<Level> getTestlevel() {
-			//create Chunks
-			//add platforms
+		LevelGenerator();
+		int getChunkSize();
+		void setChunkSize(int i_size);
+		std::shared_ptr<Level> getTestLevel();
+		std::shared_ptr<Level>  getLevel(/*something*/);
 
-			//compile platforms into level...
+	private:
+		int m_chunkSize;
 
-			//to compile for now
-			return std::shared_ptr<Level>(new Level());
+		tile_grid makeTileGrid(int i_width, int i_height); //helper method
+		std::shared_ptr<Level> compileLevel(tile_grid i_tiles);
+
+
+		//Tile grid helper method
+		inline LevelGenerator::tile_grid LevelGenerator::makeTileGrid(int i_width, int i_height){
+			tile_grid grid;
+			for (int x = 0; x < i_width; x++){
+				tile_column col;
+				for (int y = 0; y < i_height; y++){
+					col.push_back(Tile());
+				}
+				grid.push_back(col);
+			}
 		}
 	};
-
-
 }
