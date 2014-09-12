@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <functional>
 #include <unordered_map>
+#include <utility>
 
 #include "GECom.hpp"
 #include "Bound.hpp"
@@ -50,10 +51,17 @@ namespace gecom {
 			bool m_isleaf = true;
 
 			inline void dump(map_t &values) {
-				values.insert(m_values.begin(), m_values.end());
+				// move values out of this node
+				for (auto it = m_values.begin(); it != m_values.end(); ++it) {
+					values.insert(std::move(*it));
+				}
+				// move values out of child nodes
 				for (Node **pn = m_children + 4; pn --> m_children; ) {
 					if (*pn) (*pn)->dump(values);
 				}
+				// safety
+				m_values.clear();
+				m_count = 0;
 			}
 
 			inline unsigned childID(const vec3_t &p) {
@@ -111,9 +119,15 @@ namespace gecom {
 
 			// insert a value, using a specified bounding box
 			inline bool insert(const T &t, const aabb_t &a) {
+				T t2(t);
+				return insert(std::move(t2), a);
+			}
+
+			// move-insert a value, using a specified bounding box
+			inline bool insert(T &&t, const aabb_t &a) {
 				if (!m_bound.contains(a)) throw out_of_bounds();
 				if (m_isleaf && m_count < GECOM_QUADTREE_MAX_LEAF_ELEMENTS) {
-					if (!m_values.insert(t).second) return false;
+					if (!m_values.insert(std::move(std::make_pair(std::move(t), a))).second) return false;
 				} else {
 					// not a leaf or should not be
 					unleafify();
@@ -121,7 +135,7 @@ namespace gecom {
 					unsigned cid_max = childID(a.max());
 					if (cid_min != cid_max) {
 						// element spans multiple child nodes, insert into this one
-						if (!m_values.insert(std::make_pair(t, a)).second) return false;
+						if (!m_values.insert(std::move(std::make_pair(std::move(t), a))).second) return false;
 					} else {
 						// element contained in one child node - create if necessary then insert
 						Node *child = m_children[cid_min];
@@ -135,10 +149,10 @@ namespace gecom {
 							m_children[cid_min] = child;
 						}
 						try {
-							if (!child->insert(t, a)) return false;
+							if (!child->insert(std::move(t), a)) return false;
 						} catch (out_of_bounds &e) {
 							// child doesn't want to accept it
-							if (!m_values.insert(std::make_pair(t, a)).second) return false;
+							if (!m_values.insert(std::move(std::make_pair(std::move(t), a))).second) return false;
 						}
 					}
 				}
@@ -299,7 +313,11 @@ namespace gecom {
 		
 		// kill the z dimension of an aabb so this actually functions as a quadtree
 		static inline aabb_t sanitize(const aabb_t &a) {
-			// TODO
+			vec3_t c = a.center();
+			vec3_t h = a.halfsize();
+			c.z() = 0;
+			h.z() = 0;
+			return aabb_t(c, h);
 		}
 
 		inline void destroy() {
@@ -335,9 +353,15 @@ namespace gecom {
 		}
 		
 		inline bool insert(const T &value, const aabb_t &valuebb) {
-			if (!m_root) m_root = new Node(sanitize(valuebb));
+			T t2(value);
+			return insert(std::move(t2), valuebb);
+		}
+
+		inline bool insert(T &&value, const aabb_t &valuebb) {
+			aabb_t valuebb2 = sanitize(valuebb);
+			if (!m_root) m_root = new Node(valuebb2);
 			try {
-				m_root->insert(value, valuebb);
+				m_root->insert(std::move(value), valuebb2);
 			} catch (out_of_bounds &) {
 				// make new root
 				Node * const oldroot = m_root;
@@ -345,7 +369,7 @@ namespace gecom {
 				// vector from centre to max of new root
 				const vec3_t vr = 2.0 * a.halfsize();
 				// vector from centre of current root to centre of new element
-				const vec3_t vct = valuebb.center() - a.center();
+				const vec3_t vct = valuebb2.center() - a.center();
 				// vector from current root to corner nearest centre of new element
 				vec3_t corner = vr * 0.5;
 				if (vct.x() < 0) corner.x() = -corner.x();
@@ -360,7 +384,7 @@ namespace gecom {
 					delete oldroot;
 				}
 				// re-attempt to add
-				return insert(value, valuebb);
+				return insert(std::move(value), valuebb2);
 			}
 		}
 		
@@ -425,12 +449,32 @@ namespace gecom {
 	
 	template <typename T, typename CoordT, typename HashT, typename EqualToT>
 	inline void quadtree<T, CoordT, HashT, EqualToT>::Node::unleafify() {
-		// TODO
+		if (m_isleaf) {
+			m_isleaf = false;
+			// move current elements out of node
+			map_t temp = std::move(m_values);
+			// decrement the count because re-inserting will increment it again
+			m_count -= temp.size();
+			// re-insert values
+			for (auto it = temp.begin(); it != temp.end(); ++it) {
+				insert(std::move(it->first), it->second);
+			}
+		}
 	}
 	
 	template <typename T, typename CoordT, typename HashT, typename EqualToT>
 	inline void quadtree<T, CoordT, HashT, EqualToT>::Node::leafify() {
-		// TODO
+		if (!m_isleaf) {
+			m_isleaf = true;
+			// dump values in child nodes into this one
+			for (Node **pn = m_children + 4; pn --> m_children; ) {
+				if (*pn) {
+					(*pn)->dump(m_values);
+					delete *pn;
+					*pn = nullptr;
+				}
+			}
+		}
 	}
 
 }

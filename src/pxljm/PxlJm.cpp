@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iostream>
 
+#include <gecom/GECom.hpp>
 #include <gecom/Window.hpp>
 #include <gecom/Resource.hpp>
 #include <gecom/Config.hpp>
@@ -17,8 +18,9 @@
 
 #include <gecom/Quadtree.hpp>
 
-using namespace gecom;
 using namespace std;
+using namespace gecom;
+using namespace i3d;
 
 //
 // dropping example state machine code here for starters
@@ -198,14 +200,15 @@ int main() {
 
 	i3d::mat4d() * aabbd() * 3;
 
-	quadtree<shared_ptr<Entity>> etree;
+	quadtree<string> etree;
+	etree.insert("foo", aabbd(vec3d::zero(), vec3d(1, 1, 0)));
 
-	// // make an error
-	// try {
-	// 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 9001);
-	// } catch (gl_error &e) {
-	// 	log() << "DID I JUST CATCH A GL ERROR?";
-	// }
+	// make an error
+	try {
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 9001);
+	} catch (gl_error &e) {
+		log() << "DID I JUST CATCH A GL ERROR?";
+	}
 
 	// Event<int> e1;
 
