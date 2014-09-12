@@ -10,6 +10,7 @@ SET(GECOM_SOURCES
 	Entity.cpp
 	json11.cpp
 	perlin.cpp
+	Box2D.cpp
 
 )
 
