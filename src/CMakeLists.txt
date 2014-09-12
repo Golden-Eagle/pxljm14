@@ -5,4 +5,4 @@ include_directories("${PROJECT_SOURCE_DIR}/src")
 # this needs to be first
 add_subdirectory(gecom)
 
-add_subdirectory(platform)
+add_subdirectory(pxljm)
