@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <typeindex>
 
+#include "Window.hpp"
+
 #include "State.hpp"
 
 namespace gecom {
@@ -66,11 +68,18 @@ namespace gecom {
 		bool game_init = false;
 		StateManager state_manager;
 		GameComponentManager ec_manager;
+		Window* win;
 
 	public:
 		template <typename FirstStateT, typename... ArgTR>
 		void init(ArgTR && ...args) {
-			game_init = true;
+			
+
+			win = createWindow().visible(true);
+			win->makeContextCurrent();
+
+			win->shaderManager()->addSourceDirectory("./res/shader");
+
 			state_manager.init<FirstStateT>(std::forward<ArgTR>(args)...);
 
 			#ifndef GECOM_NO_DEFAULT_EC
@@ -78,6 +87,7 @@ namespace gecom {
 				// add resourcemanager ?
 				// ?
 			#endif
+			game_init = true;
 		}
 
 		void run() {
@@ -94,6 +104,7 @@ namespace gecom {
 
 				// draw
 				state_manager.draw();
+				win->swapBuffers();
 			}
 		}
 

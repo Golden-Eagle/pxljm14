@@ -46,6 +46,15 @@ namespace gecom {
 				sortDrawQueue(); 
 			return m_drawqueue;
 		}
+
+		void execute() {
+			if (m_draw_queue_dirty)
+				sortDrawQueue();
+
+			for (auto it : m_drawqueue) {
+				it->getDrawable()->draw();
+			}
+		}
 	};
 }
 #endif

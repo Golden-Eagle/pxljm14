@@ -9,13 +9,21 @@
 #include <typeindex>
 
 #include "GECom.hpp"
+#include "Entity.hpp"
 
 namespace gecom {
+	class Entity;
+
 	using entity_id_t = uint32_t;
 	
-	class EntityComponent { };
+	class EntityComponent { 
+		std::shared_ptr<Entity> m_parent;
+	public:
+		EntityComponent(std::shared_ptr<Entity> parent) : m_parent(parent) { }
+	};
 	class DrawableComponent : public EntityComponent {
 	public:
+		DrawableComponent(std::shared_ptr<Entity> parent) : EntityComponent(parent) { }
 		virtual void draw() =0;
 	};
 
@@ -57,7 +65,8 @@ namespace gecom {
 					rets.push_back(std::static_pointer_cast<T>(*c));
 				}
 			}
-			return rets;		}
+			return rets;		
+		}
 	};
 }
 

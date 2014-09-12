@@ -15,6 +15,8 @@
 #include <gecom/Scene.hpp>
 #include <gecom/Entity.hpp>
 #include <gecom/Box2D.hpp>
+#include <gecom/UnitSquare.hpp>
+#include <gecom/Render.hpp>
 
 #include <gecom/Quadtree.hpp>
 
@@ -140,27 +142,18 @@ public:
 	}
 };
 
-class SquareDrawableComponent : public DrawableComponent {
-public:
-	SquareDrawableComponent() {
-
-	}
-	
-
-	void draw() {
-	}
-};
-
 class TestState : public State<> {
 	InefficentScene myScene;
 	std::shared_ptr<b2World> sceneWorld;
+	std::shared_ptr<Entity> e;
 
 public:
 	TestState() { 
 		// sceneWorld = game.getComponent<Box2DGameComponent>().addWorld(i3d::vec3f(0.0f, -10.0f, 0.0f));
 
-		auto e = std::make_shared<Entity>();
-		e->addComponent<DrawableComponent>(std::make_shared<SquareDrawableComponent>());
+		e = std::make_shared<Entity>();
+		e->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(e));
+		e->addComponent<B2PhysicsComponent>(std::make_shared<B2PhysicsComponent>(e));
 
 		// auto physComp = std::make_shared<Box2DGameComponent>(sceneWorld);
 		// e->addComponent<PhysicsComponent>(physComp);
@@ -176,39 +169,36 @@ public:
 		// myScene.add(e);
 
 		// some kind of call to game->render(myScene);
-
+		DrawQueue dq;
+		dq.insert(make_shared<DrawCall>(0, e->getComponents<DrawableComponent>()[0], i3d::mat4d()));
+		dq.execute();
 		return nullAction();
 	}
 	
 	virtual void drawForeground() override {
-		log("Test") << "drawing";
+		//log("Test") << "drawing";
 	}
 };
 
 int main() {
 	AsyncExecutor::start();
 
-	Window *win = createWindow();
-	win->makeContextCurrent();
-
-	win->shaderManager()->addSourceDirectory("./res/shader");
-
-	auto spec = shader_program_spec().source("showtex.glsl").define("MY_MACRO", 3.0f);
+	/*auto spec = shader_program_spec().source("showtex.glsl").define("MY_MACRO", 3.0f);
 
 	win->shaderManager()->program(spec);
-	win->shaderManager()->program(spec);
+	win->shaderManager()->program(spec);*/
 
-	i3d::mat4d() * aabbd() * 3;
+	//i3d::mat4d() * aabbd() * 3;
 
-	quadtree<string> etree;
-	etree.insert("foo", aabbd(vec3d::zero(), vec3d(1, 1, 0)));
+	//quadtree<string> etree;
+	//etree.insert("foo", aabbd(vec3d::zero(), vec3d(1, 1, 0)));
 
-	// make an error
-	try {
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 9001);
-	} catch (gl_error &e) {
-		log() << "DID I JUST CATCH A GL ERROR?";
-	}
+	//// make an error
+	//try {
+	//	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 9001);
+	//} catch (gl_error &e) {
+	//	log() << "DID I JUST CATCH A GL ERROR?";
+	//}
 
 	// Event<int> e1;
 

@@ -10,15 +10,18 @@ SET(GECOM_SOURCES
 	Entity.cpp
 	json11.cpp
 	perlin.cpp
+
 )
 
 SET(GECOM_HEADERS
+	UnitSquare.hpp
 	GECom.hpp
 	GL.hpp
 	Initial3D.hpp
 	Bound.hpp
 	Quadtree.hpp
 	Log.hpp
+	Game.hpp
 	Concurrent.hpp
 	Window.hpp
 	Chrono.hpp
