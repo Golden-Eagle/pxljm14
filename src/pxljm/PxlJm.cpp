@@ -147,10 +147,10 @@ class TestState : public State<> {
 	std::shared_ptr<WorldProxy> world;
 
 public:
-	TestState(Game& game) {
+	TestState(Game *game) {
 		// sceneWorld = game.getComponent<Box2DGameComponent>().addWorld(i3d::vec3f(0.0f, -10.0f, 0.0f));
 		e = std::make_shared<Entity>();
-		world = game.getGCM().get<Box2DGameComponent>()->addWorld(i3d::vec3d(0.0, -10.0, 0.0));
+		world = game->getGCM().get<Box2DGameComponent>()->addWorld(i3d::vec3d(0.0, -10.0, 0.0));
 		e->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(e));
 		auto phs = std::make_shared<B2PhysicsComponent>(e, world);
 		phs->doShit();
@@ -182,57 +182,35 @@ public:
 int main() {
 	AsyncExecutor::start();
 
-	/*auto spec = shader_program_spec().source("showtex.glsl").define("MY_MACRO", 3.0f);
+	// create main context, so it can be shared with
+	Window *win = createWindow();
+	win->makeContextCurrent();
 
-	win->shaderManager()->program(spec);
-	win->shaderManager()->program(spec);*/
+	win->shaderManager()->addSourceDirectory("./res/shader");
+	
+	// create contexts for background threads that share with main context
+	Window *win2 = createWindow().share(win);
+	Window *win3 = createWindow().share(win);
 
-	//i3d::mat4d() * aabbd() * 3;
+	AsyncExecutor::enqueueFast([=] {
+		win2->makeContextCurrent();
+	});
 
-	//quadtree<string> etree;
-	//etree.insert("foo", aabbd(vec3d::zero(), vec3d(1, 1, 0)));
+	AsyncExecutor::enqueueSlow([=] {
+		win3->makeContextCurrent();
+	});
 
-	//// make an error
-	//try {
-	//	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 9001);
-	//} catch (gl_error &e) {
-	//	log() << "DID I JUST CATCH A GL ERROR?";
-	//}
-
-	// Event<int> e1;
-
-	// // test auto-cancel on subscription destruction
-	// {
-	// 	auto sub1 = e1.subscribe([](int a) {
-	// 		log() << "Event happened: " << a;
-	// 		return false;
-	// 	});
-	// 	e1.notify(42);
-	// 	e1.notify(43);
-	// }
-	// // you wont see this
-	// e1.notify(44);
-
-	// // test safe cancel after event destruction
-	// {
-	// 	// when this goes out of scope nothing breaks
-	// 	subscription sub2;
-	// 	{
-	// 		Event<int> e2;
-	// 		sub2 = e2.subscribe([](int a) {
-	// 			log() << "Other event happened: " << a;
-	// 			return false;
-	// 		});
-	// 		e2.notify(9001);
-	// 		e2.notify(9002);
-	// 	}
-	// }
-
-
-	Game platform_game;
-	platform_game.create<Box2DGameComponent>();
-	platform_game.init<TestState>();
-	platform_game.run();
+	Game pxljm;
+	pxljm.create<Box2DGameComponent>();
+	pxljm.init<TestState>(win);
+	pxljm.run();
 
 	AsyncExecutor::stop();
+
+	delete win3;
+	delete win2;
+	delete win;
+
+	glfwTerminate();
+
 }

@@ -13,9 +13,11 @@
 #include "State.hpp"
 
 namespace gecom {
+
 	class Game;
 
 	class GameComponent {
+		// TODO use a pointer for this
 		Game& active_game;
 	public:
 		GameComponent(Game &g) : active_game(g) { }
@@ -68,28 +70,28 @@ namespace gecom {
 		bool game_init = false;
 		StateManager state_manager;
 		GameComponentManager ec_manager;
-		Window* win;
+		Window* win = nullptr;
 
 	public:
 		template <typename FirstStateT>
-		void init() {
-			
-
-			win = createWindow().visible(true);
-			win->makeContextCurrent();
-
-			win->shaderManager()->addSourceDirectory("./res/shader");
+		void init(Window *win_) {
+			win = win_;
 
 			// init
 			ec_manager.init();
 
-			state_manager.init<FirstStateT>(*this);
+			state_manager.init<FirstStateT>(this);
 
 			#ifndef GECOM_NO_DEFAULT_EC
 				// add audiomanager ?
 				// add resourcemanager ?
 				// ?
 			#endif
+
+			// TODO setup event dispatch ???
+
+			win->visible(true);
+
 			game_init = true;
 		}
 
@@ -98,10 +100,14 @@ namespace gecom {
 				throw std::runtime_error("Must call game::init() before game::run()");
 
 			while(!state_manager.done()) {
-				// update
 
+				// run tasks scheduled for the main thread
 				AsyncExecutor::execute(std::chrono::milliseconds(1));
 
+				// dispatch events
+				glfwPollEvents();
+
+				// update
 				ec_manager.update();
 				state_manager.update();
 

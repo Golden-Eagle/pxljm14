@@ -29,6 +29,7 @@ namespace gecom {
 	};
 
 	class Entity {
+		// TODO physics data interpolation?
 		i3d::vec3d m_position;
 		i3d::vec3d m_velocity;
 		i3d::vec3d m_rotation;
