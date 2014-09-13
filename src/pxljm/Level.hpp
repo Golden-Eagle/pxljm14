@@ -1,3 +1,6 @@
+#ifndef GECOM_LEVEL_HEADER
+#define GECOM_LEVEL_HEADER
+
 #include <memory>
 #include <vector>
 
@@ -166,3 +169,5 @@ namespace pxljm {
 		virtual int apply(int i_currentHeight, tile_grid i_grid);
 	};
 }
+
+#endif

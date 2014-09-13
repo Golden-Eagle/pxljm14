@@ -15,6 +15,9 @@ project(PXLJM14 CXX C)
 include(FindOpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
+#Spine-C
+add_subdirectory("${PROJECT_SOURCE_DIR}/ext/spine-c" "${PROJECT_BINARY_DIR}/ext/spinec")
+
 # GLFW
 add_subdirectory("${PROJECT_SOURCE_DIR}/ext/glfw-3.0.3" "${PROJECT_BINARY_DIR}/ext/glfw")
 include_directories("${PROJECT_SOURCE_DIR}/ext/glfw-3.0.3/include")
