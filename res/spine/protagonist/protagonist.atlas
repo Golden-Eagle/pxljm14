@@ -1,0 +1,118 @@
+
+protagonist.png
+size: 490,490
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+character-assets/back_arm
+  rotate: false
+  xy: 62, 126
+  size: 19, 57
+  orig: 19, 57
+  offset: 0, 0
+  index: -1
+character-assets/back_foot
+  rotate: false
+  xy: 330, 417
+  size: 41, 24
+  orig: 41, 24
+  offset: 0, 0
+  index: -1
+character-assets/back_hand
+  rotate: false
+  xy: 295, 392
+  size: 19, 23
+  orig: 19, 23
+  offset: 0, 0
+  index: -1
+character-assets/back_shin
+  rotate: true
+  xy: 330, 443
+  size: 47, 84
+  orig: 47, 84
+  offset: 0, 0
+  index: -1
+character-assets/back_shoulder
+  rotate: false
+  xy: 83, 223
+  size: 41, 122
+  orig: 41, 122
+  offset: 0, 0
+  index: -1
+character-assets/front_arm
+  rotate: false
+  xy: 251, 367
+  size: 42, 48
+  orig: 42, 48
+  offset: 0, 0
+  index: -1
+character-assets/front_foot
+  rotate: true
+  xy: 83, 169
+  size: 52, 23
+  orig: 52, 23
+  offset: 0, 0
+  index: -1
+character-assets/front_hand
+  rotate: false
+  xy: 126, 231
+  size: 19, 24
+  orig: 19, 24
+  offset: 0, 0
+  index: -1
+character-assets/front_shin
+  rotate: false
+  xy: 126, 257
+  size: 30, 88
+  orig: 30, 88
+  offset: 0, 0
+  index: -1
+character-assets/hair
+  rotate: false
+  xy: 2, 185
+  size: 79, 160
+  orig: 79, 160
+  offset: 0, 0
+  index: -1
+character-assets/head
+  rotate: false
+  xy: 2, 2
+  size: 58, 56
+  orig: 58, 56
+  offset: 0, 0
+  index: -1
+character-assets/lower_body
+  rotate: false
+  xy: 165, 417
+  size: 163, 73
+  orig: 163, 73
+  offset: 0, 0
+  index: -1
+character-assets/mid_body
+  rotate: false
+  xy: 2, 347
+  size: 161, 143
+  orig: 161, 143
+  offset: 0, 0
+  index: -1
+character-assets/neck
+  rotate: false
+  xy: 416, 446
+  size: 38, 44
+  orig: 38, 44
+  offset: 0, 0
+  index: -1
+character-assets/shoulder
+  rotate: false
+  xy: 2, 60
+  size: 58, 123
+  orig: 58, 123
+  offset: 0, 0
+  index: -1
+character-assets/upper_body
+  rotate: true
+  xy: 165, 363
+  size: 52, 84
+  orig: 52, 84
+  offset: 0, 0
+  index: -1
