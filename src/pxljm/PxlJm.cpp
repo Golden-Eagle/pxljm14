@@ -52,7 +52,7 @@ public:
 
 		box = std::make_shared<Entity>();
 		box->setPosition(i3d::vec3d(5, 10, 0));
-		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(box));
+		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(box, 1, 1));
 		player_phs = std::make_shared<B2PhysicsComponent>(box);
 		player_phs->registerWithWorld(world);
 		box->addComponent<B2PhysicsComponent>(player_phs);
@@ -64,8 +64,8 @@ public:
 
 		ground = std::make_shared<Entity>();
 		ground->setPosition(i3d::vec3d(0, -10, 0));
-		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(ground));
-		auto gphs = std::make_shared<B2PhysicsStatic>(ground);
+		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(ground, 5, 1));
+		auto gphs = std::make_shared<B2PhysicsStatic>(ground, 5, 1);
 		gphs->registerWithWorld(world);
 		ground->addComponent<B2PhysicsComponent>(gphs);
 

@@ -30,7 +30,7 @@ namespace pxljm {
 
 	class B2ChunkPhysicsComponent : public gecom::B2PhysicsStatic {
 	public:
-		B2ChunkPhysicsComponent(std::shared_ptr<Chunk> parent) : gecom::B2PhysicsStatic(parent) { }
+		B2ChunkPhysicsComponent(std::shared_ptr<Chunk> parent) : gecom::B2PhysicsStatic(parent, 0, 0) { }
 
 		void registerWithWorld(std::shared_ptr<gecom::WorldProxy> world) {
 
@@ -42,7 +42,7 @@ namespace pxljm {
 						b2BodyDef nbodydef;
 						nbodydef.type = b2_staticBody;
 						auto body_pos = getParent()->getPosition() + i3d::vec3d(x+0.5, y+0.5, 0);
-						gecom::log("chunk-phys") << "Creating B2ChunkPhysicsComponent at " << body_pos.x() << ", " << body_pos.y();
+						//gecom::log("chunk-phys") << "Creating B2ChunkPhysicsComponent at " << body_pos.x() << ", " << body_pos.y();
 						nbodydef.position.Set(body_pos.x(), body_pos.y());
 						uint32_t nbody = world->createBody(nbodydef, shared_from_this());
 
