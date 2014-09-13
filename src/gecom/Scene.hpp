@@ -41,6 +41,7 @@ namespace gecom{
 		}
 
 		virtual inline void bind() { }
+		virtual inline void unbind() { }
 		virtual inline GLuint program() { return 0; }
 		virtual inline void update(GLuint prog, const Scene &scene, const i3d::mat4d &mv) { }
 		virtual inline ~Technique() { }
@@ -195,6 +196,7 @@ namespace gecom{
 				q.pop();
 				auto tech2 = d.technique();
 				if (tech2 != tech) {
+					if (tech) tech->unbind();
 					tech = tech2;
 					auto prog2 = d.program();
 					if (prog2 != prog) {
@@ -208,6 +210,7 @@ namespace gecom{
 				// draw
 				d.draw();
 			}
+			if (tech) tech->unbind();
 	
 			glUseProgram(0);
 
