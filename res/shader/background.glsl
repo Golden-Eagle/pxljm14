@@ -19,7 +19,7 @@ void main() {
 	tc *= vec2(min(1.0, ratio / tr), min(1.0, tr / ratio));
 	tc += 0.5;
 	
-	frag_color = vec4(texture(sampler_bg, tc).rgb, 1.0);
+	frag_color = texture(sampler_bg, tc);
 
 	gl_FragDepth = 1.0;
 	
