@@ -6,6 +6,7 @@
 #include <gecom/Bound.hpp>
 #include <gecom/Scene.hpp>
 #include <gecom/Window.hpp>
+#include <gecom/PNG.hpp>
 
 namespace pxljm {
 
@@ -49,14 +50,35 @@ namespace pxljm {
 	class ChunkStandardTechnique : public gecom::Technique {
 	private:
 		gecom::shader_program_spec m_prog_spec;
+		GLuint m_tex_atlas;
 
 	public:
 		inline ChunkStandardTechnique() {
 			m_prog_spec.source("chunk_standard.glsl");
 
-		}
-		virtual inline void bind() {
+			gecom::image img(gecom::image::type_png(), "./res/textures/atlas.png", false);
 
+			unsigned lod = 0;
+			while ((1 << lod) <= img.width() && (1 << lod) <= img.height()) lod++;
+
+			glGenTextures(1, &m_tex_atlas);
+			glBindTexture(GL_TEXTURE_2D, m_tex_atlas);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, lod);
+
+
+			// min/max mipmap level???
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, img.width(), img.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data());
+			glGenerateMipmap(GL_TEXTURE_2D);
+
+		}
+
+		virtual inline void bind() {
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, m_tex_atlas);
 		}
 
 		virtual inline GLuint program() {
@@ -66,6 +88,8 @@ namespace pxljm {
 		virtual inline void update(GLuint prog, const gecom::Scene &scene, const i3d::mat4d &mv) {
 			glUniformMatrix4fv(glGetUniformLocation(prog, "modelview_matrix"), 1, true, i3d::mat4f(mv));
 			glUniformMatrix4fv(glGetUniformLocation(prog, "projection_matrix"), 1, true, i3d::mat4f::scale(0.1));
+			glUniform1i(glGetUniformLocation(prog, "sampler_atlas"), 0);
+
 		}
 	};
 
