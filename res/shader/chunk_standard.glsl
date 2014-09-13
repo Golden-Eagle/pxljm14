@@ -19,11 +19,11 @@ out VertexData {
 } vertex_out;
 
 void main() {
-	vec3 pos_v = (modelview_matrix * vec4(data1.xy + vec2(data2.xy), 0.0, 1.0)).xyz;
+	vec3 pos_v = (modelview_matrix * vec4(data1.xy + vec2(data2.xy), 0.0, 1.0)).xyz; // + vec3(float(gl_InstanceID), 0.0, 0.0);
 	gl_Position = projection_matrix * vec4(pos_v, 1.0);
 	vertex_out.pos_v = pos_v;
 	vertex_out.data2 = data2;
-	vertex_out.id = gl_InstanceID;
+	vertex_out.id = uint(gl_InstanceID);
 }
 
 #endif
@@ -39,7 +39,7 @@ in VertexData {
 out vec4 frag_color;
 
 void main() {
-	frag_color = vec4(1.0, 0.0, 0.0, 1.0);
+	frag_color = vec4(1.0, float(vertex_in.id) / 256.0, 0.0, 1.0);
 }
 
 #endif
