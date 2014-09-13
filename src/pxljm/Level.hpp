@@ -144,4 +144,25 @@ namespace pxljm {
 			return true;
 		}
 	};
+
+	class LevelComponent{
+	private:
+		int m_start;
+		int m_end;
+	public:
+		LevelComponent(int i_start, int i_end);
+		virtual void apply(int i_height) = 0;
+	};
+
+	class MovingComponent : public LevelComponent{
+	public:
+		MovingComponent(int i_start, int i_end);
+		virtual int apply(int i_currentHeight, tile_grid i_grid);
+	};
+
+	class JumpComponent : public LevelComponent{
+	public:
+		JumpComponent(int i_start, int i_end);
+		virtual int apply(int i_currentHeight, tile_grid i_grid);
+	};
 }

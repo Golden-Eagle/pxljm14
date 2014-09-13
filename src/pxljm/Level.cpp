@@ -272,5 +272,23 @@ namespace pxljm {
 		}
 		return level;
 	}
+
+	LevelComponent::LevelComponent(int i_start, int i_end) : m_start(i_start), m_end(i_end) {  }
+
+	MovingComponent::MovingComponent(int i_start, int i_end) : LevelComponent(i_start, i_end){
+
+	}
+
+	int MovingComponent::apply(int i_currentHeight, tile_grid i_grid){
+		return 0;
+	}
+
+	JumpComponent::JumpComponent(int i_start, int i_end) : LevelComponent(i_start, i_end){
+
+	}
+
+	int JumpComponent::apply(int i_currentHeight, tile_grid i_grid){
+		return 0;
+	}
 }
 
