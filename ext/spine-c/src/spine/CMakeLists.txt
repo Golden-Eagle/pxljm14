@@ -1,0 +1,63 @@
+SET(SPINEC_SOURCES
+	Animation.c
+	AnimationState.c
+	AnimationStateData.c
+	Atlas.c
+	AtlasAttachmentLoader.c
+	Attachment.c
+	AttachmentLoader.c
+	Bone.c
+	BoneData.c
+	BoundingBoxAttachment.c
+	CMakeLists.txt
+	Event.c
+	EventData.c
+	IkConstraint.c
+	IkConstraintData.c
+	Json.c
+	Json.h
+	MeshAttachment.c
+	RegionAttachment.c
+	Skeleton.c
+	SkeletonBounds.c
+	SkeletonData.c
+	SkeletonJson.c
+	Skin.c
+	SkinnedMeshAttachment.c
+	Slot.c
+	SlotData.c
+	extension.c
+)
+
+SET(SPINEC_HEADERS
+	${SPINEC_SOURCE_DIR}/include/spine/Animation.h
+	${SPINEC_SOURCE_DIR}/include/spine/AnimationState.h
+	${SPINEC_SOURCE_DIR}/include/spine/AnimationStateData.h
+	${SPINEC_SOURCE_DIR}/include/spine/Atlas.h
+	${SPINEC_SOURCE_DIR}/include/spine/AtlasAttachmentLoader.h
+	${SPINEC_SOURCE_DIR}/include/spine/Attachment.h
+	${SPINEC_SOURCE_DIR}/include/spine/AttachmentLoader.h
+	${SPINEC_SOURCE_DIR}/include/spine/Bone.h
+	${SPINEC_SOURCE_DIR}/include/spine/BoneData.h
+	${SPINEC_SOURCE_DIR}/include/spine/BoundingBoxAttachment.h
+	${SPINEC_SOURCE_DIR}/include/spine/Event.h
+	${SPINEC_SOURCE_DIR}/include/spine/EventData.h
+	${SPINEC_SOURCE_DIR}/include/spine/IkConstraint.h
+	${SPINEC_SOURCE_DIR}/include/spine/IkConstraintData.h
+	${SPINEC_SOURCE_DIR}/include/spine/MeshAttachment.h
+	${SPINEC_SOURCE_DIR}/include/spine/RegionAttachment.h
+	${SPINEC_SOURCE_DIR}/include/spine/Skeleton.h
+	${SPINEC_SOURCE_DIR}/include/spine/SkeletonBounds.h
+	${SPINEC_SOURCE_DIR}/include/spine/SkeletonData.h
+	${SPINEC_SOURCE_DIR}/include/spine/SkeletonJson.h
+	${SPINEC_SOURCE_DIR}/include/spine/Skin.h
+	${SPINEC_SOURCE_DIR}/include/spine/SkinnedMeshAttachment.h
+	${SPINEC_SOURCE_DIR}/include/spine/Slot.h
+	${SPINEC_SOURCE_DIR}/include/spine/SlotData.h
+	${SPINEC_SOURCE_DIR}/include/spine/extension.h
+	${SPINEC_SOURCE_DIR}/include/spine/spine.h
+)
+
+add_library(spinec ${SPINEC_SOURCES} ${SPINEC_HEADERS})
+
+set_target_properties(spinec PROPERTIES LINKER_LANGUAGE CXX)

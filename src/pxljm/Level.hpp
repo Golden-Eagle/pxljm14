@@ -1,3 +1,6 @@
+#ifndef GECOM_LEVEL_HEADER
+#define GECOM_LEVEL_HEADER
+
 #include <memory>
 #include <vector>
 
@@ -120,6 +123,23 @@ namespace pxljm {
 
 		std::shared_ptr<Level> compileLevel(tile_grid i_tiles);
 
+		struct BuildingHint {
+			BuildingHint() {  }
+		};
+
+		enum SpacingHint {
+			uniform,
+			swing,
+			random
+		};
+
+		std::vector<int> getSpacing(int i_width, SpacingHint i_spaceHint, int i_avgSize);
+
+		void movingSubpart(int i_height, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint);
+		void jumpSubpart(int i_height, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint);
+
+
+
 
 		//Tile grid helper method
 		inline LevelGenerator::tile_grid LevelGenerator::makeTileGrid(int i_width, int i_height){
@@ -145,3 +165,5 @@ namespace pxljm {
 		}
 	};
 }
+
+#endif
