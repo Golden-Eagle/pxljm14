@@ -15,6 +15,7 @@ SET(GECOM_SOURCES
 )
 
 SET(GECOM_HEADERS
+	ProtagonistDrawable.hpp
 	PNG.hpp
 	UnitSquare.hpp
 	GECom.hpp
@@ -43,7 +44,7 @@ add_library(gecom ${GECOM_SOURCES} ${GECOM_HEADERS})
 
 # list libs that must be linked with gecom
 # cryptopp ${CRYPTOPP_LIBRARIES}
-list(APPEND GECOM_LIBRARIES_impl glew ${GLEW_LIBRARIES} glfw ${GLFW_LIBRARIES} Box2D)
+list(APPEND GECOM_LIBRARIES_impl glew ${GLEW_LIBRARIES} glfw ${GLFW_LIBRARIES} Box2D spinec)
 if(WIN32)
 	# netcode, and cryptopp depends on wsock
 	list(APPEND GECOM_LIBRARIES_impl wsock32 ws2_32)

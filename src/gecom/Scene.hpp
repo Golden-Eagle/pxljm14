@@ -9,8 +9,10 @@
 #include <unordered_map>
 #include <mutex>
 #include <utility>
+#include <chrono>
 
 #include "Entity.hpp"
+#include "Chrono.hpp"
 #include "Initial3D.hpp"
 #include "Bound.hpp"
 #include "Quadtree.hpp"
@@ -234,6 +236,7 @@ namespace gecom{
 		virtual std::shared_ptr<Camera> getCamera() { return m_camera; }
 		virtual void setCamera(std::shared_ptr<Camera> i_camera) { m_camera = i_camera; }
 		virtual std::vector<std::shared_ptr<gecom::Entity>>& get_all() = 0;
+		virtual void update(gecom::really_high_resolution_clock::duration) = 0;
 		virtual ~Scene() { }
 	};
 
@@ -274,6 +277,12 @@ namespace gecom{
 
 		void addStatic(std::shared_ptr<gecom::Entity> i_entity) {
 			m_staticEntities.insert(i_entity, i_entity->getWorldAABB());
+		}
+
+		void update(gecom::really_high_resolution_clock::duration delta) {
+			for (auto e : m_dynamicEntities) {
+				e->update(delta);
+			}
 		}
 
 		std::vector<std::shared_ptr<gecom::Entity>>& get_all() {

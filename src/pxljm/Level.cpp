@@ -189,7 +189,7 @@ namespace pxljm {
 
 	shared_ptr<Level> LevelGenerator::getTestLevel() {
 		int height = 32;
-		int width = 1024;
+		int width = 128;
 
 		tile_grid grid = makeTileGrid(width, height);
 

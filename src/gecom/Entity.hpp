@@ -8,6 +8,7 @@
 #include <map>
 #include <typeindex>
 
+#include "Chrono.hpp"
 #include "GECom.hpp"
 #include "Bound.hpp"
 
@@ -21,6 +22,10 @@ namespace gecom {
 	public:
 		EntityComponent(std::shared_ptr<Entity> parent) : m_parent(parent) { }
 		std::shared_ptr<Entity>& getParent() { return m_parent; }
+
+		virtual void update(gecom::really_high_resolution_clock::duration delta) {
+
+		}
 	};
 
 	
@@ -41,6 +46,14 @@ namespace gecom {
 		Entity() { m_ID = Entity::sm_ID.fetch_add(1); }
 
 		entity_id_t getID() const { return m_ID; }
+
+		void update(gecom::really_high_resolution_clock::duration delta) {
+			for (auto cv : components) {
+				for (auto c : cv.second) {
+					c->update(delta);
+				}
+			}
+		}
 
 		void addChild(std::shared_ptr<Entity>& i_child) {
 			m_children.push_back(i_child);

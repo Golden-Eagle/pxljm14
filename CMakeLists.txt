@@ -17,6 +17,7 @@ include_directories(${OPENGL_INCLUDE_DIR})
 
 #Spine-C
 add_subdirectory("${PROJECT_SOURCE_DIR}/ext/spine-c" "${PROJECT_BINARY_DIR}/ext/spinec")
+include_directories("${PROJECT_SOURCE_DIR}/ext/spine-c/include")
 
 # GLFW
 add_subdirectory("${PROJECT_SOURCE_DIR}/ext/glfw-3.0.3" "${PROJECT_BINARY_DIR}/ext/glfw")
@@ -71,6 +72,8 @@ SET_PROPERTY(TARGET glew PROPERTY FOLDER "ext")
 SET_PROPERTY(TARGET gtest PROPERTY FOLDER "ext")
 SET_PROPERTY(TARGET gtest_main PROPERTY FOLDER "ext")
 #SET_PROPERTY(TARGET cryptopp PROPERTY FOLDER "ext")
+SET_PROPERTY(TARGET Box2D PROPERTY FOLDER "ext")
+SET_PROPERTY(TARGET spinec PROPERTY FOLDER "ext")
 SET_PROPERTY(TARGET gecom PROPERTY FOLDER "src")
 SET_PROPERTY(TARGET pxljm PROPERTY FOLDER "src")
 SET_PROPERTY(TARGET res PROPERTY FOLDER "res")
