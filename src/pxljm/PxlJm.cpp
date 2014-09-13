@@ -57,6 +57,9 @@ public:
 		player_phs->registerWithWorld(world);
 		box->addComponent<B2PhysicsComponent>(player_phs);
 
+		shared_ptr<Camera> camera(make_shared<Camera>(box));
+		m_scene.setCamera(camera);
+
 		m_scene.add(box);
 
 		ground = std::make_shared<Entity>();

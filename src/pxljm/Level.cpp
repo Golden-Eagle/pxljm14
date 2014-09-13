@@ -150,7 +150,7 @@ namespace pxljm {
 		tile_grid grid = makeTileGrid(width, height);
 
 		std::default_random_engine generator;
-		std::normal_distribution<double> distribution(-2.0, 2.0);
+		std::normal_distribution<double> distribution(0.0, 1.2);
 		int heightNoise = 0;
 
 		int columnHeight = 5;

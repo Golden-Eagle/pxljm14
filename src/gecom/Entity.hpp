@@ -71,6 +71,10 @@ namespace gecom {
 
 		}
 
+		i3d::mat4d getModelWorldMatrix() {
+			return i3d::mat4d::translate(getPosition()) * i3d::mat4d::rotateZ(getRotation());
+		}
+
 		template <typename B, typename T>
 		void addComponent(const std::shared_ptr<T> comp) {
 			static_assert(std::is_base_of<B, T>::value, "T must be a sublcass of B");
