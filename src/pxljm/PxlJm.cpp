@@ -77,9 +77,9 @@ public:
 		world = game->getGCM().get<Box2DGameComponent>()->addWorld(i3d::vec3d(0.0, -20.0, 0.0));
 
 		box = std::make_shared<Entity>();
-		box->setPosition(i3d::vec3d(5, 30, 0));
-		box->addComponent<DrawableComponent>(std::make_shared<ProtagonistDrawable>(box));
-		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(box, 1, 2.5));
+		box->setPosition(i3d::vec3d(5, 50, 0));
+		//box->addComponent<DrawableComponent>(std::make_shared<ProtagonistDrawable>(box));
+		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(box, 1, 1.5));
 		player_phs = std::make_shared<B2PhysicsComponent>(box);
 		player_phs->registerWithWorld(world);
 		box->addComponent<B2PhysicsComponent>(player_phs);
@@ -121,15 +121,15 @@ public:
 		//dq.execute();
 
 		if (Window::currentContext()->pollKey(GLFW_KEY_UP)) {
-			player_phs->applyLinearImpulse(i3d::vec3d(0, 100000, 0));
+			player_phs->applyLinearImpulse(i3d::vec3d(0, 10000, 0));
 		}
 		
 		if (Window::currentContext()->getKey(GLFW_KEY_RIGHT)) {
-			player_phs->applyLinearImpulse(i3d::vec3d(5000, 0, 0));
+			player_phs->applyLinearImpulse(i3d::vec3d(100, 0, 0));
 		}
 		
 		if (Window::currentContext()->getKey(GLFW_KEY_LEFT)) {
-			player_phs->applyLinearImpulse(i3d::vec3d(-5000, 0, 0));
+			player_phs->applyLinearImpulse(i3d::vec3d(-100, 0, 0));
 		}
 
 		auto delta = gecom::really_high_resolution_clock().now() - last_update;

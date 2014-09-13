@@ -7,6 +7,7 @@
 #include <Box2D/Box2D.h>
 
 #include "Game.hpp"
+#include "GameComponent.hpp"
 #include "Concurrent.hpp"
 #include "Entity.hpp"
 
@@ -90,7 +91,6 @@ namespace gecom {
 		}
 	};
 
-
 	class Box2DGameComponent : public GameComponent, public std::enable_shared_from_this < Box2DGameComponent > {
 		std::thread m_worker;
 
@@ -104,8 +104,12 @@ namespace gecom {
 		std::map<uint32_t, std::pair<std::shared_ptr<b2World>, std::shared_ptr<WorldProxy>>> worlds;
 		std::map <uint32_t, b2Body*> bodies;
 
+		std::atomic<int> current_pfs;
+	
 		inline void dowork();
 	public:
+		int getCurrentPFS() { return current_pfs; }
+
 		friend class WorldProxy;
 		Box2DGameComponent(Game &g) : GameComponent(g) { }
 
@@ -211,18 +215,19 @@ namespace gecom {
 			def.type = b2_dynamicBody;
 			def.fixedRotation = true;
 			def.position.Set(getParent()->getPosition().x(), getParent()->getPosition().y());
+			def.linearDamping = 0.6f;
 			m_b_id = world->createBody(def, shared_from_this());
 
 			auto bbb = std::make_shared<b2PolygonShape>();
-			bbb->SetAsBox(1, 2.5);
+			bbb->SetAsBox(1, 1.5);
 
 			auto fix = std::make_shared<b2FixtureDef>();
 			fix->shape = bbb.get();
-			fix->density = 1020;
-			fix->friction = 0.9f;
+			fix->density = 130;
+			fix->friction = 0.99f;
 
 			auto feet_sensor = std::make_shared<b2PolygonShape>();
-			feet_sensor->SetAsBox(1, 0.2, b2Vec2(0, -2.5), 0);
+			feet_sensor->SetAsBox(0.3, 0.2, b2Vec2(0, -1.25), 0);
 			
 			auto feet_sensor_fixture = std::make_shared<b2FixtureDef>();
 
@@ -277,15 +282,25 @@ namespace gecom {
 			getParent()->setRotation(0);
 			uint32_t bd = world->createBody(def, shared_from_this());
 
+
 			auto groundBox = std::make_shared<b2PolygonShape>();
 			groundBox->SetAsBox(m_hw, m_hh);
-			world->createShape(bd, groundBox);
+			
+
+			auto groundFix = std::make_shared<b2FixtureDef>();
+			groundFix->shape = groundBox.get();
+			groundFix->friction = 100000;
+			groundFix->density = 0.0;
+
+			world->createFixture(bd, groundFix, groundBox);
 		}
 	};
 
 	void Box2DGameComponent::dowork() {
+		auto last_pfs = gecom::really_high_resolution_clock::now();
+		int pfs = 0;
 		while (true) {
-			auto start = std::chrono::high_resolution_clock::now();
+			auto start = gecom::really_high_resolution_clock::now();
 
 			for (auto world : worlds) {
 				auto n_pf = std::make_shared<PhysicsFrame>();
@@ -304,9 +319,16 @@ namespace gecom {
 				AsyncExecutor::enqueueMain([=] { n_world_proxy->receivePFO(n_pf); });
 			}
 
-			AsyncExecutor::execute(std::chrono::milliseconds(10));
+			AsyncExecutor::execute(std::chrono::milliseconds(2));
+			pfs++;
 
-			auto dur = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - start);
+			if (gecom::really_high_resolution_clock::now() - last_pfs > std::chrono::seconds(1)) {
+				current_pfs.store(pfs);
+				pfs = 0;
+				last_pfs = gecom::really_high_resolution_clock::now();
+			}
+
+			auto dur = gecom::really_high_resolution_clock::now() - start;
 			auto sleep_duration = std::chrono::milliseconds(int(m_time_step * 1000.0f)) - dur;
 			//log("phys-thread") << "Sleeping for " << sleep_duration.count() << std::endl;
 			std::this_thread::sleep_for(sleep_duration);

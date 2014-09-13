@@ -11,10 +11,11 @@ SET(GECOM_SOURCES
 	json11.cpp
 	perlin.cpp
 	Box2D.cpp
-
+	Game.cpp
 )
 
 SET(GECOM_HEADERS
+	GameComponent.hpp
 	ProtagonistDrawable.hpp
 	PNG.hpp
 	UnitSquare.hpp

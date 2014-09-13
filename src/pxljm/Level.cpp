@@ -115,10 +115,16 @@ namespace pxljm {
 						nbodydef.position.Set(body_pos.x(), body_pos.y());
 						uint32_t nbody = world->createBody(nbodydef, shared_from_this());
 
+						
 						auto rs = std::make_shared<b2PolygonShape>();
 						rs->SetAsBox(0.5, 0.5);
 
-						world->createShape(nbody, rs);
+						auto rf = std::make_shared<b2FixtureDef>();
+						rf->shape = rs.get();
+						rf->friction = 1f;
+						rf->density = 0.0f;
+
+						world->createFixture(nbody, rf, rs);
 					}
 				}
 
