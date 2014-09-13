@@ -45,6 +45,30 @@
 	}
 
 namespace gecom {
+	class SpineTechnique : public Technique {
+		gecom::shader_program_spec spec;
+	public:
+		SpineTechnique() {
+			spec.source("spine.glsl");
+		}
+
+		virtual GLuint program() override {
+			return gecom::Window::currentContext()->shaderManager()->program(spec);
+		}
+
+		virtual void update(GLuint prog, const gecom::Scene& scene, const i3d::mat4d &mv, const size2i &sz) override {
+			Technique::update(prog, scene, mv, sz);
+		}
+
+		virtual void bind() override {
+			glEnable(GL_ALPHA_TEST);
+			glAlphaFunc(GL_NEVER, 0.5);
+		}
+
+		virtual void unbind() override {
+			glDisable(GL_ALPHA_TEST);
+		}
+	};
 
 	class SpineDrawable : public DrawableComponent, public std::enable_shared_from_this<SpineDrawable> {
 		const int cm_time_scale = 1;
@@ -55,7 +79,9 @@ namespace gecom {
 		float* m_world_vertices;
 
 		GLuint vaoID;
-		GLuint vboID;
+		GLuint vertexVBO;
+		GLuint uvVBO;
+		GLuint tex_id;
 
 	public:
 		static void callback(spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount) {
@@ -85,7 +111,11 @@ namespace gecom {
 			switch (dt)
 			{
 			case draw_type::standard:
-				q.push(draw_call(Technique::singleton<DefaultTechnique>(), mat, [=] {
+				q.push(draw_call(Technique::singleton<SpineTechnique>(), mat, [=] (GLuint prog) {
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_2D, tex_id);
+					glUniform1i(glGetUniformLocation(prog, "sampler_thing"), 0);
+
 					draw();
 				}));
 				break;
@@ -97,19 +127,41 @@ namespace gecom {
 		SpineDrawable(const std::string& n, const std::shared_ptr<Entity> parent) : DrawableComponent(parent) {
 			glGenVertexArrays(1, &vaoID);
 			glBindVertexArray(vaoID);
-			glGenBuffers(1, &vboID);
 
-			glBindBuffer(GL_ARRAY_BUFFER, vboID);
+			glGenBuffers(1, &vertexVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
+			glGenBuffers(1, &uvVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, uvVBO);
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 
 			// Load atlas, skeleton, and animations.
 			m_world_vertices = new float[1000];
 			spAtlas* atlas = spAtlas_createFromFile((std::string("res/spine/") + n + "/" + n + ".atlas").c_str(), 0);
+
+			gecom::image* img = (gecom::image*)(atlas->pages[0].rendererObject);
+
+			glGenTextures(1, &tex_id);
+			glBindTexture(GL_TEXTURE_2D, tex_id);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+
+			// min/max mipmap level???
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, img->width(), img->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img->data());
+			glGenerateMipmap(GL_TEXTURE_2D);
+
+
 			spSkeletonJson* json = spSkeletonJson_create(atlas);
-			json->scale = 0.01f;
+			json->scale = 0.05;
 			spSkeletonData *skeletonData = spSkeletonJson_readSkeletonDataFile(json, (std::string("res/spine/") + n + "/" + n + ".json").c_str());
 
 			if (!skeletonData) {
@@ -145,7 +197,7 @@ namespace gecom {
 				spAnimationState_setAnimationByName(m_state, 0, "test", true);
 				}
 				else {*/
-			spAnimationState_setAnimationByName(m_state, 0, "idle", true);
+			spAnimationState_setAnimationByName(m_state, 0, "run", true);
 			//spAnimationState_addAnimationByName(m_state, 0, "jump", false, 3);
 			//spAnimationState_addAnimationByName(m_state, 0, "run", true, 0);
 		//}
@@ -189,7 +241,7 @@ namespace gecom {
 			double deltaTime = std::chrono::duration_cast<std::chrono::duration<double>>(delta).count();
 			//log("spine") << "doing dat update: " << deltaTime;
 			m_skeleton->x = getParent()->getPosition().x();
-			m_skeleton->y = getParent()->getPosition().y() - 2.5;
+			m_skeleton->y = getParent()->getPosition().y() - 1.5;
 			spSkeletonBounds_update(m_bounds, m_skeleton, true);
 			spSkeleton_update(m_skeleton, deltaTime);
 			spAnimationState_update(m_state, deltaTime * cm_time_scale);
@@ -222,6 +274,7 @@ namespace gecom {
 					uint8_t a = static_cast<uint8_t>(m_skeleton->a * slot->a * 255);
 
 					float verts[12];
+					float uvs[8];
 
 					/*vertices[0].color.r = r;
 					vertices[0].color.g = g;
@@ -230,6 +283,10 @@ namespace gecom {
 					verts[0] = m_world_vertices[SP_VERTEX_X1];
 					verts[1] = m_world_vertices[SP_VERTEX_Y1];
 					verts[2] = 0;
+
+					uvs[0] = regionAttachment->uvs[SP_VERTEX_X1];
+					uvs[1] = regionAttachment->uvs[SP_VERTEX_Y1];
+
 					/*vertices[0].texCoords.x = regionAttachment->uvs[SP_VERTEX_X1] * image->width();
 					vertices[0].texCoords.y = regionAttachment->uvs[SP_VERTEX_Y1] * image->height();*/
 
@@ -240,6 +297,9 @@ namespace gecom {
 					verts[3] = m_world_vertices[SP_VERTEX_X2];
 					verts[4] = m_world_vertices[SP_VERTEX_Y2];
 					verts[5] = 0;
+
+					uvs[2] = regionAttachment->uvs[SP_VERTEX_X2];
+					uvs[3] = regionAttachment->uvs[SP_VERTEX_Y2];
 					/*vertices[1].texCoords.x = regionAttachment->uvs[VERTEX_X2] * size.x;
 					vertices[1].texCoords.y = regionAttachment->uvs[VERTEX_Y2] * size.y;*/
 
@@ -250,6 +310,9 @@ namespace gecom {
 					verts[9] = m_world_vertices[SP_VERTEX_X3];
 					verts[10] = m_world_vertices[SP_VERTEX_Y3];
 					verts[11] = 0;
+
+					uvs[4] = regionAttachment->uvs[SP_VERTEX_X3];
+					uvs[5] = regionAttachment->uvs[SP_VERTEX_Y3];
 					/*vertices[2].texCoords.x = regionAttachment->uvs[VERTEX_X3] * size.x;
 					vertices[2].texCoords.y = regionAttachment->uvs[VERTEX_Y3] * size.y;*/
 
@@ -260,6 +323,9 @@ namespace gecom {
 					verts[6] = m_world_vertices[SP_VERTEX_X4];
 					verts[7] = m_world_vertices[SP_VERTEX_Y4];
 					verts[8] = 0;
+
+					uvs[6] = regionAttachment->uvs[SP_VERTEX_X4];
+					uvs[7] = regionAttachment->uvs[SP_VERTEX_Y4];
 					/*vertices[3].texCoords.x = regionAttachment->uvs[VERTEX_X4] * size.x;
 					vertices[3].texCoords.y = regionAttachment->uvs[VERTEX_Y4] * size.y;*/
 
@@ -271,9 +337,11 @@ namespace gecom {
 					vertexArray->append(vertices[3]);*/
 					//log("spine") << "doing draw";
 
-					glBindBuffer(GL_ARRAY_BUFFER, vboID);
+					glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
 					glBufferData(GL_ARRAY_BUFFER, 3 * 4 * sizeof(float), verts, GL_DYNAMIC_DRAW);
-					glBindBuffer(GL_ARRAY_BUFFER, 0);
+					glBindBuffer(GL_ARRAY_BUFFER, uvVBO);
+					glBufferData(GL_ARRAY_BUFFER, 2 * 4 * sizeof(float), uvs, GL_DYNAMIC_DRAW);
+
 					glBindVertexArray(vaoID);
 					glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 					glBindVertexArray(0);
@@ -289,7 +357,7 @@ namespace gecom {
 
 	class ProtagonistDrawable : public SpineDrawable {
 	public:
-		ProtagonistDrawable(const std::shared_ptr<Entity> parent) : SpineDrawable(std::string("spineboy"), parent) { }
+		ProtagonistDrawable(const std::shared_ptr<Entity> parent) : SpineDrawable(std::string("protagonist"), parent) { }
 	};
 }
 

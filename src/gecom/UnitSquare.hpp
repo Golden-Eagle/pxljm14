@@ -41,7 +41,7 @@ namespace gecom {
 			switch (dt)
 			{
 			case draw_type::standard : 
-				q.push(draw_call(Technique::singleton<DefaultTechnique>(),mat, [=] {
+				q.push(draw_call(Technique::singleton<DefaultTechnique>(),mat, [=] (GLuint prog) {
 					draw();
 				}));
 				break;

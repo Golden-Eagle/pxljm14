@@ -14,6 +14,7 @@
 
 namespace gecom {
 	class Entity;
+	class Scene;
 
 	using entity_id_t = uint32_t;
 	
@@ -22,14 +23,13 @@ namespace gecom {
 	public:
 		EntityComponent(std::shared_ptr<Entity> parent) : m_parent(parent) { }
 		std::shared_ptr<Entity>& getParent() { return m_parent; }
-
 		virtual void update(gecom::really_high_resolution_clock::duration delta) {
 
 		}
 	};
 
 	
-	class Entity {
+	class Entity : public std::enable_shared_from_this<Entity> {
 		// TODO physics data interpolation?
 		i3d::vec3d m_position;
 		i3d::vec3d m_velocity;
@@ -47,7 +47,9 @@ namespace gecom {
 
 		entity_id_t getID() const { return m_ID; }
 
-		void update(gecom::really_high_resolution_clock::duration delta) {
+		virtual void init(Scene& scene) { }
+
+		virtual void update(gecom::really_high_resolution_clock::duration delta) {
 			for (auto cv : components) {
 				for (auto c : cv.second) {
 					c->update(delta);

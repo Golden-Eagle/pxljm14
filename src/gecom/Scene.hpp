@@ -84,20 +84,20 @@ namespace gecom{
 	private:
 		Technique *m_tech = nullptr;
 		i3d::mat4d m_mw;
-		std::function<void(void)> m_draw;
+		std::function<void(GLuint)> m_draw;
 		GLuint m_prog = 0;
 
 		inline void reset() {
 			m_tech = nullptr;
 			m_mw = i3d::mat4d();
-			m_draw = std::function<void(void)>();
+			m_draw = std::function<void(GLuint)>();
 			m_prog = 0;
 		}
 
 	public:
 		inline draw_call() { }
 
-		inline draw_call(Technique *tech_, const i3d::mat4d &mw_, std::function<void(void)> draw_) :
+		inline draw_call(Technique *tech_, const i3d::mat4d &mw_, std::function<void(GLuint)> draw_) :
 			m_tech(tech_), m_mw(mw_), m_draw(draw_), m_prog(tech_->program()) { }
 
 		inline draw_call(const draw_call &other) :
@@ -148,8 +148,8 @@ namespace gecom{
 			return m_mw;
 		}
 
-		inline void draw() const {
-			m_draw();
+		inline void draw(GLuint prog) const {
+			m_draw(prog);
 		}
 	};
 
@@ -226,7 +226,7 @@ namespace gecom{
 		}
 	};
 
-	class Scene {
+	class Scene : public std::enable_shared_from_this<Scene> {
 	private:
 		std::shared_ptr<Camera> m_camera = nullptr;
 	public:
@@ -270,11 +270,15 @@ namespace gecom{
 		quadtree<std::shared_ptr<gecom::Entity>> m_staticEntities;
 
 	public:
-		void add(std::shared_ptr<gecom::Entity> ne) {
+		Scene2D() : Scene() { }
+
+		inline void add(std::shared_ptr<gecom::Entity> ne) {
+			ne->init(*this);
 			m_dynamicEntities.push_back(ne);
 		}
 
-		void addStatic(std::shared_ptr<gecom::Entity> i_entity) {
+		inline void addStatic(std::shared_ptr<gecom::Entity> i_entity) {
+			i_entity->init(*this);
 			m_staticEntities.insert(i_entity, i_entity->getWorldAABB());
 		}
 
@@ -349,7 +353,7 @@ namespace gecom{
 			auto modelViewMatrix = worldView * d.modelWorld();
 			tech->update(prog, *m_scene, modelViewMatrix, sz);
 			// draw
-			d.draw();
+			d.draw(prog);
 		}
 		if (tech) tech->unbind();
 

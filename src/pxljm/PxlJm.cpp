@@ -23,6 +23,8 @@
 #include <gecom/ProtagonistDrawable.hpp>
 
 #include "Level.hpp"
+#include "PlayerEntity.hpp"
+
 using namespace std;
 using namespace gecom;
 using namespace i3d;
@@ -49,11 +51,9 @@ public:
 };
 
 class PlayState : public State<std::string> {
-	std::shared_ptr<Entity> box;
-	std::shared_ptr<Entity> ground;
+	std::shared_ptr<Entity> player;
 	std::shared_ptr<WorldProxy> world;
 	Scene2D m_scene;
-	std::shared_ptr<B2PhysicsComponent> player_phs;
 	Game* m_game;
 	GLuint m_tex_bg;
 
@@ -76,29 +76,23 @@ public:
 
 		world = game->getGCM().get<Box2DGameComponent>()->addWorld(i3d::vec3d(0.0, -20.0, 0.0));
 
-		box = std::make_shared<Entity>();
-		box->setPosition(i3d::vec3d(5, 50, 0));
+		player = std::make_shared<PlayerEntity>(world);
+		m_scene.add(player);
+		//box = std::make_shared<Entity>();
+		//box->setPosition(i3d::vec3d(5, 50, 0));
 		//box->addComponent<DrawableComponent>(std::make_shared<ProtagonistDrawable>(box));
-		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(box, 1, 1.5));
-		player_phs = std::make_shared<B2PhysicsComponent>(box);
-		player_phs->registerWithWorld(world);
-		box->addComponent<B2PhysicsComponent>(player_phs);
+		//box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(box, 1, 1.5));
+		//player_phs = std::make_shared<B2PhysicsComponent>(box);
+		//player_phs->registerWithWorld(world);
+		//box->addComponent<B2PhysicsComponent>(player_phs);
 
-		shared_ptr<SteadyFocusCamera> cameraEntity(make_shared<SteadyFocusCamera>(box));
+		//shared_ptr<SteadyFocusCamera> cameraEntity(make_shared<SteadyFocusCamera>(player));
+		auto cameraEntity = std::make_shared<SteadyFocusCamera>(player);
 		m_scene.add(cameraEntity);
-		shared_ptr<Camera> camera(make_shared<Camera>(cameraEntity));
-		m_scene.setCamera(camera);
 
-		m_scene.add(box);
-
-		ground = std::make_shared<Entity>();
-		ground->setPosition(i3d::vec3d(0, -5, 0));
-		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(ground, 5, 1));
-		auto gphs = std::make_shared<B2PhysicsStatic>(ground, 5, 1);
-		gphs->registerWithWorld(world);
-		ground->addComponent<B2PhysicsComponent>(gphs);
-
-		m_scene.add(ground);
+		auto camera = std::make_shared<Camera>(cameraEntity);
+		//shared_ptr<Camera> camera(make_shared<Camera>(cameraEntity));
+		m_scene.setCamera(camera);		
 
 		pxljm::LevelGenerator lg;
 		auto level = lg.getTestLevel();
@@ -119,18 +113,6 @@ public:
 		//DrawQueue dq;
 		//dq.insert(make_shared<DrawCall>(0, e->getComponents<DrawableComponent>()[0], i3d::mat4d()));
 		//dq.execute();
-
-		if (Window::currentContext()->pollKey(GLFW_KEY_UP)) {
-			player_phs->applyLinearImpulse(i3d::vec3d(0, 10000, 0));
-		}
-		
-		if (Window::currentContext()->getKey(GLFW_KEY_RIGHT)) {
-			player_phs->applyLinearImpulse(i3d::vec3d(100, 0, 0));
-		}
-		
-		if (Window::currentContext()->getKey(GLFW_KEY_LEFT)) {
-			player_phs->applyLinearImpulse(i3d::vec3d(-100, 0, 0));
-		}
 
 		auto delta = gecom::really_high_resolution_clock().now() - last_update;
 		last_update = gecom::really_high_resolution_clock().now();

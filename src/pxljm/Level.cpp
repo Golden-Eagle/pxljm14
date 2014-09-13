@@ -74,7 +74,7 @@ namespace pxljm {
 		switch (dt)
 		{
 		case draw_type::standard:
-			q.push(draw_call(Technique::singleton<ChunkStandardTechnique>(), i3d::mat4d::translate(p), [=] {
+			q.push(draw_call(Technique::singleton<ChunkStandardTechnique>(), i3d::mat4d::translate(p), [=] (GLuint prog) {
 				draw();
 			}));
 			break;
@@ -121,7 +121,7 @@ namespace pxljm {
 
 						auto rf = std::make_shared<b2FixtureDef>();
 						rf->shape = rs.get();
-						rf->friction = 1f;
+						rf->friction = 1.0f;
 						rf->density = 0.0f;
 
 						world->createFixture(nbody, rf, rs);

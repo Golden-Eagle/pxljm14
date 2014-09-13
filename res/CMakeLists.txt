@@ -5,6 +5,7 @@ SET(SHADERS
 	"shader/scene_default.glsl"
 	"shader/chunk_standard.glsl"
 	"shader/background.glsl"
+	"shader/spine.glsl"
 )
 
 add_custom_target(
