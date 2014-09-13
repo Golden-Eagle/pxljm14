@@ -57,6 +57,7 @@ namespace gecom {
 		static std::atomic<uint32_t> sm_world_id;
 		static std::atomic<uint32_t> sm_body_id;
 		std::map<uint32_t, std::pair<std::shared_ptr<b2World>, std::shared_ptr<WorldProxy>>> worlds;
+		std::map <uint32_t, b2Body*> bodies;
 
 		inline void dowork();
 
@@ -81,6 +82,15 @@ namespace gecom {
 			//log("phys::createBody") << "got here!" << std::endl;
 			b2Body* w = worlds[n_world_id].first->CreateBody(&def);
 			w->SetUserData((void*)n_body_id);
+			bodies[n_body_id] = w;
+		}
+
+		void createShape(uint32_t w, uint32_t b, const std::shared_ptr<b2Shape>& def) {
+			bodies[b]->CreateFixture(def.get(), 0.0f);
+		}
+
+		void createFixture(uint32_t w, uint32_t b, const std::shared_ptr<b2FixtureDef>& def, const std::shared_ptr<b2Shape>& sh) {
+			bodies[b]->CreateFixture(def.get());
 		}
 
 		void init() { m_worker = std::thread{ [this]() { this->dowork(); } }; }
@@ -105,14 +115,18 @@ namespace gecom {
 		WorldProxy(const std::shared_ptr<Box2DGameComponent>& m, uint32_t nid) : m_master(m), m_world_id(nid) { }
 
 		uint32_t createBody(const b2BodyDef& def, std::shared_ptr<B2PhysicsComponent> p);
-		void createFixture(const b2FixtureDef& def) { }
-		void createShape(const b2Shape& def) { }
+		void createFixture(const uint32_t b, const std::shared_ptr<b2FixtureDef>& def, const std::shared_ptr<b2Shape>& sh);
+		void createShape(const uint32_t b, const std::shared_ptr<b2Shape>& def);
 		void receivePFO(std::shared_ptr<PhysicsFrame> pfo);
 	};
 
 	class B2PhysicsComponent : public EntityComponent, public std::enable_shared_from_this<B2PhysicsComponent> {
 		std::shared_ptr<WorldProxy> world;
+
+		
 	public:
+		std::shared_ptr<WorldProxy> getWorld() { return world; }
+
 		B2PhysicsComponent(std::shared_ptr<Entity> parent, std::shared_ptr<WorldProxy> wp) : EntityComponent(parent), world(wp) {
 
 		}
@@ -121,7 +135,17 @@ namespace gecom {
 			b2BodyDef def;
 			def.type = b2_dynamicBody;
 			def.position.Set(getParent()->getPosition().x(), getParent()->getPosition().y());
-			world->createBody(def, shared_from_this());
+			uint32_t body = world->createBody(def, shared_from_this());
+
+			auto bbb = std::make_shared<b2PolygonShape>();
+			bbb->SetAsBox(1, 1);
+
+			auto fix = std::make_shared<b2FixtureDef>();
+			fix->shape = bbb.get();
+			fix->density = 1;
+			fix->friction = 0.3f;
+
+			world->createFixture(body, fix, bbb);
 		}
 
 		void recieveFrame(gecom::PhysicsFrameData pfd) {
@@ -129,6 +153,25 @@ namespace gecom {
 			//log("phys-test") << pfd.getPos() << std::endl;
 			// TODO - NOT THIS
 			getParent()->setPosition(pfd.getPos());
+			getParent()->setRotation(pfd.getRot());
+		}
+	};
+
+	class B2PhysicsStatic : public B2PhysicsComponent {
+	public:
+		B2PhysicsStatic(std::shared_ptr<Entity> parent, std::shared_ptr<WorldProxy> wp) : B2PhysicsComponent(parent, wp) {
+
+		}
+
+		void doShit() {
+			b2BodyDef def;
+			def.type = b2_staticBody;
+			def.position.Set(getParent()->getPosition().x(), getParent()->getPosition().y());
+			uint32_t bd = getWorld()->createBody(def, shared_from_this());
+
+			auto groundBox = std::make_shared<b2PolygonShape>();
+			groundBox->SetAsBox(1.0, 1.0f);
+			getWorld()->createShape(bd, groundBox);
 		}
 	};
 

@@ -145,21 +145,33 @@ public:
 };
 
 class TestState : public State<> {
-	std::shared_ptr<Entity> e;
+	std::shared_ptr<Entity> box;
+	std::shared_ptr<Entity> ground;
 	std::shared_ptr<WorldProxy> world;
 	Scene2D m_scene;
 
 public:
 	TestState(Game *game) {
 		// sceneWorld = game.getComponent<Box2DGameComponent>().addWorld(i3d::vec3f(0.0f, -10.0f, 0.0f));
-		e = std::make_shared<Entity>();
 		world = game->getGCM().get<Box2DGameComponent>()->addWorld(i3d::vec3d(0.0, -10.0, 0.0));
-		e->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(e));
-		auto phs = std::make_shared<B2PhysicsComponent>(e, world);
-		phs->doShit();
-		e->addComponent<B2PhysicsComponent>(phs);
 
-		m_scene.add(e);
+		box = std::make_shared<Entity>();
+		box->setPosition(i3d::vec3d(0, 0, 0));
+		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(box));
+		auto phs = std::make_shared<B2PhysicsComponent>(box, world);
+		phs->doShit();
+		box->addComponent<B2PhysicsComponent>(phs);
+
+		m_scene.add(box);
+
+		ground = std::make_shared<Entity>();
+		ground->setPosition(i3d::vec3d(1.1f, -10, 0));
+		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(ground));
+		auto gphs = std::make_shared<B2PhysicsStatic>(ground, world);
+		gphs->doShit();
+		ground->addComponent<B2PhysicsComponent>(phs);
+
+		m_scene.add(ground);
 
 		pxljm::LevelGenerator lg;
 		auto level = lg.getTestLevel();

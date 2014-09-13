@@ -37,11 +37,11 @@ namespace gecom {
 		}
 
 		virtual void pushDrawCalls(draw_queue &q, unsigned dt) {
-			i3d::vec3d p = getParent()->getPosition();
+			auto mat = i3d::mat4d::translate(getParent()->getPosition()) * i3d::mat4d::rotateZ(getParent()->getRotation());
 			switch (dt)
 			{
 			case draw_type::standard : 
-				q.push(draw_call(Technique::singleton<DefaultTechnique>(), i3d::mat4d::translate(p), [=] {
+				q.push(draw_call(Technique::singleton<DefaultTechnique>(),mat, [=] {
 					draw();
 				}));
 				break;
