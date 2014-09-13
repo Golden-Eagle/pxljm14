@@ -1,6 +1,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <random>
 #include <vector>
 
 
@@ -37,7 +38,7 @@ namespace pxljm {
 		for (const tile_column &col : i_chunk->getTileGrid()) {
 			unsigned y = 0;
 			for (Tile tile : col) {
-				if (tile.solid) {
+				if (!tile.isEmpty()) {
 					tileTypeArray.push_back(x);
 					tileTypeArray.push_back(y);
 					tileTypeArray.push_back(0);
@@ -92,6 +93,18 @@ namespace pxljm {
 
 		//fillGrid and compute bounding everything
 		//TODO
+
+		//0-0-32-32
+		//addComponent(make_shared<B2PhysicsStatic>());
+		/*int x = 0;
+		for (tile_column col : m_tileGrid) {
+			for (int y = 0; y < col.size(); ++y) {
+				addComponent(make_shared<B2PhysicsStatic>());
+			}
+			++x;
+		}*/
+
+
 	}
 
 	const tile_grid & Chunk::getTileGrid(){
@@ -132,10 +145,17 @@ namespace pxljm {
 
 		tile_grid grid = makeTileGrid(width, height);
 
+		std::default_random_engine generator;
+		std::normal_distribution<double> distribution(-2.0, 2.0);
+		int heightNoise = 0;
 
+		int columnHeight = 5;
 		for (int x = 0; x < width; x++){
-			grid[x][0].solid = true;
-			grid[x][x].solid = true; //WHY NOT!!!
+			heightNoise = int(distribution(generator));
+			columnHeight = max(min(heightNoise + columnHeight, height), 1);
+			for (int y = 0; y < columnHeight; y++){
+				grid[x][y].solid = true; //WHY NOT!!!
+			}
 		}
 
 
@@ -149,7 +169,22 @@ namespace pxljm {
 	}
 
 	std::shared_ptr<Level> LevelGenerator::getLevel() {
-		//perform complex calculations to get a list of components
+		////TODO get heigh/width from somewhere
+		//int height = 32;
+		//int width = 128;
+
+		//tile_grid grid = makeTileGrid(width, height);
+
+		//vector<PlatformComponent> components(genComponents());
+
+		//for (PlatformComponent plat : components) {
+		//	plat.
+		//}
+
+
+
+
+		//return compileLevel(grid);
 		return nullptr;
 	}
 
@@ -179,9 +214,11 @@ namespace pxljm {
 				}
 
 				//create chunk
-				shared_ptr<Chunk> chunk = make_shared<Chunk>(startX, startY, chunkGrid);
-				chunk->addComponent<DrawableComponent>(make_shared<ChunkDrawableComponent>(chunk));
-				level->addChunk(chunk);
+				if (!emptyGrid(chunkGrid)){
+					shared_ptr<Chunk> chunk = make_shared<Chunk>(startX, startY, chunkGrid);
+					chunk->addComponent<DrawableComponent>(make_shared<ChunkDrawableComponent>(chunk));
+					level->addChunk(chunk);
+				}
 			}
 		}
 		return level;

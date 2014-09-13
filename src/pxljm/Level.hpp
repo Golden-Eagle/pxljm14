@@ -13,7 +13,8 @@ namespace pxljm {
 
 	struct Tile {
 		bool solid;
-		Tile() : solid(true) {}
+		Tile() : solid(false) {}
+		inline bool isEmpty() { return !solid; }
 	};
 
 	using tile_column = std::vector<Tile>;
@@ -101,6 +102,16 @@ namespace pxljm {
 				grid.push_back(col);
 			}
 			return grid;
+		}
+
+		inline bool emptyGrid(tile_grid i_grid){
+			for (tile_column col : i_grid) {
+				for (Tile tile : col){
+					if (!tile.isEmpty())
+						return false;
+				}
+			}
+			return true;
 		}
 	};
 }
