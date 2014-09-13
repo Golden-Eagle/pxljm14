@@ -1,3 +1,6 @@
+#ifndef GECOM_LEVEL_HEADER
+#define GECOM_LEVEL_HEADER
+
 #include <memory>
 #include <vector>
 
@@ -145,3 +148,5 @@ namespace pxljm {
 		}
 	};
 }
+
+#endif

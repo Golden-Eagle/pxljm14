@@ -48,11 +48,11 @@ class PlayState : public State<std::string> {
 public:
 	PlayState(Game* game) : m_game(game) {
 
-		world = game->getGCM().get<Box2DGameComponent>()->addWorld(i3d::vec3d(0.0, -10.0, 0.0));
+		world = game->getGCM().get<Box2DGameComponent>()->addWorld(i3d::vec3d(0.0, -20.0, 0.0));
 
 		box = std::make_shared<Entity>();
 		box->setPosition(i3d::vec3d(5, 10, 0));
-		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(box, 1, 1));
+		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(box, 1, 2.5));
 		player_phs = std::make_shared<B2PhysicsComponent>(box);
 		player_phs->registerWithWorld(world);
 		box->addComponent<B2PhysicsComponent>(player_phs);
@@ -63,7 +63,7 @@ public:
 		m_scene.add(box);
 
 		ground = std::make_shared<Entity>();
-		ground->setPosition(i3d::vec3d(0, -10, 0));
+		ground->setPosition(i3d::vec3d(0, -4, 0));
 		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(ground, 5, 1));
 		auto gphs = std::make_shared<B2PhysicsStatic>(ground, 5, 1);
 		gphs->registerWithWorld(world);
@@ -92,13 +92,15 @@ public:
 		//dq.execute();
 
 		if (Window::currentContext()->pollKey(GLFW_KEY_UP)) {
-			player_phs->applyLinearImpulse(i3d::vec3d(0, 1000, 0));
+			player_phs->applyLinearImpulse(i3d::vec3d(0, 100000, 0));
 		}
-		else if (Window::currentContext()->getKey(GLFW_KEY_RIGHT)) {
-			player_phs->applyForce(i3d::vec3d(200, 0, 0));
+		
+		if (Window::currentContext()->getKey(GLFW_KEY_RIGHT)) {
+			player_phs->applyLinearImpulse(i3d::vec3d(500, 0, 0));
 		}
-		else if (Window::currentContext()->getKey(GLFW_KEY_LEFT)) {
-			player_phs->applyForce(i3d::vec3d(-200, 0, 0));
+		
+		if (Window::currentContext()->getKey(GLFW_KEY_LEFT)) {
+			player_phs->applyLinearImpulse(i3d::vec3d(-500, 0, 0));
 		}
 
 		return nullAction();
