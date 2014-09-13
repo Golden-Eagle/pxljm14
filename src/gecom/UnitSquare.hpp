@@ -11,16 +11,16 @@ namespace gecom {
 		GLuint vaoID;
 		GLuint vboID;
 	public:
-		UnitSquare(std::shared_ptr<Entity> parent) : DrawableComponent(parent) {
+		UnitSquare(std::shared_ptr<Entity> parent, double half_width, double half_height) : DrawableComponent(parent) {
 			glGenVertexArrays(1, &vaoID);
 			glBindVertexArray(vaoID);
 			glGenBuffers(1, &vboID);
 
 			float pos[] = {
-				-1, -1, 0,
-				-1, 1, 0,
-				1, -1, 0,
-				1, 1, 0
+				-1 * half_width, -1 * half_height, 0,
+				-1 * half_width, 1 * half_height, 0,
+				1 * half_width, -1 * half_height, 0,
+				1 * half_width, 1 * half_height, 0
 			};
 			glBindBuffer(GL_ARRAY_BUFFER, vboID);
 			glBufferData(GL_ARRAY_BUFFER, 3 * 4 * sizeof(float), pos, GL_STATIC_DRAW);

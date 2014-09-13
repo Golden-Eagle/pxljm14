@@ -180,8 +180,10 @@ namespace gecom {
 	};
 
 	class B2PhysicsStatic : public B2PhysicsComponent {
+		double m_hw;
+		double m_hh;
 	public:
-		B2PhysicsStatic(std::shared_ptr<Entity> parent) : B2PhysicsComponent(parent) {}
+		B2PhysicsStatic(std::shared_ptr<Entity> parent, double half_width, double half_height) : B2PhysicsComponent(parent), m_hw(half_width), m_hh(half_height) {}
 
 		void recieveFrame(gecom::PhysicsFrameData pdf) {
 		}
@@ -190,10 +192,12 @@ namespace gecom {
 			b2BodyDef def;
 			def.type = b2_staticBody;
 			def.position.Set(getParent()->getPosition().x(), getParent()->getPosition().y());
+			def.angle = 0;
+			getParent()->setRotation(0);
 			uint32_t bd = world->createBody(def, shared_from_this());
 
 			auto groundBox = std::make_shared<b2PolygonShape>();
-			groundBox->SetAsBox(10.0, 1.0f);
+			groundBox->SetAsBox(m_hw, m_hh);
 			world->createShape(bd, groundBox);
 		}
 	};
