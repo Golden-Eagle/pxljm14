@@ -84,6 +84,10 @@ namespace pxljm {
 			glBindTexture(GL_TEXTURE_2D, m_tex_atlas);
 		}
 
+		virtual inline void unbind() {
+
+		}
+
 		virtual inline GLuint program() {
 			return gecom::Window::currentContext()->shaderManager()->program(m_prog_spec);
 		}

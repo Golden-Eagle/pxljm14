@@ -16,10 +16,9 @@ void main() {
 	float tr = f.x / f.y;
 
 	vec2 tc = texCoord - 0.5;
-	tc /= vec2(1.0 / min(1.0, ratio), max(1.0, ratio));
-	tc /= vec2(max(1.0, tr), 1.0 / min(1.0, tr));
+	tc *= vec2(min(1.0, ratio / tr), min(1.0, tr / ratio));
 	tc += 0.5;
-
+	
 	frag_color = vec4(texture(sampler_bg, tc).rgb, 1.0);
 
 	gl_FragDepth = 1.0;
