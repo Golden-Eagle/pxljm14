@@ -16,7 +16,6 @@ SET(GECOM_SOURCES
 
 SET(GECOM_HEADERS
 	GameComponent.hpp
-	ProtagonistDrawable.hpp
 	PNG.hpp
 	UnitSquare.hpp
 	GECom.hpp
