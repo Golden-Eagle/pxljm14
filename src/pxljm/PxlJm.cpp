@@ -51,7 +51,7 @@ public:
 		world = game->getGCM().get<Box2DGameComponent>()->addWorld(i3d::vec3d(0.0, -20.0, 0.0));
 
 		box = std::make_shared<Entity>();
-		box->setPosition(i3d::vec3d(5, 10, 0));
+		box->setPosition(i3d::vec3d(5, 30, 0));
 		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(box, 1, 2.5));
 		player_phs = std::make_shared<B2PhysicsComponent>(box);
 		player_phs->registerWithWorld(world);
@@ -65,7 +65,7 @@ public:
 		m_scene.add(box);
 
 		ground = std::make_shared<Entity>();
-		ground->setPosition(i3d::vec3d(0, -4, 0));
+		ground->setPosition(i3d::vec3d(0, -5, 0));
 		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(ground, 5, 1));
 		auto gphs = std::make_shared<B2PhysicsStatic>(ground, 5, 1);
 		gphs->registerWithWorld(world);
