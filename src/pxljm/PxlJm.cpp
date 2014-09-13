@@ -57,7 +57,9 @@ public:
 		player_phs->registerWithWorld(world);
 		box->addComponent<B2PhysicsComponent>(player_phs);
 
-		shared_ptr<Camera> camera(make_shared<Camera>(box));
+		shared_ptr<SteadyFocusCamera> cameraEntity(make_shared<SteadyFocusCamera>(box));
+		m_scene.add(cameraEntity);
+		shared_ptr<Camera> camera(make_shared<Camera>(cameraEntity));
 		m_scene.setCamera(camera);
 
 		m_scene.add(box);
