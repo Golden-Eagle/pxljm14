@@ -1,6 +1,7 @@
 #ifndef PXLJM_PE_HEADER
 #define PXLJM_PE_HEADER
 
+#include <gecom/Chrono.hpp>
 #include <gecom/Entity.hpp>
 #include <gecom/Scene.hpp>
 #include <gecom/Box2D.hpp>
@@ -40,11 +41,11 @@ public:
 		bool should_be_running = false;// std::abs(player_phs->getLinearVelocity().x()) > 0.0;
 
 		if (gecom::Window::currentContext()->getKey(GLFW_KEY_RIGHT)) {
-			player_phs->applyLinearImpulse(i3d::vec3d(100, 0, 0));
+			player_phs->applyLinearImpulse(i3d::vec3d(30000.0 * std::chrono::duration_cast<std::chrono::duration<double>>(delta).count(), 0, 0));
 			player_dw->setLeft(true);
 			should_be_running = true;
 		} else if (gecom::Window::currentContext()->getKey(GLFW_KEY_LEFT)) {
-			player_phs->applyLinearImpulse(i3d::vec3d(-100, 0, 0));
+			player_phs->applyLinearImpulse(i3d::vec3d(-30000.0 * std::chrono::duration_cast<std::chrono::duration<double>>(delta).count(), 0, 0));
 			player_dw->setLeft(false);
 			should_be_running = true;
 		}
