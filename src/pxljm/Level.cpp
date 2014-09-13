@@ -85,7 +85,7 @@ namespace pxljm {
 
 
 
-	B2ChunkPhysicsComponent::B2ChunkPhysicsComponent(std::shared_ptr<Chunk> parent) : gecom::B2PhysicsStatic(parent) { }
+	B2ChunkPhysicsComponent::B2ChunkPhysicsComponent(std::shared_ptr<Chunk> parent) : gecom::B2PhysicsStatic(parent, 0, 0) { }
 
 	void B2ChunkPhysicsComponent::registerWithWorld(std::shared_ptr<gecom::WorldProxy> world) {
 

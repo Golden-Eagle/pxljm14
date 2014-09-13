@@ -6,6 +6,7 @@ SET(PXLJM_SOURCES
 
 SET(PXLJM_HEADERS
 	Level.hpp
+	Collectable.hpp
 )
 
 add_executable(pxljm ${PXLJM_SOURCES} ${PXLJM_HEADERS})
