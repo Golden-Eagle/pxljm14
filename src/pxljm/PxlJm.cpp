@@ -2,6 +2,7 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include <stdexcept>
 
 #include <gecom/GECom.hpp>
 #include <gecom/Window.hpp>
@@ -28,6 +29,12 @@
 using namespace std;
 using namespace gecom;
 using namespace i3d;
+
+
+class window_close_error : public std::runtime_error {
+public:
+	inline window_close_error() : std::runtime_error("window close requested") { }
+};
 
 void draw_fullscreen() {
 static GLuint vao = 0;
@@ -104,6 +111,10 @@ public:
 			return callAction<PauseState>();
 		}
 
+		if (Window::currentContext()->shouldClose()) {
+			throw window_close_error();
+		}
+
 		// WTF?!
 		// auto e = std::make_shared<Entity>();
 		// e->addComponent<DrawableComponent>(std::make_shared<SquareDrawableComponent>());
@@ -132,18 +143,18 @@ public:
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 
-		draw_queue q = m_scene.makeDrawQueue(aabbd(vec3d(), vec3d::one() * 20), draw_type::standard);
-		q.execute(sz);
-
 		static shader_program_spec spec_bg = shader_program_spec().source("background.glsl");
 		GLuint prog_bg = Window::currentContext()->shaderManager()->program(spec_bg);
-
 		glUseProgram(prog_bg);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m_tex_bg);
 		glUniform1f(glGetUniformLocation(prog_bg, "ratio"), sz.ratio());
 		glUniform1i(glGetUniformLocation(prog_bg, "sampler_bg"), 0);
 		draw_fullscreen();
+
+		draw_queue q = m_scene.makeDrawQueue(aabbd(vec3d(), vec3d::one() * 20), draw_type::standard);
+		q.execute(sz);
+
 		
 		glDisable(GL_DEPTH_TEST);
 

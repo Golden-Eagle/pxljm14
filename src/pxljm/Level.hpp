@@ -82,6 +82,13 @@ namespace pxljm {
 		virtual inline void bind() {
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, m_tex_atlas);
+			glEnable(GL_BLEND);
+			glBlendEquation(GL_FUNC_ADD);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+
+		virtual inline void unbind() {
+			glDisable(GL_BLEND);
 		}
 
 		virtual inline GLuint program() {
