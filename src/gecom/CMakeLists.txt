@@ -15,6 +15,7 @@ SET(GECOM_SOURCES
 )
 
 SET(GECOM_HEADERS
+	PNG.hpp
 	UnitSquare.hpp
 	GECom.hpp
 	GL.hpp

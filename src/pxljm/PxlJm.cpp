@@ -20,7 +20,7 @@
 
 #include <gecom/Quadtree.hpp>
 
-#include "Level.hpp";
+#include "Level.hpp"
 
 using namespace std;
 using namespace gecom;
@@ -33,127 +33,21 @@ using namespace i3d;
 class PauseState : public State<> {
 public:
 	virtual action_ptr updateForeground() override {
-		log("Pause").warning() << "pause is a lie, exceptioning";
-		throw std::runtime_error("fooled you!");
+		return nullAction();
 	}
 };
 
 class PlayState : public State<std::string> {
-public:
-	virtual void onInit() override {
-		log("Play") << "NOW PLAYING";
-	}
-	
-	virtual action_ptr updateForeground() override {
-		std::cout << "[p to pause] enter an int greater than 100:" << std::endl;
-		int a;
-		std::cin >> a;
-		if (!std::cin.fail()) {
-			if (a > 100) {
-				return returnAction("WOOHOO!");
-			} else {
-				std::cout << "OH NOES!" << std::endl;
-			}
-		} else if (!std::cin.bad()) {
-			// input not an int
-			std::cin.clear();
-			std::string s;
-			std::cin >> s;
-			if (s == "p") {
-				return callback(callAction<PauseState>(),
-					[](int r) {
-						log("Play") << "pause returned normally";
-						return nullAction();
-					},
-					[this](const rethrow_t &rethrow) {
-						try {
-							rethrow();
-						} catch (std::exception &e) {
-							log("Play").error() << "pause exceptioned, returning 'error'";
-							return returnAction("error");
-						}
-						return returnAction("");
-					}
-				);
-			}
-			throw std::runtime_error("bad input: " + s);
-		}
-		std::cin.clear();
-		return nullAction();
-	}
-};
-
-class MainMenuState : public State<> {
-public:
-	MainMenuState(int a, const std::string &b) {
-		// the ctor gets the arguments of callAction()
-	}
-	
-	virtual action_ptr updateForeground() override {
-		std::cout << "-- Main Menu --" << std::endl;
-		std::cout << "1) Play" << std::endl;
-		std::cout << "2) Exit" << std::endl;
-		int a;
-		std::cin >> a;
-		if (!std::cin.fail()) {
-			if (a == 1) return callback(callAction<PlayState>(),
-				[](const std::string &r) {
-					log("MainMenu") << "Play returned " << r;
-					if (r == "error") {
-						log("MainMenu") << "Play returned 'error', exceptioning";
-						throw std::runtime_error("thrown by a callback from an action returned by an exception handler");
-					}
-					return nullAction();
-				},
-				[](const rethrow_t &rethrow) {
-					log("MainMenu").warning() << "I CANT HANDLE THIS!" << std::endl;
-					return nullAction();
-					// note - this will not stop main menu from being popped
-				}
-			);
-			if (a == 2) return returnAction(0);
-		}
-		std::cin.clear();
-		return nullAction();
-	}
-
-};
-
-class StartupState : public State<> {
-public:
-	StartupState(int a) {
-
-	}
-
-	virtual action_ptr updateForeground() override {
-		return callback(callAction<MainMenuState>(9001, "hello world"),
-			[this](const int &r) {
-				log("Startup") << "MainMenu returned " << r;
-				return returnAction(0);
-				// now, think about what happens if you return a callAction() from a callback...
-			},
-			[this](const rethrow_t &rethrow) {
-				try {
-					rethrow();
-				} catch (std::exception &e) {
-					log("Startup") << "BUT I CAN!: exception: " << e.what();
-				}
-				return returnAction(1);
-			}
-		);
-	}
-};
-
-class TestState : public State<> {
 	std::shared_ptr<Entity> box;
 	std::shared_ptr<Entity> ground;
 	std::shared_ptr<WorldProxy> world;
 	Scene2D m_scene;
 	std::shared_ptr<B2PhysicsComponent> player_phs;
+	Game* m_game;
 
 public:
-	TestState(Game *game) {
-		// sceneWorld = game.getComponent<Box2DGameComponent>().addWorld(i3d::vec3f(0.0f, -10.0f, 0.0f));
+	PlayState(Game* game) : m_game(game) {
+
 		world = game->getGCM().get<Box2DGameComponent>()->addWorld(i3d::vec3d(0.0, -10.0, 0.0));
 
 		box = std::make_shared<Entity>();
@@ -177,13 +71,13 @@ public:
 		pxljm::LevelGenerator lg;
 		auto level = lg.getTestLevel();
 		level->load(m_scene, world);
-
-		// auto physComp = std::make_shared<Box2DGameComponent>(sceneWorld);
-		// e->addComponent<PhysicsComponent>(physComp);
 	}
-	
 
 	virtual action_ptr updateForeground() override {
+		if(Window::currentContext()->pollKey(GLFW_KEY_ESCAPE)) {
+			return callAction<PauseState>();
+		}
+
 		// WTF?!
 		// auto e = std::make_shared<Entity>();
 		// e->addComponent<DrawableComponent>(std::make_shared<SquareDrawableComponent>());
@@ -206,7 +100,7 @@ public:
 
 		return nullAction();
 	}
-	
+
 	virtual void drawForeground() override {
 		//log("Test") << "drawing";
 
@@ -215,6 +109,37 @@ public:
 		draw_queue q = m_scene.makeDrawQueue(aabbd(vec3d(), vec3d::one() * 20), draw_type::standard);
 		q.execute();
 
+	}
+};
+
+class LoadingGameState : public State < > {
+	Game* m_game;
+public:
+	LoadingGameState(Game* game) : m_game(game) { }
+
+	virtual action_ptr updateForeground() override {
+		return callAction<PlayState>(m_game);
+	}
+};
+
+class MainMenuState : public State<> {
+	Game* m_game;
+public:
+	MainMenuState(Game* game) : m_game(game) { }
+	
+	virtual action_ptr updateForeground() override { 
+		return callAction<LoadingGameState>(m_game);
+	}
+
+};
+
+class StartupState : public State<> {
+	Game* m_game;
+public:
+	StartupState(Game* game) : m_game(game) { }
+
+	virtual action_ptr updateForeground() override {
+		return callAction<MainMenuState>(m_game);
 	}
 };
 
@@ -241,7 +166,7 @@ int main() {
 
 	Game pxljm;
 	pxljm.create<Box2DGameComponent>();
-	pxljm.init<TestState>(win);
+	pxljm.init<StartupState>(win);
 	pxljm.run();
 
 	AsyncExecutor::stop();
