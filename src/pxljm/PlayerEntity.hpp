@@ -31,6 +31,8 @@ public:
 		Entity::update(delta);
 
 		if (gecom::Window::currentContext()->pollKey(GLFW_KEY_UP)) {
+			// intent -> registerIntent([=] { player_phs->applyLinearImpulse(..); }, 1000);
+
 			player_phs->applyLinearImpulse(i3d::vec3d(0, 10000, 0));
 			player_dw->startJumpAnimation();
 		}
@@ -39,10 +41,11 @@ public:
 
 		if (gecom::Window::currentContext()->getKey(GLFW_KEY_RIGHT)) {
 			player_phs->applyLinearImpulse(i3d::vec3d(100, 0, 0));
+			player_dw->setLeft(true);
 			should_be_running = true;
-		}
-		if (gecom::Window::currentContext()->getKey(GLFW_KEY_LEFT)) {
+		} else if (gecom::Window::currentContext()->getKey(GLFW_KEY_LEFT)) {
 			player_phs->applyLinearImpulse(i3d::vec3d(-100, 0, 0));
+			player_dw->setLeft(false);
 			should_be_running = true;
 		}
 

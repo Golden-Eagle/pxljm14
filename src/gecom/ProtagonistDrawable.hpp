@@ -72,7 +72,7 @@ namespace gecom {
 	};
 
 	class SpineDrawable : public DrawableComponent, public std::enable_shared_from_this<SpineDrawable> {
-		const int cm_time_scale = 1;
+		const int cm_time_scale = 1.8;
 		spSkeleton* m_skeleton;
 		spAnimationStateData* m_state_data;
 		spAnimationState* m_state;
@@ -125,16 +125,21 @@ namespace gecom {
 			}
 		}
 
+		void setLeft(bool is_left) {
+			m_skeleton->flipX = !is_left;
+		}
+
 		void startRunAnimation() {
-			spAnimationState_addAnimationByName(m_state, 0, "run", true, 0);
+			spAnimationState_setAnimationByName(m_state, 0, "run", true);
 		}
 
 		void stopRunAnimation() {
-			spAnimationState_addAnimationByName(m_state, 0, "idle", true, 0);
+			spAnimationState_setAnimationByName(m_state, 0, "idle", true);
 		}
 
 		void startJumpAnimation() {
 			spAnimationState_setAnimationByName(m_state, 0, "jump", false);
+			spAnimationState_addAnimationByName(m_state, 0, "idle", true, 0);
 		}
 
 		SpineDrawable(const std::string& n, const std::shared_ptr<Entity> parent) : DrawableComponent(parent) {
@@ -186,10 +191,10 @@ namespace gecom {
 
 			// Configure mixing.
 			m_state_data = spAnimationStateData_create(skeletonData);
-			spAnimationStateData_setMixByName(m_state_data, "idle", "run", 0.8f);
-			spAnimationStateData_setMixByName(m_state_data, "run", "idle", 0.8f);
-			spAnimationStateData_setMixByName(m_state_data, "run", "jump", 0.8f);
-			spAnimationStateData_setMixByName(m_state_data, "jump", "run", 0.8f);
+			spAnimationStateData_setMixByName(m_state_data, "idle", "run", 0.6f);
+			spAnimationStateData_setMixByName(m_state_data, "run", "idle", 0.6f);
+			spAnimationStateData_setMixByName(m_state_data, "run", "jump", 0.6f);
+			spAnimationStateData_setMixByName(m_state_data, "jump", "run", 0.6f);
 
 			//spSkeletonDrawable* drawable = new spSkeletonDrawable(skeletonData, stateData);
 

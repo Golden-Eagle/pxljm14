@@ -88,7 +88,7 @@ namespace pxljm {
 	B2ChunkPhysicsComponent::B2ChunkPhysicsComponent(std::shared_ptr<Chunk> parent) : gecom::B2PhysicsStatic(parent, 0, 0) { }
 
 	void B2ChunkPhysicsComponent::registerWithWorld(std::shared_ptr<gecom::WorldProxy> world) {
-
+		b2Filter ground_filter;
 		//METHOD NEEDS SERIOUS OPTIMISATIONS
 		tile_grid grid = std::static_pointer_cast<Chunk>(getParent())->getTileGrid();
 		for (int x = 0; x < grid.size(); ++x) {
@@ -117,9 +117,10 @@ namespace pxljm {
 
 						
 						auto rs = std::make_shared<b2PolygonShape>();
-						rs->SetAsBox(0.5, 0.5);
+						rs->SetAsBox(0.6, 0.5);
 
 						auto rf = std::make_shared<b2FixtureDef>();
+						rf->filter = ground_filter;
 						rf->shape = rs.get();
 						rf->friction = 1.0f;
 						rf->density = 0.0f;
