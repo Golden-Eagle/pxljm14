@@ -7,8 +7,6 @@
 #include <gecom/Scene.hpp>
 #include <gecom/Window.hpp>
 
-
-
 namespace pxljm {
 
 	struct Tile {
@@ -26,6 +24,38 @@ namespace pxljm {
 		const tile_grid &getTileGrid();
 	private:
 		tile_grid m_tileGrid;
+	};
+
+	
+
+	class B2ChunkPhysicsComponent : public gecom::B2PhysicsStatic {
+	public:
+		B2ChunkPhysicsComponent(std::shared_ptr<Chunk> parent) : gecom::B2PhysicsStatic(parent) { }
+
+		void registerWithWorld(std::shared_ptr<gecom::WorldProxy> world) {
+
+			int x = 0;
+			for (auto col : std::static_pointer_cast<Chunk>(getParent())->getTileGrid()) {
+				int y = 0;
+				for (auto tile : col) {
+					if (tile.solid) {
+						b2BodyDef nbodydef;
+						nbodydef.type = b2_staticBody;
+						auto body_pos = getParent()->getPosition() + i3d::vec3d(x+0.5, y+0.5, 0);
+						gecom::log("chunk-phys") << "Creating B2ChunkPhysicsComponent at " << body_pos.x() << ", " << body_pos.y();
+						nbodydef.position.Set(body_pos.x(), body_pos.y());
+						uint32_t nbody = world->createBody(nbodydef, shared_from_this());
+
+						auto rs = std::make_shared<b2PolygonShape>();
+						rs->SetAsBox(0.5, 0.5);
+
+						world->createShape(nbody, rs);
+					}
+					y++;
+				}
+				x++;
+			}
+		}
 	};
 
 	class ChunkDrawableComponent : public gecom::DrawableComponent {
@@ -63,15 +93,15 @@ namespace pxljm {
 		}
 	};
 
-	class ChunkPhysicsComponent : public gecom::EntityComponent {
-	public:
-	};
+	//class ChunkPhysicsComponent : public gecom::EntityComponent {
+	//public:
+	//};
 
 	class Level {
 	public:
 		Level();
 		void addChunk(std::shared_ptr<Chunk>);
-		void load(gecom::Scene &scene);
+		void load(gecom::Scene& scene, const std::shared_ptr<gecom::WorldProxy> world);
 		void unload(gecom::Scene &scene);
 	private:
 		std::vector<std::shared_ptr<Chunk>> m_chunks;

@@ -30,3 +30,11 @@ void gecom::WorldProxy::receivePFO(std::shared_ptr<PhysicsFrame> pfo) {
 		}
 	}
 }
+
+void gecom::WorldProxy::applyForce(const uint32_t b, const i3d::vec3d f) {
+	AsyncExecutor::enqueue(m_master->getThreadID(), [=] { m_master->applyForce(b, f); });
+}
+
+void gecom::WorldProxy::applyLinearImpulse(const uint32_t b, const i3d::vec3d f) {
+	AsyncExecutor::enqueue(m_master->getThreadID(), [=] { m_master->applyLinearImpulse(b, f);  });
+}

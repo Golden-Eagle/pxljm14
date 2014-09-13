@@ -149,6 +149,7 @@ class TestState : public State<> {
 	std::shared_ptr<Entity> ground;
 	std::shared_ptr<WorldProxy> world;
 	Scene2D m_scene;
+	std::shared_ptr<B2PhysicsComponent> player_phs;
 
 public:
 	TestState(Game *game) {
@@ -156,28 +157,26 @@ public:
 		world = game->getGCM().get<Box2DGameComponent>()->addWorld(i3d::vec3d(0.0, -10.0, 0.0));
 
 		box = std::make_shared<Entity>();
-		box->setPosition(i3d::vec3d(0, 0, 0));
+		box->setPosition(i3d::vec3d(5, 10, 0));
 		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(box));
-		auto phs = std::make_shared<B2PhysicsComponent>(box, world);
-		phs->doShit();
-		box->addComponent<B2PhysicsComponent>(phs);
+		player_phs = std::make_shared<B2PhysicsComponent>(box);
+		player_phs->registerWithWorld(world);
+		box->addComponent<B2PhysicsComponent>(player_phs);
 
 		m_scene.add(box);
 
 		ground = std::make_shared<Entity>();
-		ground->setPosition(i3d::vec3d(1.1f, -10, 0));
+		ground->setPosition(i3d::vec3d(0, -10, 0));
 		box->addComponent<DrawableComponent>(std::make_shared<UnitSquare>(ground));
-		auto gphs = std::make_shared<B2PhysicsStatic>(ground, world);
-		gphs->doShit();
-		ground->addComponent<B2PhysicsComponent>(phs);
+		auto gphs = std::make_shared<B2PhysicsStatic>(ground);
+		gphs->registerWithWorld(world);
+		ground->addComponent<B2PhysicsComponent>(gphs);
 
 		m_scene.add(ground);
 
 		pxljm::LevelGenerator lg;
 		auto level = lg.getTestLevel();
-		level->load(m_scene);
-
-
+		level->load(m_scene, world);
 
 		// auto physComp = std::make_shared<Box2DGameComponent>(sceneWorld);
 		// e->addComponent<PhysicsComponent>(physComp);
@@ -194,6 +193,17 @@ public:
 		//DrawQueue dq;
 		//dq.insert(make_shared<DrawCall>(0, e->getComponents<DrawableComponent>()[0], i3d::mat4d()));
 		//dq.execute();
+
+		if (Window::currentContext()->pollKey(GLFW_KEY_UP)) {
+			player_phs->applyLinearImpulse(i3d::vec3d(0, 1000, 0));
+		}
+		else if (Window::currentContext()->getKey(GLFW_KEY_RIGHT)) {
+			player_phs->applyForce(i3d::vec3d(200, 0, 0));
+		}
+		else if (Window::currentContext()->getKey(GLFW_KEY_LEFT)) {
+			player_phs->applyForce(i3d::vec3d(-200, 0, 0));
+		}
+
 		return nullAction();
 	}
 	

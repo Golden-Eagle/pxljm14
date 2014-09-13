@@ -119,8 +119,12 @@ namespace pxljm {
 		m_chunks.push_back(i_chunk);
 	}
 
-	void Level::load(Scene &scene){
+	void Level::load(gecom::Scene &scene, std::shared_ptr<gecom::WorldProxy> world){
+		log("level") << "Performing level load into scence";
 		for (shared_ptr<Chunk> c : m_chunks) {
+			for (auto comp : c->getComponents<B2ChunkPhysicsComponent>())
+				comp->registerWithWorld(world);
+
 			scene.add(c);
 		}
 	}
@@ -217,6 +221,7 @@ namespace pxljm {
 				if (!emptyGrid(chunkGrid)){
 					shared_ptr<Chunk> chunk = make_shared<Chunk>(startX, startY, chunkGrid);
 					chunk->addComponent<DrawableComponent>(make_shared<ChunkDrawableComponent>(chunk));
+					chunk->addComponent<B2ChunkPhysicsComponent>(make_shared<B2ChunkPhysicsComponent>(chunk));
 					level->addChunk(chunk);
 				}
 			}

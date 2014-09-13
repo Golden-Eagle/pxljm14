@@ -65,6 +65,10 @@ namespace gecom {
 			return i3d::vec3d(b.x, b.y, 0);
 		}
 
+		b2Vec2 to_b2Vec(i3d::vec3d i) {
+			return b2Vec2(i.x(), i.y());
+		}
+
 	public:
 		friend class WorldProxy;
 		Box2DGameComponent(Game &g) : GameComponent(g) { }
@@ -93,6 +97,14 @@ namespace gecom {
 			bodies[b]->CreateFixture(def.get());
 		}
 
+		void applyForce(uint32_t b, i3d::vec3d f) {
+			bodies[b]->ApplyForce(to_b2Vec(f), bodies[b]->GetWorldCenter(), true);
+		}
+
+		void applyLinearImpulse(uint32_t b, i3d::vec3d f) {
+			bodies[b]->ApplyLinearImpulse(to_b2Vec(f), bodies[b]->GetWorldCenter(), true);
+		}
+
 		void init() { m_worker = std::thread{ [this]() { this->dowork(); } }; }
 
 		inline std::shared_ptr<WorldProxy> addWorld(i3d::vec3d gravity) {
@@ -118,40 +130,50 @@ namespace gecom {
 		void createFixture(const uint32_t b, const std::shared_ptr<b2FixtureDef>& def, const std::shared_ptr<b2Shape>& sh);
 		void createShape(const uint32_t b, const std::shared_ptr<b2Shape>& def);
 		void receivePFO(std::shared_ptr<PhysicsFrame> pfo);
+		void applyForce(const uint32_t b, const i3d::vec3d f);
+		void applyLinearImpulse(const uint32_t b, const i3d::vec3d f);
 	};
 
 	class B2PhysicsComponent : public EntityComponent, public std::enable_shared_from_this<B2PhysicsComponent> {
-		std::shared_ptr<WorldProxy> world;
-
-		
+		uint32_t m_b_id;
+		std::shared_ptr<WorldProxy> m_world;
 	public:
-		std::shared_ptr<WorldProxy> getWorld() { return world; }
-
-		B2PhysicsComponent(std::shared_ptr<Entity> parent, std::shared_ptr<WorldProxy> wp) : EntityComponent(parent), world(wp) {
-
+		B2PhysicsComponent(std::shared_ptr<Entity> parent) : EntityComponent(parent) {
+			
 		}
 
-		void doShit() {
+		virtual void registerWithWorld(std::shared_ptr<WorldProxy> world) {
+			m_world = world;
+
 			b2BodyDef def;
 			def.type = b2_dynamicBody;
 			def.position.Set(getParent()->getPosition().x(), getParent()->getPosition().y());
-			uint32_t body = world->createBody(def, shared_from_this());
+			m_b_id = world->createBody(def, shared_from_this());
 
 			auto bbb = std::make_shared<b2PolygonShape>();
 			bbb->SetAsBox(1, 1);
 
 			auto fix = std::make_shared<b2FixtureDef>();
 			fix->shape = bbb.get();
-			fix->density = 1;
-			fix->friction = 0.3f;
+			fix->density = 30;
+			fix->friction = 0.6f;
 
-			world->createFixture(body, fix, bbb);
+			world->createFixture(m_b_id, fix, bbb);
 		}
 
-		void recieveFrame(gecom::PhysicsFrameData pfd) {
+		void applyForce(i3d::vec3d f) {
+			m_world->applyForce(m_b_id, f);
+		}
+
+		void applyLinearImpulse(i3d::vec3d f) {
+			m_world->applyLinearImpulse(m_b_id, f);
+		}
+
+		virtual void recieveFrame(gecom::PhysicsFrameData pfd) {
 			// TODO pass by reference more often neo
 			//log("phys-test") << pfd.getPos() << std::endl;
 			// TODO - NOT THIS
+
 			getParent()->setPosition(pfd.getPos());
 			getParent()->setRotation(pfd.getRot());
 		}
@@ -159,19 +181,20 @@ namespace gecom {
 
 	class B2PhysicsStatic : public B2PhysicsComponent {
 	public:
-		B2PhysicsStatic(std::shared_ptr<Entity> parent, std::shared_ptr<WorldProxy> wp) : B2PhysicsComponent(parent, wp) {
+		B2PhysicsStatic(std::shared_ptr<Entity> parent) : B2PhysicsComponent(parent) {}
 
+		void recieveFrame(gecom::PhysicsFrameData pdf) {
 		}
 
-		void doShit() {
+		void registerWithWorld(std::shared_ptr<WorldProxy> world) {
 			b2BodyDef def;
 			def.type = b2_staticBody;
 			def.position.Set(getParent()->getPosition().x(), getParent()->getPosition().y());
-			uint32_t bd = getWorld()->createBody(def, shared_from_this());
+			uint32_t bd = world->createBody(def, shared_from_this());
 
 			auto groundBox = std::make_shared<b2PolygonShape>();
-			groundBox->SetAsBox(1.0, 1.0f);
-			getWorld()->createShape(bd, groundBox);
+			groundBox->SetAsBox(10.0, 1.0f);
+			world->createShape(bd, groundBox);
 		}
 	};
 
