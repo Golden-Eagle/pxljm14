@@ -289,7 +289,7 @@ namespace gecom {
 
 			auto groundFix = std::make_shared<b2FixtureDef>();
 			groundFix->shape = groundBox.get();
-			groundFix->friction = 100000;
+			groundFix->friction = 1;
 			groundFix->density = 0.0;
 
 			world->createFixture(bd, groundFix, groundBox);

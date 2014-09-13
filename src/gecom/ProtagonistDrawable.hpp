@@ -27,7 +27,7 @@
 	//};
 
 	void _spAtlasPage_createTexture(spAtlasPage* self, const char* path){
-		gecom::image* texture = new gecom::image(gecom::image::type_png(), path, true);
+		gecom::image* texture = new gecom::image(gecom::image::type_png(), path, false);
 		
 		//if (!texture->loadFromFile(path)) return;
 		//texture->setSmooth(true);
@@ -60,13 +60,14 @@ namespace gecom {
 			Technique::update(prog, scene, mv, sz);
 		}
 
-		virtual void bind() override {
-			glEnable(GL_ALPHA_TEST);
-			glAlphaFunc(GL_NEVER, 0.5);
+		virtual inline void bind() {
+			glEnable(GL_BLEND);
+			glBlendEquation(GL_FUNC_ADD);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 
-		virtual void unbind() override {
-			glDisable(GL_ALPHA_TEST);
+		virtual inline void unbind() {
+			glDisable(GL_BLEND);
 		}
 	};
 
@@ -124,6 +125,18 @@ namespace gecom {
 			}
 		}
 
+		void startRunAnimation() {
+			spAnimationState_addAnimationByName(m_state, 0, "run", true, 0);
+		}
+
+		void stopRunAnimation() {
+			spAnimationState_addAnimationByName(m_state, 0, "idle", true, 0);
+		}
+
+		void startJumpAnimation() {
+			spAnimationState_setAnimationByName(m_state, 0, "jump", false);
+		}
+
 		SpineDrawable(const std::string& n, const std::shared_ptr<Entity> parent) : DrawableComponent(parent) {
 			glGenVertexArrays(1, &vaoID);
 			glBindVertexArray(vaoID);
@@ -161,7 +174,7 @@ namespace gecom {
 
 
 			spSkeletonJson* json = spSkeletonJson_create(atlas);
-			json->scale = 0.05;
+			json->scale = 0.015f;
 			spSkeletonData *skeletonData = spSkeletonJson_readSkeletonDataFile(json, (std::string("res/spine/") + n + "/" + n + ".json").c_str());
 
 			if (!skeletonData) {
@@ -173,8 +186,10 @@ namespace gecom {
 
 			// Configure mixing.
 			m_state_data = spAnimationStateData_create(skeletonData);
-			spAnimationStateData_setMixByName(m_state_data, "walk", "jump", 0.2f);
-			spAnimationStateData_setMixByName(m_state_data, "jump", "run", 0.2f);
+			spAnimationStateData_setMixByName(m_state_data, "idle", "run", 0.8f);
+			spAnimationStateData_setMixByName(m_state_data, "run", "idle", 0.8f);
+			spAnimationStateData_setMixByName(m_state_data, "run", "jump", 0.8f);
+			spAnimationStateData_setMixByName(m_state_data, "jump", "run", 0.8f);
 
 			//spSkeletonDrawable* drawable = new spSkeletonDrawable(skeletonData, stateData);
 
@@ -197,7 +212,8 @@ namespace gecom {
 				spAnimationState_setAnimationByName(m_state, 0, "test", true);
 				}
 				else {*/
-			spAnimationState_setAnimationByName(m_state, 0, "run", true);
+			spAnimationState_setAnimationByName(m_state, 0, "idle", true);
+
 			//spAnimationState_addAnimationByName(m_state, 0, "jump", false, 3);
 			//spAnimationState_addAnimationByName(m_state, 0, "run", true, 0);
 		//}
@@ -311,8 +327,10 @@ namespace gecom {
 					verts[10] = m_world_vertices[SP_VERTEX_Y3];
 					verts[11] = 0;
 
-					uvs[4] = regionAttachment->uvs[SP_VERTEX_X3];
-					uvs[5] = regionAttachment->uvs[SP_VERTEX_Y3];
+					uvs[6] = regionAttachment->uvs[SP_VERTEX_X3];
+					uvs[7] = regionAttachment->uvs[SP_VERTEX_Y3];
+
+
 					/*vertices[2].texCoords.x = regionAttachment->uvs[VERTEX_X3] * size.x;
 					vertices[2].texCoords.y = regionAttachment->uvs[VERTEX_Y3] * size.y;*/
 
@@ -324,8 +342,9 @@ namespace gecom {
 					verts[7] = m_world_vertices[SP_VERTEX_Y4];
 					verts[8] = 0;
 
-					uvs[6] = regionAttachment->uvs[SP_VERTEX_X4];
-					uvs[7] = regionAttachment->uvs[SP_VERTEX_Y4];
+					uvs[4] = regionAttachment->uvs[SP_VERTEX_X4];
+					uvs[5] = regionAttachment->uvs[SP_VERTEX_Y4];
+					
 					/*vertices[3].texCoords.x = regionAttachment->uvs[VERTEX_X4] * size.x;
 					vertices[3].texCoords.y = regionAttachment->uvs[VERTEX_Y4] * size.y;*/
 
