@@ -5,7 +5,7 @@ std::atomic<uint32_t> gecom::Box2DGameComponent::sm_body_id(1);
 
 // uint32_t createBody(const b2BodyDef& def, std::shared_ptr<B2PhysicsComponent> p)
 uint32_t gecom::WorldProxy::createBody(const b2BodyDef& def, std::shared_ptr<B2PhysicsComponent> p) {
-	log("phys::WorldProxy::createBody") << "got to line " << __LINE__;
+	//log("phys::WorldProxy::createBody") << "got to line " << __LINE__;
 	uint32_t n_body_id = m_master->getNewBodyID();
 	AsyncExecutor::enqueue(m_master->getThreadID(), [=] { m_master->createBody(m_world_id, n_body_id, def); });
 	m_bodies[n_body_id] = p;

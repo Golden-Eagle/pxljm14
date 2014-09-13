@@ -84,6 +84,49 @@ namespace pxljm {
 	}
 
 
+
+	B2ChunkPhysicsComponent::B2ChunkPhysicsComponent(std::shared_ptr<Chunk> parent) : gecom::B2PhysicsStatic(parent) { }
+
+	void B2ChunkPhysicsComponent::registerWithWorld(std::shared_ptr<gecom::WorldProxy> world) {
+
+		//METHOD NEEDS SERIOUS OPTIMISATIONS
+		tile_grid grid = std::static_pointer_cast<Chunk>(getParent())->getTileGrid();
+		for (int x = 0; x < grid.size(); ++x) {
+			tile_column col = grid[x];
+			auto get_tile = [&](int x, int y) -> Tile {
+				// clamp to edge of heightmap
+				if (y < 0) y = 0;
+				if (y >= col.size()) y = col.size()-1;
+				if (x < 0) x = 0;
+				if (x >= grid.size()) x = grid.size()-1;
+				return grid[x][y];
+			};
+
+			for (int y = 0; y < col.size(); ++y) {
+				if (grid[x][y].solid) {
+					if (!get_tile(x, y + 1).solid ||
+						!get_tile(x, y - 1).solid ||
+						!get_tile(x + 1, y).solid ||
+						!get_tile(x - 1, y).solid){
+						//make physics
+						b2BodyDef nbodydef;
+						nbodydef.type = b2_staticBody;
+						auto body_pos = getParent()->getPosition() + i3d::vec3d(x + 0.5, y + 0.5, 0);
+						nbodydef.position.Set(body_pos.x(), body_pos.y());
+						uint32_t nbody = world->createBody(nbodydef, shared_from_this());
+
+						auto rs = std::make_shared<b2PolygonShape>();
+						rs->SetAsBox(0.5, 0.5);
+
+						world->createShape(nbody, rs);
+					}
+				}
+
+			}
+		}
+	}
+
+
 	//TODO
 	Chunk::Chunk(int i_xpos, int i_ypos, tile_grid i_grid) : gecom::Entity(), m_tileGrid(i_grid) {
 		setPosition(i3d::vec3d(double(i_xpos), double(i_ypos), 0.0));
@@ -121,6 +164,7 @@ namespace pxljm {
 
 	void Level::load(gecom::Scene &scene, std::shared_ptr<gecom::WorldProxy> world){
 		log("level") << "Performing level load into scence";
+
 		for (shared_ptr<Chunk> c : m_chunks) {
 			for (auto comp : c->getComponents<B2ChunkPhysicsComponent>())
 				comp->registerWithWorld(world);
@@ -145,7 +189,7 @@ namespace pxljm {
 
 	shared_ptr<Level> LevelGenerator::getTestLevel() {
 		int height = 32;
-		int width = 32;
+		int width = 1024;
 
 		tile_grid grid = makeTileGrid(width, height);
 

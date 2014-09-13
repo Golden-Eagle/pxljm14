@@ -71,7 +71,7 @@ namespace gecom {
 
 		}
 
-		i3d::mat4d getModelWorldMatrix() {
+		virtual i3d::mat4d getModelWorldMatrix() {
 			return i3d::mat4d::translate(getPosition()) * i3d::mat4d::rotateZ(getRotation());
 		}
 

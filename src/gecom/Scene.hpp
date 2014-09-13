@@ -215,6 +215,16 @@ namespace gecom{
 		virtual ~Camera() { }
 	};
 
+	class SteadyFocusCamera : public Entity {
+	private:
+		std::shared_ptr<Entity> m_focus;
+	public:
+		SteadyFocusCamera(std::shared_ptr<Entity> i_focus) : Entity(), m_focus(i_focus) {}
+		i3d::mat4d getModelWorldMatrix() {
+			return i3d::mat4d::translate(m_focus->getPosition());
+		}
+	};
+
 	class Scene {
 	private:
 		std::shared_ptr<Camera> m_camera = nullptr;
