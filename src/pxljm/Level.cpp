@@ -193,19 +193,27 @@ namespace pxljm {
 
 		tile_grid grid = makeTileGrid(width, height);
 
-		std::default_random_engine generator;
-		std::normal_distribution<double> distribution(0.0, 1.2);
-		int heightNoise = 0;
 
-		int columnHeight = 5;
-		for (int x = 0; x < width; x++){
-			heightNoise = int(distribution(generator));
-			columnHeight = max(min(heightNoise + columnHeight, height), 1);
-			for (int y = 0; y < columnHeight; y++){
-				grid[x][y].solid = true; //WHY NOT!!!
+		auto spaces = getSpacing(width, SpacingHint::uniform, 6);
+		std::default_random_engine generator;
+		std::uniform_int_distribution<int> typeDistribution(0, 1);
+
+		int colHeight = 5;
+
+		for (int i = 0; i < spaces.size()-1; ++i){
+			int type = typeDistribution(generator);
+			switch (type){
+			case 0:
+				movingSubpart(colHeight, spaces[i], spaces[i + 1], grid, BuildingHint());
+				break;
+			case 1:
+				jumpSubpart(colHeight, spaces[i], spaces[i + 1], grid, BuildingHint());
+				break;
+			default:
+				movingSubpart(colHeight, spaces[i], spaces[i + 1], grid, BuildingHint());
+				break;
 			}
 		}
-
 
 		//add platforms
 
@@ -271,6 +279,32 @@ namespace pxljm {
 			}
 		}
 		return level;
+	}
+
+	vector<int> LevelGenerator::getSpacing(int i_width, SpacingHint i_spaceHint, int i_avgSize){
+		vector<int> spaces;
+		for (int x = 0; x < i_width; x += i_avgSize){
+			spaces.push_back(x);
+		}
+		return spaces;
+	}
+
+	void LevelGenerator::movingSubpart(int i_height, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint = BuildingHint()){
+		//Flat walk
+		for (int x = i_start; x < i_end; ++x){
+			for (int y = 0; y < i_height-1; ++y){
+				io_grid[x][y].solid = true;
+			}
+		}
+	}
+
+	void LevelGenerator::jumpSubpart(int i_height, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint = BuildingHint()){
+		//Flat Jump
+		for (int x = min(i_start + 3, i_end-1); x < i_end; ++x){
+			for (int y = 0; y < i_height; ++y){
+				io_grid[x][y].solid = true;
+			}
+		}
 	}
 }
 

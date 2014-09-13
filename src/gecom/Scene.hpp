@@ -45,7 +45,14 @@ namespace gecom{
 		virtual inline void bind() { }
 		virtual inline void unbind() { }
 		virtual inline GLuint program() { return 0; }
-		virtual inline void update(GLuint prog, const Scene &scene, const i3d::mat4d &mv) { }
+
+		virtual inline void update(GLuint prog, const Scene &scene, const i3d::mat4d &mv, const size2i &sz) {
+			glUniformMatrix4fv(glGetUniformLocation(prog, "modelview_matrix"), 1, true, i3d::mat4f(mv));
+			// TODO proper default projection?
+			glUniformMatrix4fv(glGetUniformLocation(prog, "projection_matrix"), 1, true, i3d::mat4f::scale(0.05 / sz.ratio(), 0.05, 0.001));
+			
+		}
+
 		virtual inline ~Technique() { }
 	};
 
@@ -56,20 +63,12 @@ namespace gecom{
 	public:
 		inline DefaultTechnique() {
 			m_prog_spec.source("scene_default.glsl");
-
-		}
-		virtual inline void bind() {
-
 		}
 
 		virtual inline GLuint program() {
 			return Window::currentContext()->shaderManager()->program(m_prog_spec);
 		}
 
-		virtual inline void update(GLuint prog, const Scene &scene, const i3d::mat4d &mv) {
-			glUniformMatrix4fv(glGetUniformLocation(prog, "modelview_matrix"), 1, true, i3d::mat4f(mv));
-			glUniformMatrix4fv(glGetUniformLocation(prog, "projection_matrix"), 1, true, i3d::mat4f::scale(0.1));
-		}
 	};
 
 	struct draw_type {
@@ -186,7 +185,7 @@ namespace gecom{
 			}
 		}
 
-		inline void execute() const;
+		inline void execute(const size2i &) const;
 	};
 
 	class DrawableComponent : public EntityComponent {
@@ -324,7 +323,7 @@ namespace gecom{
 
 
 	//Forward decleared function
-	void draw_queue::execute() const {
+	void draw_queue::execute(const size2i &sz) const {
 		Technique * tech = nullptr;
 		GLuint prog = 0;
 		glUseProgram(0);
@@ -348,7 +347,7 @@ namespace gecom{
 			}
 			// update
 			auto modelViewMatrix = worldView * d.modelWorld();
-			tech->update(prog, *m_scene, modelViewMatrix);
+			tech->update(prog, *m_scene, modelViewMatrix, sz);
 			// draw
 			d.draw();
 		}
