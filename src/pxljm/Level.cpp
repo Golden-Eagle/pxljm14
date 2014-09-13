@@ -30,7 +30,7 @@ namespace pxljm {
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo_v);
 		glBufferData(GL_ARRAY_BUFFER, 4 * 4 * sizeof(float), pos, GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glVertexAttribPointer(0, 4, GL_FLOAT, false, 0, nullptr);
 
 		vector<GLuint> tileTypeArray;
 		unsigned x = 0;
@@ -53,7 +53,7 @@ namespace pxljm {
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo_t);
 		glBufferData(GL_ARRAY_BUFFER, tileTypeArray.size() * sizeof(GLuint), &tileTypeArray[0], GL_STATIC_DRAW);
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 4, GL_UNSIGNED_INT, GL_FALSE, 0, nullptr);
+		glVertexAttribIPointer(1, 4, GL_UNSIGNED_INT, 0, nullptr);
 
 		glVertexAttribDivisor(1,1);
 
@@ -62,6 +62,7 @@ namespace pxljm {
 
 	void ChunkDrawableComponent::draw()
 	{
+		//log() << m_instances;
 		glBindVertexArray(m_vaoID);
 		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_instances);
 		glBindVertexArray(0);
