@@ -69,6 +69,10 @@ namespace gecom {
 		T w, h;
 		size2(T w_, T h_) : w(w_), h(h_) { }
 		size2() : w(0), h(0) { }
+
+		inline double ratio() const {
+			return double(w) / h;
+		}
 	};
 
 	using size2i = size2<int>;

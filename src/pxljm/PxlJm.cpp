@@ -26,6 +26,16 @@ using namespace std;
 using namespace gecom;
 using namespace i3d;
 
+void draw_fullscreen() {
+static GLuint vao = 0;
+	if (vao == 0) {
+		glGenVertexArrays(1, &vao);
+	}
+	glBindVertexArray(vao);
+	glDrawArrays(GL_POINTS, 0, 1);
+	glBindVertexArray(0);
+}
+
 //
 // dropping example state machine code here for starters
 //
@@ -44,9 +54,21 @@ class PlayState : public State<std::string> {
 	Scene2D m_scene;
 	std::shared_ptr<B2PhysicsComponent> player_phs;
 	Game* m_game;
+	GLuint m_tex_bg;
 
 public:
 	PlayState(Game* game) : m_game(game) {
+
+		gecom::image img_bg(gecom::image::type_png(), "./res/textures/bg.png", true);
+
+		glGenTextures(1, &m_tex_bg);
+		glBindTexture(GL_TEXTURE_2D, m_tex_bg);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, img_bg.width(), img_bg.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img_bg.data());
+		glGenerateMipmap(GL_TEXTURE_2D);
 
 		world = game->getGCM().get<Box2DGameComponent>()->addWorld(i3d::vec3d(0.0, -10.0, 0.0));
 
@@ -109,11 +131,29 @@ public:
 	virtual void drawForeground() override {
 		//log("Test") << "drawing";
 
-		glClear(GL_COLOR_BUFFER_BIT);
+		size2i sz = Window::currentContext()->size();
+		glViewport(0, 0, sz.w, sz.h);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
 
 		draw_queue q = m_scene.makeDrawQueue(aabbd(vec3d(), vec3d::one() * 20), draw_type::standard);
-		q.execute();
+		q.execute(sz);
 
+		static shader_program_spec spec_bg = shader_program_spec().source("background.glsl");
+		GLuint prog_bg = Window::currentContext()->shaderManager()->program(spec_bg);
+
+		glUseProgram(prog_bg);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_tex_bg);
+		glUniform1f(glGetUniformLocation(prog_bg, "ratio"), sz.ratio());
+		glUniform1i(glGetUniformLocation(prog_bg, "sampler_bg"), 0);
+		draw_fullscreen();
+		
+		glDisable(GL_DEPTH_TEST);
+		
 	}
 };
 
