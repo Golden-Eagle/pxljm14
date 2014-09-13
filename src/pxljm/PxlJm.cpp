@@ -162,6 +162,9 @@ public:
 		phs->doShit();
 		box->addComponent<B2PhysicsComponent>(phs);
 
+		shared_ptr<Camera> camera(make_shared<Camera>(box));
+		m_scene.setCamera(camera);
+
 		m_scene.add(box);
 
 		ground = std::make_shared<Entity>();

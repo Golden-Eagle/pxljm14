@@ -37,7 +37,7 @@ namespace gecom {
 		}
 
 		virtual void pushDrawCalls(draw_queue &q, unsigned dt) {
-			auto mat = i3d::mat4d::translate(getParent()->getPosition()) * i3d::mat4d::rotateZ(getParent()->getRotation());
+			auto mat = getParent()->getModelWorldMatrix();
 			switch (dt)
 			{
 			case draw_type::standard : 

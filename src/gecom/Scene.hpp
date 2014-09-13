@@ -82,13 +82,13 @@ namespace gecom{
 	class draw_call {
 	private:
 		Technique *m_tech = nullptr;
-		i3d::mat4d m_mv;
+		i3d::mat4d m_mw;
 		std::function<void(void)> m_draw;
 		GLuint m_prog = 0;
 
 		inline void reset() {
 			m_tech = nullptr;
-			m_mv = i3d::mat4d();
+			m_mw = i3d::mat4d();
 			m_draw = std::function<void(void)>();
 			m_prog = 0;
 		}
@@ -96,21 +96,21 @@ namespace gecom{
 	public:
 		inline draw_call() { }
 
-		inline draw_call(Technique *tech_, const i3d::mat4d &mv_, std::function<void(void)> draw_) :
-			m_tech(tech_), m_mv(mv_), m_draw(draw_), m_prog(tech_->program()) { }
+		inline draw_call(Technique *tech_, const i3d::mat4d &mw_, std::function<void(void)> draw_) :
+			m_tech(tech_), m_mw(mw_), m_draw(draw_), m_prog(tech_->program()) { }
 
 		inline draw_call(const draw_call &other) :
-			m_tech(other.m_tech), m_mv(other.m_mv), m_draw(other.m_draw), m_prog(other.m_prog) { }
+			m_tech(other.m_tech), m_mw(other.m_mw), m_draw(other.m_draw), m_prog(other.m_prog) { }
 
 		inline draw_call(draw_call &&other) :
-			m_tech(other.m_tech), m_mv(other.m_mv), m_draw(std::move(other.m_draw)), m_prog(other.m_prog)
+			m_tech(other.m_tech), m_mw(other.m_mw), m_draw(std::move(other.m_draw)), m_prog(other.m_prog)
 		{
 			other.reset();
 		}
 
 		inline draw_call & operator=(const draw_call &other) {
 			m_tech = other.m_tech;
-			m_mv = other.m_mv;
+			m_mw = other.m_mw;
 			m_draw = other.m_draw;
 			m_prog = other.m_prog;
 			return *this;
@@ -118,7 +118,7 @@ namespace gecom{
 
 		inline draw_call & operator=(draw_call &&other) {
 			m_tech = other.m_tech;
-			m_mv = other.m_mv;
+			m_mw = other.m_mw;
 			m_draw = std::move(other.m_draw);
 			m_prog = other.m_prog;
 			other.reset();
@@ -143,8 +143,8 @@ namespace gecom{
 			return m_prog;
 		}
 
-		inline const i3d::mat4d & modelView() const {
-			return m_mv;
+		inline const i3d::mat4d & modelWorld() const {
+			return m_mw;
 		}
 
 		inline void draw() const {
@@ -184,37 +184,7 @@ namespace gecom{
 			}
 		}
 
-		inline void execute() const {
-			Technique * tech = nullptr;
-			GLuint prog = 0;
-			glUseProgram(0);
-
-			auto q = m_draw_calls;
-	
-			while (!q.empty()) {
-				draw_call d = q.top();
-				q.pop();
-				auto tech2 = d.technique();
-				if (tech2 != tech) {
-					if (tech) tech->unbind();
-					tech = tech2;
-					auto prog2 = d.program();
-					if (prog2 != prog) {
-						prog = prog2;
-						glUseProgram(prog);
-					}
-					tech->bind();
-				}
-				// update
-				tech->update(prog, *m_scene, d.modelView());
-				// draw
-				d.draw();
-			}
-			if (tech) tech->unbind();
-	
-			glUseProgram(0);
-
-		}
+		inline void execute() const;
 	};
 
 	class DrawableComponent : public EntityComponent {
@@ -226,14 +196,6 @@ namespace gecom{
 		virtual void draw() =0;
 
 		virtual ~DrawableComponent() { }
-	};
-
-	class Scene {
-	public:
-		virtual void add(std::shared_ptr<gecom::Entity>) = 0;
-		virtual void addStatic(std::shared_ptr<gecom::Entity> i_entity) { add(i_entity); }
-		virtual std::vector<std::shared_ptr<gecom::Entity>>& get_all() = 0;
-		virtual ~Scene() { }
 	};
 
 	class Camera {
@@ -251,6 +213,18 @@ namespace gecom{
 		}
 
 		virtual ~Camera() { }
+	};
+
+	class Scene {
+	private:
+		std::shared_ptr<Camera> m_camera = nullptr;
+	public:
+		virtual void add(std::shared_ptr<gecom::Entity>) = 0;
+		virtual void addStatic(std::shared_ptr<gecom::Entity> i_entity) { add(i_entity); }
+		virtual std::shared_ptr<Camera> getCamera() { return m_camera; }
+		virtual void setCamera(std::shared_ptr<Camera> i_camera) { m_camera = i_camera; }
+		virtual std::vector<std::shared_ptr<gecom::Entity>>& get_all() = 0;
+		virtual ~Scene() { }
 	};
 
 	// delete me once sexy quadtree implementation is done
@@ -328,6 +302,42 @@ namespace gecom{
 	class Scene3D : Scene {
 		// this would be for future sexy 3d octree
 	};
+
+
+	//Forward decleared function
+	void draw_queue::execute() const {
+		Technique * tech = nullptr;
+		GLuint prog = 0;
+		glUseProgram(0);
+
+		auto q = m_draw_calls;
+		auto worldView = m_scene->getCamera()->getEntity()->getModelWorldMatrix().inverse();
+
+		while (!q.empty()) {
+			draw_call d = q.top();
+			q.pop();
+			auto tech2 = d.technique();
+			if (tech2 != tech) {
+				if (tech) tech->unbind();
+				tech = tech2;
+				auto prog2 = d.program();
+				if (prog2 != prog) {
+					prog = prog2;
+					glUseProgram(prog);
+				}
+				tech->bind();
+			}
+			// update
+			auto modelViewMatrix = worldView * d.modelWorld();
+			tech->update(prog, *m_scene, modelViewMatrix);
+			// draw
+			d.draw();
+		}
+		if (tech) tech->unbind();
+
+		glUseProgram(0);
+
+	}
 }
 
 #endif
