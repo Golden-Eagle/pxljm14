@@ -123,6 +123,23 @@ namespace pxljm {
 
 		std::shared_ptr<Level> compileLevel(tile_grid i_tiles);
 
+		struct BuildingHint {
+			BuildingHint() {  }
+		};
+
+		enum SpacingHint {
+			uniform,
+			swing,
+			random
+		};
+
+		std::vector<int> getSpacing(int i_width, SpacingHint i_spaceHint, int i_avgSize);
+
+		void movingSubpart(int i_height, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint);
+		void jumpSubpart(int i_height, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint);
+
+
+
 
 		//Tile grid helper method
 		inline LevelGenerator::tile_grid LevelGenerator::makeTileGrid(int i_width, int i_height){
@@ -146,27 +163,6 @@ namespace pxljm {
 			}
 			return true;
 		}
-	};
-
-	class LevelComponent{
-	private:
-		int m_start;
-		int m_end;
-	public:
-		LevelComponent(int i_start, int i_end);
-		virtual void apply(int i_height) = 0;
-	};
-
-	class MovingComponent : public LevelComponent{
-	public:
-		MovingComponent(int i_start, int i_end);
-		virtual int apply(int i_currentHeight, tile_grid i_grid);
-	};
-
-	class JumpComponent : public LevelComponent{
-	public:
-		JumpComponent(int i_start, int i_end);
-		virtual int apply(int i_currentHeight, tile_grid i_grid);
 	};
 }
 
