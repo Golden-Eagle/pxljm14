@@ -62,6 +62,11 @@ namespace pxljm {
 		}
 	};
 
+	class ProjectileDrawable : public SpineDrawable {
+	public:
+		ProjectileDrawable(const std::shared_ptr<gecom::Entity> parent) : SpineDrawable(std::string("fireball"), parent) { }
+	};
+
 	class ProjectileEntity : public gecom::Entity {
 		i3d::vec3d m_dir;
 		uint32_t half_width;
@@ -72,7 +77,7 @@ namespace pxljm {
 		void init(gecom::Scene* s) override {
 			gecom::Entity::init(s);
 
-			addComponent<gecom::DrawableComponent>(std::make_shared<gecom::UnitSquare>(shared_from_this(), half_width, half_height));
+			addComponent<gecom::DrawableComponent>(std::make_shared<ProjectileDrawable>(shared_from_this()));
 
 			auto phys = std::make_shared<ProjectilePhysics>(shared_from_this(), half_width, half_height);
 			phys->registerWithWorld(getWorld());

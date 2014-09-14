@@ -23,16 +23,19 @@ namespace pxljm {
 
 		//for all tiles (for now)
 		float pos[] = {
-			0, 0, 0, 0,
-			0, 1, 0, 0,
-			1, 0, 0, 0,
-			1, 1, 0, 0
+			-0.5, -0.5, 0, 0,
+			-0.5, 1.5, 0, 0,
+			1.5, -0.5, 0, 0,
+			1.5, 1.5, 0, 0
 		};
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo_v);
 		glBufferData(GL_ARRAY_BUFFER, 4 * 4 * sizeof(float), pos, GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 4, GL_FLOAT, false, 0, nullptr);
+
+		std::mt19937 generator;
+		std::uniform_int_distribution<int> texture(0, 4);
 
 		vector<GLint> tileTypeArray;
 		int x = 0;
@@ -45,19 +48,21 @@ namespace pxljm {
 
 					if (tile.inf) {
 						for (int i = 0; i < 100; ++i) {
+							int random = texture(generator);
 							tileTypeArray.push_back(x);
 							tileTypeArray.push_back(y - i);
-							tileTypeArray.push_back(tileTexture);
-							tileTypeArray.push_back(0);
+							tileTypeArray.push_back(x + random);
+							tileTypeArray.push_back(y + random);
 
 							++m_instances;
 						}
 					}
 					else {
+						int random = texture(generator);
 						tileTypeArray.push_back(x);
 						tileTypeArray.push_back(y);
-						tileTypeArray.push_back(tileTexture);
-						tileTypeArray.push_back(0);
+						tileTypeArray.push_back(x + random);
+						tileTypeArray.push_back(y + random);
 
 						++m_instances;
 					}
@@ -191,31 +196,31 @@ namespace pxljm {
 	}
 
 	shared_ptr<Level> LevelGenerator::getTestLevel(const std::shared_ptr<gecom::WorldProxy>& world) {
-		int height = 64;
-		int width = 128;
+		int height = 128;
+		int width = 512;
 
 		tile_grid grid = makeTileGrid(width, height);
 
 
-		auto spaces = getSpacing(width, SpacingHint::uniform, 20);
+		auto spaces = getSpacing(width, SpacingHint::uniform, 15);
 		std::default_random_engine generator;
 		std::uniform_int_distribution<int> typeDistribution(0, 1);
 
 		int colHeight = 3;
-		BuildingHint hint(0.0, 0.1, 0.0, 0.0);
+		BuildingHint hint;
+		hint.deltaVariance = 0.3;
 
 		for (int i = 0; i < spaces.size()-1; ++i){
-			//int type = typeDistribution(generator);
-			int type = 0;
+			int type = typeDistribution(generator);
 			switch (type){
 			case 0:
 				colHeight = movingSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, hint);
 				break;
 			case 1:
-				//colHeight = jumpSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, BuildingHint());
+				colHeight = jumpSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, hint);
 				break;
 			default:
-				//colHeight = movingSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, BuildingHint());
+				colHeight = movingSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, hint);
 				break;
 			}
 		}
@@ -319,13 +324,13 @@ namespace pxljm {
 	double smoothness;
 	double platformChance;*/
 
-	int LevelGenerator::movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, const BuildingHint &i_hint = BuildingHint()){
+	int LevelGenerator::movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint = BuildingHint()){
 		//Flat walk
 
 		i_hint.deltaHeight;
 
 		std::mt19937 generator(uint64_t(i_start) | (uint64_t(i_end) << 32));
-		std::normal_distribution<double> deltaDistribution(i_hint.deltaHeight, i_hint.varience);
+		std::normal_distribution<double> deltaDistribution(i_hint.deltaHeight, i_hint.deltaVariance);
 		std::uniform_real_distribution<double> platformChance(0, 1);
 
 		vector<int> platformStarts;
@@ -352,14 +357,57 @@ namespace pxljm {
 		return int(last);
 	}
 
-	int LevelGenerator::jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, const BuildingHint &i_hint = BuildingHint()){
-		////Flat Jump
-		//for (int x = min(i_start + 3, i_end-1); x < i_end; ++x){
-		//	for (int y = 0; y < i_height; ++y){
-		//		io_grid[x][y].solid = true;
-		//	}
-		//}
-		return i_startHeight;
+	int LevelGenerator::jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint = BuildingHint()){
+		i_hint.deltaHeight;
+
+		std::mt19937 generator(uint64_t(i_start) | (uint64_t(i_end) << 32));
+		double delta = 0.0;
+		std::normal_distribution<double> deltaDistribution(i_hint.deltaHeight, i_hint.deltaVariance);
+		delta = deltaDistribution(generator);
+
+		std::uniform_real_distribution<double> jumpTypeChance(0, 4);
+		double type = jumpTypeChance(generator);
+
+
+		int startPadHeight = i_startHeight;
+		int startPadPosition = i_start;
+
+		int finishHeight = max(min(int(i_startHeight + delta * (i_end - i_start)), i_maxHeight-1), 0);
+
+
+		double jumpX = 4;
+		double jumpY = 3;
+
+		//gap
+		if (type < 0.6) {
+
+			//work out distance
+			std::uniform_real_distribution<double> jumpDistance(0, 2*jumpX);
+			startPadPosition = min(i_end - 2, i_start + int(jumpDistance(generator)));
+
+			//work out height
+			startPadHeight = max(min(i_startHeight + int(jumpY * (startPadPosition - pow(startPadPosition, 2) / (jumpX * jumpX))), i_maxHeight), 0);
+
+			//TODO make sure that the gap isn't too big and the platform isn't too small
+		}
+
+		//drop
+		else if (type < 0.8){
+			//work out distance
+			std::uniform_real_distribution<double> jumpDistance(jumpX, 2 * jumpX);
+			int distance = min(i_end - 2, i_start + int(jumpDistance(generator)));
+
+			//good drop height
+			startPadHeight = max(min(i_startHeight + int(jumpY * (distance - pow(distance, 2) / (jumpX * jumpX))), i_maxHeight), 0);
+
+		}
+		//pit? //TODO WALKING FOR NOW
+		else {
+
+		}
+
+		return movingSubpart(startPadHeight, i_maxHeight, startPadPosition, i_end, io_grid, i_hint);
+
 	}
 }
 
