@@ -1,5 +1,9 @@
 Golden Eagle Platformer (Unnamed) - PXLJM 2014
 
+Ben Allen	-	Programming (Graphics, C++ Guru)		-	joshua.scott.132@gmail.com
+Josh Scott	-	Programming (Proc Gen, Graphics)		-	benos.9k@gmail.com
+Ben Anderson	-	Programming (Pysics, Animation, Gameplay)	-	benanderson@acidic.co.nz
+Matt Fannin	-	Design (Concept Art, Animation, Assets)		-	mattfannin@acidic.co.nz	
 
 This year, as with the previous, we brainstormed an adventure of a larger scale than what is possible to make in 48 hours, and attempted to reach a first iteration of the game, to extend upon later. 
 
