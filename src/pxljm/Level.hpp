@@ -32,7 +32,7 @@ namespace pxljm {
 
 	class Chunk : public gecom::Entity {
 	public:
-		Chunk(int i_xpos, int i_ypos, tile_grid i_grid);
+		Chunk(const std::shared_ptr<gecom::WorldProxy>& proxy, int i_xpos, int i_ypos, tile_grid i_grid);
 		const tile_grid &getTileGrid();
 	private:
 		tile_grid m_tileGrid;
@@ -130,13 +130,13 @@ namespace pxljm {
 		LevelGenerator();
 		int getChunkSize();
 		void setChunkSize(int i_size);
-		std::shared_ptr<Level> getTestLevel();
+		std::shared_ptr<Level> getTestLevel(const std::shared_ptr<gecom::WorldProxy>& world);
 		std::shared_ptr<Level>  getLevel(/*something*/);
 
 	private:
 		int m_chunkSize;
 
-		std::shared_ptr<Level> compileLevel(tile_grid i_tiles);
+		std::shared_ptr<Level> compileLevel(const std::shared_ptr<gecom::WorldProxy>& world, tile_grid i_tiles);
 
 		struct BuildingHint {
 			double deltaHeight;

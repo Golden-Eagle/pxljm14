@@ -1,6 +1,6 @@
 #include "PlayerEntity.hpp"
 
-PlayerEntity::PlayerEntity(std::shared_ptr<gecom::WorldProxy>& proxy) : gecom::Entity(), m_world(proxy) { }
+PlayerEntity::PlayerEntity(std::shared_ptr<gecom::WorldProxy>& proxy) : gecom::Entity(proxy) { }
 
 void PlayerEntity::init(gecom::Scene& s) {
 	gecom::log("player") << "Init()";

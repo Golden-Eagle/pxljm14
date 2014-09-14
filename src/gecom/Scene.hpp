@@ -259,7 +259,7 @@ namespace gecom{
 	private:
 		std::shared_ptr<Entity> m_focus;
 	public:
-		SteadyFocusCamera(std::shared_ptr<Entity> i_focus) : Entity(), m_focus(i_focus) {}
+		SteadyFocusCamera(std::shared_ptr<WorldProxy> proxy, std::shared_ptr<Entity> i_focus) : Entity(proxy), m_focus(i_focus) {}
 		i3d::mat4d getModelWorldMatrix() {
 			return i3d::mat4d::translate(m_focus->getPosition());
 		}
@@ -275,6 +275,7 @@ namespace gecom{
 		virtual void setCamera(std::shared_ptr<Camera> i_camera) { m_camera = i_camera; }
 		virtual std::vector<std::shared_ptr<gecom::Entity>>& get_all() = 0;
 		virtual void update(gecom::really_high_resolution_clock::duration) = 0;
+		virtual draw_queue makeDrawQueue(const aabbd &bb, unsigned dt) = 0;
 		virtual ~Scene() { }
 	};
 
@@ -312,12 +313,12 @@ namespace gecom{
 		Scene2D() : Scene() { }
 
 		inline void add(std::shared_ptr<gecom::Entity> ne) {
-			ne->init(*this);
+			ne->init(this);
 			m_dynamicEntities.push_back(ne);
 		}
 
 		inline void addStatic(std::shared_ptr<gecom::Entity> i_entity) {
-			i_entity->init(*this);
+			i_entity->init(this);
 			m_staticEntities.insert(i_entity, i_entity->getWorldAABB());
 		}
 

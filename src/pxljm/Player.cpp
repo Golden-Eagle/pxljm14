@@ -1,4 +1,5 @@
 #include "Player.hpp"
+#include <gecom/Concurrent.hpp>
 
 pxljm::JumpContactListener::JumpContactListener(std::shared_ptr<PlayerEntity> e) : m_e(e) {
 	gecom::log("jump") << "Listening for shit, bro!";
@@ -74,17 +75,18 @@ inline void pxljm::PlayerPhysics::registerWithWorld(std::shared_ptr<gecom::World
 	//world->createFixture(m_b_id, ffix, bfeet);
 }
 
-pxljm::PlayerEntity::PlayerEntity(std::shared_ptr<gecom::WorldProxy>& proxy) : gecom::Entity(), m_world(proxy) { }
+pxljm::PlayerEntity::PlayerEntity(std::shared_ptr<gecom::WorldProxy>& proxy) : gecom::Entity(proxy), norm_dist(0, 0.1) { }
 
-void pxljm::PlayerEntity::init(gecom::Scene& s) {
+void pxljm::PlayerEntity::init(gecom::Scene* sc) {
+	gecom::Entity::init(sc);
 	gecom::log("player") << "Init()";
 	setPosition(i3d::vec3d(5, 50, 0));
 
 	player_dw = std::make_shared<ProtagonistDrawable>(shared_from_this());
 	addComponent<gecom::DrawableComponent>(player_dw);
-	addComponent<gecom::DrawableComponent>(std::make_shared<gecom::UnitSquare>(shared_from_this(), 0.5, 2.2));
+	//addComponent<gecom::DrawableComponent>(std::make_shared<gecom::UnitSquare>(shared_from_this(), 0.5, 2.2));
 	player_phs = std::make_shared<PlayerPhysics>(std::static_pointer_cast<PlayerEntity>(shared_from_this()));
-	player_phs->registerWithWorld(m_world);
+	player_phs->registerWithWorld(getWorld());
 	addComponent<gecom::B2PhysicsComponent>(player_phs);
 }
 
@@ -105,11 +107,22 @@ void pxljm::PlayerEntity::update(gecom::really_high_resolution_clock::duration d
 
 	bool should_be_running = false;// std::abs(player_phs->getLinearVelocity().x()) > 0.0;
 
-	if (gecom::Window::currentContext()->getKey(GLFW_KEY_SPACE)) {
+	if (gecom::Window::currentContext()->pollKey(GLFW_KEY_SPACE)) {
 		// create a projectile
 		
+		std::default_random_engine gen(gecom::really_high_resolution_clock::now().time_since_epoch().count());
 		i3d::vec3d proj_dir(player_dw->isLeft() ? 1 : -1, 0, 0);
-		auto n_proj = std::make_shared<ProjectileEntity>(proj_dir);
+		auto impulse = proj_dir;
+		impulse = (proj_dir + i3d::vec3d(0.0, norm_dist(gen), 0.0));
+		impulse *= 50000.0f;
+
+		auto n_proj = std::make_shared<ProjectileEntity>(getWorld(), impulse, 1, 1);
+		
+		n_proj->setPosition(getPosition() + (proj_dir * 3));
+
+		gecom::AsyncExecutor::enqueueMain([=] {
+			getScene()->add(n_proj);
+		});
 	}
 
 	if (gecom::Window::currentContext()->getKey(GLFW_KEY_RIGHT)) {

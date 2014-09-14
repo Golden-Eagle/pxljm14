@@ -15,6 +15,7 @@
 namespace gecom {
 	class Entity;
 	class Scene;
+	class WorldProxy;
 
 	using entity_id_t = uint32_t;
 	
@@ -36,6 +37,10 @@ namespace gecom {
 		double m_rotation;
 		double m_angl_vel;
 
+		Scene* m_scene;
+
+		std::shared_ptr<gecom::WorldProxy> m_world;
+
 		std::map<std::type_index, std::vector<std::shared_ptr<EntityComponent>>> components;
 
 		static std::atomic<entity_id_t> sm_ID;
@@ -43,11 +48,13 @@ namespace gecom {
 		std::vector< std::shared_ptr<Entity>> m_children;
 
 	public:
-		Entity() { m_ID = Entity::sm_ID.fetch_add(1); }
+		Entity(const std::shared_ptr<gecom::WorldProxy>& prxy) : m_world(prxy) { m_ID = Entity::sm_ID.fetch_add(1); }
 
 		entity_id_t getID() const { return m_ID; }
 
-		virtual void init(Scene& scene) { }
+		virtual void init(Scene* scene) { m_scene = scene;  }
+		Scene* getScene() { return m_scene; }
+		const std::shared_ptr<gecom::WorldProxy>& getWorld() { return m_world; }
 
 		virtual void update(gecom::really_high_resolution_clock::duration delta) {
 			for (auto cv : components) {
