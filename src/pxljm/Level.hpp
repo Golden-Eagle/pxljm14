@@ -92,6 +92,8 @@ namespace pxljm {
 			glBindTexture(GL_TEXTURE_2D, m_tex_atlas);
 			glEnable(GL_BLEND);
 			glBlendEquation(GL_FUNC_ADD);
+			//glBlendEquation(GL_MIN);
+			//glBlendFunc(GL_ONE, GL_ONE);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 
@@ -118,11 +120,13 @@ namespace pxljm {
 	class Level {
 	public:
 		Level();
-		void addChunk(std::shared_ptr<Chunk>);
+		void addChunk(std::shared_ptr<Chunk> i_chunk);
+		void addEntities(const std::vector<std::shared_ptr<gecom::Entity>> &i_entities);
 		void load(gecom::Scene& scene, const std::shared_ptr<gecom::WorldProxy> world);
 		void unload(gecom::Scene &scene);
 	private:
 		std::vector<std::shared_ptr<Chunk>> m_chunks;
+		std::vector<std::shared_ptr<gecom::Entity>> m_entities;
 	};
 
 	class LevelGenerator {
@@ -136,7 +140,7 @@ namespace pxljm {
 	private:
 		int m_chunkSize;
 
-		std::shared_ptr<Level> compileLevel(const std::shared_ptr<gecom::WorldProxy>& world, tile_grid i_tiles);
+std::shared_ptr<Level> compileLevel(const std::shared_ptr<gecom::WorldProxy>& world, tile_grid i_tiles, std::vector<std::shared_ptr<gecom::Entity>> &i_entities);
 
 		struct BuildingHint {
 			double deltaHeight = 0.0;
@@ -156,8 +160,8 @@ namespace pxljm {
 
 		std::vector<int> getSpacing(int i_width, SpacingHint i_spaceHint, int i_avgSize);
 
-		int movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint);
-		int jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint);
+		int movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, std::vector<std::shared_ptr<gecom::Entity>> &io_entities, BuildingHint i_hint);
+		int jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, std::vector<std::shared_ptr<gecom::Entity>> &io_entities, BuildingHint i_hint);
 
 
 

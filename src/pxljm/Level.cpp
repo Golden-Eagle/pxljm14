@@ -23,10 +23,10 @@ namespace pxljm {
 
 		//for all tiles (for now)
 		float pos[] = {
-			-0.5, -0.5, 0, 0,
-			-0.5, 1.5, 0, 0,
-			1.5, -0.5, 0, 0,
-			1.5, 1.5, 0, 0
+			-0.6, -0.6, 0, 0,
+			-0.6, 1.6, 0, 0,
+			1.6, -0.6, 0, 0,
+			1.6, 1.6, 0, 0
 		};
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo_v);
@@ -164,10 +164,14 @@ namespace pxljm {
 
 
 
-	Level::Level() : m_chunks() {  }
+	Level::Level() : m_chunks(), m_entities() {  }
 
 	void Level::addChunk(shared_ptr<Chunk> i_chunk){
 		m_chunks.push_back(i_chunk);
+	}
+
+	void Level::addEntities(const vector<shared_ptr<Entity>> &i_entities){
+		m_entities.insert(m_entities.end(), i_entities.begin(), i_entities.end());
 	}
 
 	void Level::load(gecom::Scene &scene, std::shared_ptr<gecom::WorldProxy> world){
@@ -178,6 +182,10 @@ namespace pxljm {
 				comp->registerWithWorld(world);
 
 			scene.add(c);
+		}
+
+		for (shared_ptr<Entity> e : m_entities) {
+			scene.add(e);
 		}
 	}
 
@@ -210,17 +218,19 @@ namespace pxljm {
 		BuildingHint hint;
 		hint.deltaVariance = 0.3;
 
+		vector<shared_ptr<Entity>> entities;
+
 		for (int i = 0; i < spaces.size()-1; ++i){
 			int type = typeDistribution(generator);
 			switch (type){
 			case 0:
-				colHeight = movingSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, hint);
+				colHeight = movingSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, entities, hint);
 				break;
 			case 1:
-				colHeight = jumpSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, hint);
+				colHeight = jumpSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, entities, hint);
 				break;
 			default:
-				colHeight = movingSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, hint);
+				colHeight = movingSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, entities, hint);
 				break;
 			}
 		}
@@ -231,7 +241,7 @@ namespace pxljm {
 
 		//to compile for now
 		//return std::shared_ptr<Level>(new Level());
-		return compileLevel(world, grid);
+		return compileLevel(world, grid, entities);
 	}
 
 	std::shared_ptr<Level> LevelGenerator::getLevel() {
@@ -254,7 +264,7 @@ namespace pxljm {
 		return nullptr;
 	}
 
-	std::shared_ptr<Level> LevelGenerator::compileLevel(const std::shared_ptr<gecom::WorldProxy>& world, tile_grid i_tiles)
+	std::shared_ptr<Level> LevelGenerator::compileLevel(const std::shared_ptr<gecom::WorldProxy>& world, tile_grid i_tiles, vector<shared_ptr<Entity>> &i_entities)
 	{
 		shared_ptr<Level> level(new Level());
 
@@ -324,7 +334,7 @@ namespace pxljm {
 	double smoothness;
 	double platformChance;*/
 
-	int LevelGenerator::movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint = BuildingHint()){
+	int LevelGenerator::movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, vector<shared_ptr<Entity>> &io_entities, BuildingHint i_hint = BuildingHint()){
 		//Flat walk
 
 		i_hint.deltaHeight;
@@ -357,7 +367,7 @@ namespace pxljm {
 		return int(last);
 	}
 
-	int LevelGenerator::jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint = BuildingHint()){
+	int LevelGenerator::jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, vector<shared_ptr<Entity>> &io_entities, BuildingHint i_hint = BuildingHint()){
 		i_hint.deltaHeight;
 
 		std::mt19937 generator(uint64_t(i_start) | (uint64_t(i_end) << 32));
@@ -406,7 +416,7 @@ namespace pxljm {
 
 		}
 
-		return movingSubpart(startPadHeight, i_maxHeight, startPadPosition, i_end, io_grid, i_hint);
+		return movingSubpart(startPadHeight, i_maxHeight, startPadPosition, i_end, io_grid, io_entities, i_hint);
 
 	}
 }
