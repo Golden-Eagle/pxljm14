@@ -2,6 +2,7 @@
 
 SET(SHADERS
 	"shader/fullscreen.glsl"
+	"shader/scene.glsl"
 	"shader/scene_default.glsl"
 	"shader/chunk_standard.glsl"
 	"shader/background.glsl"

@@ -22,6 +22,8 @@ namespace gecom{
 
 	class Scene;
 
+	class draw_queue;
+
 	// TODO texture unit allocator
 	
 	// shader program technique
@@ -46,12 +48,7 @@ namespace gecom{
 		virtual inline void unbind() { }
 		virtual inline GLuint program() { return 0; }
 
-		virtual inline void update(GLuint prog, const Scene &scene, const i3d::mat4d &mv, const size2i &sz) {
-			glUniformMatrix4fv(glGetUniformLocation(prog, "modelview_matrix"), 1, true, i3d::mat4f(mv));
-			// TODO proper default projection?
-			glUniformMatrix4fv(glGetUniformLocation(prog, "projection_matrix"), 1, true, i3d::mat4f::scale(0.05 / sz.ratio(), 0.05, 0.001));
-			
-		}
+		virtual inline void update(GLuint prog, const draw_queue &q, const i3d::mat4d &mv, const size2i &sz);
 
 		virtual inline bool depthOrdered() { return true; }
 
@@ -161,11 +158,33 @@ namespace gecom{
 		}
 	};
 
+	class PointLightComponent : public EntityComponent {
+	private:
+		i3d::vec3d m_localpos;
+		i3d::vec3f m_intensity = i3d::vec3f(1, 1, 1);
+
+	public:
+		PointLightComponent(std::shared_ptr<Entity> parent) : EntityComponent(parent) { }
+		
+		virtual void setIntensity(const i3d::vec3f &intensity) { m_intensity = intensity; }
+
+		virtual void setLocalPosition(const i3d::vec3d &pos) { m_localpos = pos; }
+
+		virtual i3d::vec3f getIntensity() { return m_intensity; }
+
+		virtual i3d::vec3d getLocalPosition() { return m_localpos; }
+
+		virtual i3d::vec3d getPosition() { return getParent()->getModelWorldMatrix() * m_localpos; }
+
+		virtual ~PointLightComponent() { }
+	};
+
 	class draw_queue {
 	private:
 		Scene *m_scene = nullptr;
 		std::priority_queue<draw_call> m_draw_calls;
-		
+		std::vector<std::shared_ptr<PointLightComponent>> m_lights;
+
 	public:
 		inline draw_queue() { }
 
@@ -191,6 +210,18 @@ namespace gecom{
 			if (dc) {
 				m_draw_calls.push(dc);
 			}
+		}
+
+		inline void light(const std::shared_ptr<PointLightComponent> &l) {
+			m_lights.push_back(l);
+		}
+
+		inline const std::vector<std::shared_ptr<PointLightComponent>> & lights() {
+			return m_lights;
+		}
+
+		inline Scene * scene() {
+			return m_scene;
 		}
 
 		inline void execute(const size2i &) const;
@@ -324,6 +355,10 @@ namespace gecom{
 				for (auto &d : vd) {
 					d->pushDrawCalls(q, dt);
 				}
+				auto vl = e->getComponents<PointLightComponent>();
+				for (auto &l : vl) {
+					q.light(l);
+				}
 			}
 			return q;
 		}
@@ -359,7 +394,7 @@ namespace gecom{
 			}
 			// update
 			auto modelViewMatrix = worldView * d.modelWorld();
-			tech->update(prog, *m_scene, modelViewMatrix, sz);
+			tech->update(prog, *this, modelViewMatrix, sz);
 			// draw
 			d.draw(prog);
 		}
@@ -367,6 +402,17 @@ namespace gecom{
 
 		glUseProgram(0);
 
+	}
+
+	inline void Technique::update(GLuint prog, const draw_queue &q, const i3d::mat4d &mv, const size2i &sz) {
+		glUniformMatrix4fv(glGetUniformLocation(prog, "modelview_matrix"), 1, true, i3d::mat4f(mv));
+		// TODO proper default projection?
+		glUniformMatrix4fv(glGetUniformLocation(prog, "projection_matrix"), 1, true, i3d::mat4f::scale(0.05 / sz.ratio(), 0.05, 0.001));
+		
+		if (glGetUniformLocation(prog, "num_lights") >= 0) {
+			// TODO upload lights to UBO
+
+		}
 	}
 }
 #endif
