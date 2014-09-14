@@ -67,8 +67,62 @@ namespace pxljm {
 
 		gecom::really_high_resolution_clock::time_point last_update;
 
+		gecom::subscription window_sub;
+
+		GLuint m_fbo = 0;
+		GLuint m_tex_hdr = 0;
+		GLuint m_tex_depth = 0;
+
+		double m_exposure = 1;
+
+		void make_fbo(size2i sz) {
+			gecom::log() << "RESIZE " << sz.w << ", " << sz.h;
+
+			if (m_fbo) glDeleteFramebuffers(1, &m_fbo);
+			glGenFramebuffers(1, &m_fbo);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
+
+			if (m_tex_hdr) glDeleteTextures(1, &m_tex_hdr);
+			if (m_tex_depth) glDeleteTextures(1, &m_tex_depth);
+
+			glGenTextures(1, &m_tex_hdr);
+			glGenTextures(1, &m_tex_depth);
+
+			glActiveTexture(GL_TEXTURE0);
+
+			glBindTexture(GL_TEXTURE_2D, m_tex_hdr);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, sz.w, sz.h, 0, GL_RGBA, GL_FLOAT, nullptr);
+			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_tex_hdr, 0);
+
+			glBindTexture(GL_TEXTURE_2D, m_tex_depth);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, sz.w, sz.h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_tex_depth, 0);
+
+			GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
+			glDrawBuffers(1, bufs);
+
+		}
+
 	public:
 		PlayState(Game* game) : m_game(game) {
+
+			window_sub = Window::currentContext()->onResize.subscribe([=](const gecom::window_size_event &e) {
+				if (e.size.w > 0 && e.size.h > 0) {
+					make_fbo(e.size);
+				}
+				return false;
+			});
+
+			make_fbo(Window::currentContext()->size());
+
 			m_scene = new Scene2D();
 			last_update = gecom::really_high_resolution_clock().now();
 
@@ -121,6 +175,14 @@ namespace pxljm {
 				return callAction<PauseState>();
 			}
 
+			if (Window::currentContext()->pollKey(GLFW_KEY_EQUAL)) {
+				m_exposure *= 1.2;
+			}
+
+			if (Window::currentContext()->pollKey(GLFW_KEY_MINUS)) {
+				m_exposure /= 1.2;
+			}
+
 			if (Window::currentContext()->shouldClose()) {
 				throw window_close_error();
 			}
@@ -146,6 +208,8 @@ namespace pxljm {
 			//log("Test") << "drawing";
 
 			size2i sz = Window::currentContext()->size();
+
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
 			glViewport(0, 0, sz.w, sz.h);
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -167,6 +231,20 @@ namespace pxljm {
 
 
 			glDisable(GL_DEPTH_TEST);
+
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glViewport(0, 0, sz.w, sz.h);
+
+			static shader_program_spec spec_hdr = shader_program_spec().source("hdr.glsl");
+			GLuint prog_hdr = Window::currentContext()->shaderManager()->program(spec_hdr);
+			glUseProgram(prog_hdr);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, m_tex_hdr);
+			glUniform1f(glGetUniformLocation(prog_hdr, "exposure"), m_exposure);
+			glUniform1i(glGetUniformLocation(prog_hdr, "sampler_hdr"), 0);
+			draw_fullscreen();
+
+			glFinish();
 
 		}
 	};

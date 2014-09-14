@@ -308,7 +308,7 @@ namespace gecom {
 			
 #ifndef GECOM_GL_NO_EXCEPTIONS
 			if (exceptional) {
-				throw gl_error(oss.str());
+				throw gl_error(); //oss.str());
 			}
 #endif
 
@@ -378,10 +378,10 @@ namespace gecom {
 			// enable GL_ARB_debug_output if available
 			if (glfwExtensionSupported("GL_ARB_debug_output")) {
 				// this allows the error location to be determined from a stacktrace
-				//glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 				// set the callback
-				//glDebugMessageCallback(callbackDebugGL, this);
-				//glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
+				glDebugMessageCallback(callbackDebugGL, this);
+				glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
 				log("Window") << "GL debug callback installed";
 			} else {
 				log("Window") << "GL_ARB_debug_output not available";
