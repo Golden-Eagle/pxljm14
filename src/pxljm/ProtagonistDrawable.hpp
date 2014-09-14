@@ -150,9 +150,10 @@ namespace pxljm {
 
 			// Load atlas, skeleton, and animations.
 			m_world_vertices = new float[1000];
-			spAtlas* atlas = spAtlas_createFromFile((std::string("res/spine/") + n + "/" + n + ".atlas").c_str(), 0);
 
-			gecom::image* img = (gecom::image*)(atlas->pages[0].rendererObject);
+				spAtlas* atlas = spAtlas_createFromFile((std::string("res/spine/") + n + "/" + n + ".atlas").c_str(), 0);
+				gecom::image* img = (gecom::image*)(atlas->pages[0].rendererObject);
+
 
 			glGenTextures(1, &tex_id);
 			glBindTexture(GL_TEXTURE_2D, tex_id);
@@ -371,6 +372,11 @@ namespace pxljm {
 	class ProtagonistDrawable : public SpineDrawable {
 	public:
 		ProtagonistDrawable(const std::shared_ptr<gecom::Entity> parent) : SpineDrawable(std::string("protagonist"), parent) { }
+	};
+
+	class DroneDrawable : public SpineDrawable {
+	public:
+		DroneDrawable(const std::shared_ptr<gecom::Entity> parent) : SpineDrawable(std::string("drone"), parent) { }
 	};
 }
 

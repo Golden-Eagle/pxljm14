@@ -20,15 +20,15 @@ void pxljm::JumpContactListener::BeginContact(b2Contact* contact) {
 
 void pxljm::JumpContactListener::EndContact(b2Contact* contact) {
 	gecom::log("endcontact") << (int)contact->GetFixtureA()->GetUserData() << " " << (int)contact->GetFixtureA()->GetUserData();
-	//check if fixture A was the foot sensor
-	void* fixtureUserData = contact->GetFixtureA()->GetUserData();
-	if ((int)fixtureUserData == FOOT_SENSOR)
-		m_e->setJumpAvailable(false);
+	////check if fixture A was the foot sensor
+	//void* fixtureUserData = contact->GetFixtureA()->GetUserData();
+	//if ((int)fixtureUserData == FOOT_SENSOR)
+	//	//m_e->setJumpAvailable(false);
 
-	//check if fixture B was the foot sensor
-	fixtureUserData = contact->GetFixtureB()->GetUserData();
-	if ((int)fixtureUserData == FOOT_SENSOR)
-		m_e->setJumpAvailable(false);
+	////check if fixture B was the foot sensor
+	//fixtureUserData = contact->GetFixtureB()->GetUserData();
+	//if ((int)fixtureUserData == FOOT_SENSOR)
+	//	//m_e->setJumpAvailable(false);
 }
 
 pxljm::PlayerPhysics::PlayerPhysics(std::shared_ptr<PlayerEntity> parent) : gecom::B2PhysicsComponent(std::static_pointer_cast<gecom::Entity>(parent)) { }
@@ -79,7 +79,7 @@ pxljm::PlayerEntity::PlayerEntity(std::shared_ptr<gecom::WorldProxy>& proxy) : g
 
 void pxljm::PlayerEntity::init(gecom::Scene* sc) {
 	gecom::Entity::init(sc);
-	gecom::log("player") << "Init()";
+	//gecom::log("player") << "Init()";
 	setPosition(i3d::vec3d(5, 50, 0));
 
 	player_dw = std::make_shared<ProtagonistDrawable>(shared_from_this());
@@ -145,4 +145,14 @@ void pxljm::PlayerEntity::update(gecom::really_high_resolution_clock::duration d
 		player_dw->stopRunAnimation();
 		is_running = false;
 	}
+}
+
+void pxljm::PlayerEntity::kill() {
+	// reset health
+	m_health = 100;
+
+	// reset position
+	//player_phs->
+
+	// set to idle animation
 }

@@ -95,12 +95,17 @@ namespace pxljm {
 		bool is_running = false;
 		bool jump_available = true;
 		std::normal_distribution<double> norm_dist;
+
+		int m_health = 100;
+
+
 	public:
 		PlayerEntity(std::shared_ptr<gecom::WorldProxy>& proxy);
 
 		void init(gecom::Scene* s) override;
 		void setJumpAvailable(bool should_jump);
 		void update(gecom::really_high_resolution_clock::duration delta);
+		void kill();
 	};
 
 }
