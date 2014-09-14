@@ -1,5 +1,7 @@
 #include "Player.hpp"
 
+#include <random>
+
 pxljm::JumpContactListener::JumpContactListener(std::shared_ptr<PlayerEntity> e) : m_e(e) {
 	gecom::log("jump") << "Listening for shit, bro!";
 }
@@ -28,6 +30,17 @@ void pxljm::JumpContactListener::EndContact(b2Contact* contact) {
 	fixtureUserData = contact->GetFixtureB()->GetUserData();
 	if ((int)fixtureUserData == FOOT_SENSOR)
 		m_e->setJumpAvailable(false);
+}
+
+pxljm::ProjectileEntity::ProjectileEntity(std::shared_ptr<gecom::WorldProxy>& prox, i3d::vec3d dir) : gecom::Entity(prox), m_dir(dir) {
+	
+}
+
+void pxljm::ProjectileEntity::init()  {
+	addComponent<gecom::DrawableComponent>(std::make_shared<gecom::UnitSquare>(shared_from_this(), 1, 1));
+	auto phys = std::make_shared<ProjectilePhysics>(shared_from_this(), 1, 1, m_dir);
+	phys->registerWithWorld(getWorld());
+	addComponent<gecom::B2PhysicsComponent>(phys);
 }
 
 pxljm::PlayerPhysics::PlayerPhysics(std::shared_ptr<PlayerEntity> parent) : gecom::B2PhysicsComponent(std::static_pointer_cast<gecom::Entity>(parent)) { }
@@ -74,17 +87,17 @@ inline void pxljm::PlayerPhysics::registerWithWorld(std::shared_ptr<gecom::World
 	//world->createFixture(m_b_id, ffix, bfeet);
 }
 
-pxljm::PlayerEntity::PlayerEntity(std::shared_ptr<gecom::WorldProxy>& proxy) : gecom::Entity(), m_world(proxy) { }
+pxljm::PlayerEntity::PlayerEntity(std::shared_ptr<gecom::WorldProxy>& proxy) : gecom::Entity(proxy) { }
 
-void pxljm::PlayerEntity::init(gecom::Scene& s) {
-	gecom::log("player") << "Init()";
+void pxljm::PlayerEntity::init() {
+	//gecom::log("player") << "Init()";
 	setPosition(i3d::vec3d(5, 50, 0));
 
 	player_dw = std::make_shared<ProtagonistDrawable>(shared_from_this());
 	addComponent<gecom::DrawableComponent>(player_dw);
-	addComponent<gecom::DrawableComponent>(std::make_shared<gecom::UnitSquare>(shared_from_this(), 0.5, 2.2));
+	//addComponent<gecom::DrawableComponent>(std::make_shared<gecom::UnitSquare>(shared_from_this(), 0.5, 2.2));
 	player_phs = std::make_shared<PlayerPhysics>(std::static_pointer_cast<PlayerEntity>(shared_from_this()));
-	player_phs->registerWithWorld(m_world);
+	player_phs->registerWithWorld(getWorld());
 	addComponent<gecom::B2PhysicsComponent>(player_phs);
 }
 
@@ -105,11 +118,17 @@ void pxljm::PlayerEntity::update(gecom::really_high_resolution_clock::duration d
 
 	bool should_be_running = false;// std::abs(player_phs->getLinearVelocity().x()) > 0.0;
 
-	if (gecom::Window::currentContext()->getKey(GLFW_KEY_SPACE)) {
+	if (gecom::Window::currentContext()->pollKey(GLFW_KEY_SPACE)) {
 		// create a projectile
 		
 		i3d::vec3d proj_dir(player_dw->isLeft() ? 1 : -1, 0, 0);
-		auto n_proj = std::make_shared<ProjectileEntity>(proj_dir);
+		
+
+		std::normal_distribution<double> distrub(0.0, 1.0);
+		auto n_proj = std::make_shared<ProjectileEntity>(getWorld(), proj_dir);
+		n_proj->setPosition(getPosition() + i3d::vec3d(distrub(gen), 1, 0) + (proj_dir * 3));
+		addChild(std::static_pointer_cast<Entity>(n_proj));
+		player_dw->startFireAnimation();
 	}
 
 	if (gecom::Window::currentContext()->getKey(GLFW_KEY_RIGHT)) {

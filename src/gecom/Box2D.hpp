@@ -126,10 +126,10 @@ namespace gecom {
 
 		void init() { m_worker = std::thread{ [this]() { this->dowork(); } }; }
 
-		inline std::shared_ptr<WorldProxy> addWorld(i3d::vec3d gravity) {
+		inline std::shared_ptr<WorldProxy> addWorld(i3d::vec3d gravity, std::shared_ptr<Scene> scene) {
 			auto n_world_id = sm_world_id.fetch_add(1);
 			auto n_world = std::make_shared<b2World>(b2Vec2(gravity.x(), gravity.y()));
-			auto n_world_proxy = std::make_shared<WorldProxy>(shared_from_this(), n_world_id);
+			auto n_world_proxy = std::make_shared<WorldProxy>(shared_from_this(), n_world_id, scene);
 			worlds[n_world_id] = std::make_pair(n_world, n_world_proxy);
 			return n_world_proxy;
 		}
@@ -142,8 +142,9 @@ namespace gecom {
 		std::shared_ptr<Box2DGameComponent> m_master;
 		uint32_t m_world_id;
 		std::map<uint32_t, std::shared_ptr<B2PhysicsComponent>> m_bodies;
+		std::shared_ptr<Scene> m_scene;
 	public:
-		WorldProxy(const std::shared_ptr<Box2DGameComponent>& m, uint32_t nid) : m_master(m), m_world_id(nid) { }
+		WorldProxy(const std::shared_ptr<Box2DGameComponent>& m, uint32_t nid, const std::shared_ptr<Scene>& scene) : m_master(m), m_world_id(nid), m_scene(scene) { }
 
 		uint32_t createBody(const b2BodyDef& def, std::shared_ptr<B2PhysicsComponent> p);
 		void createFixture(const uint32_t b, const std::shared_ptr<b2FixtureDef>& def, const std::shared_ptr<b2Shape>& sh);
@@ -151,6 +152,7 @@ namespace gecom {
 		void receivePFO(std::shared_ptr<PhysicsFrame> pfo);
 		void applyForce(const uint32_t b, const i3d::vec3d f);
 		void applyLinearImpulse(const uint32_t b, const i3d::vec3d f);
+		const std::shared_ptr<Scene>& getScene() { return m_scene; }
 		void setContactListener(b2ContactListener* f) {
 			AsyncExecutor::enqueue(m_master->getThreadID(), [=] { m_master->setContactListener(m_world_id, f); });
 		}

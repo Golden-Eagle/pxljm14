@@ -61,7 +61,7 @@ namespace pxljm {
 	class PlayState : public State < std::string > {
 		std::shared_ptr<Entity> player;
 		std::shared_ptr<WorldProxy> world;
-		Scene2D m_scene;
+		std::shared_ptr<Scene> m_scene = std::make_shared<Scene2D>();
 		Game* m_game;
 		GLuint m_tex_bg;
 
@@ -82,10 +82,10 @@ namespace pxljm {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, img_bg.width(), img_bg.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img_bg.data());
 			glGenerateMipmap(GL_TEXTURE_2D);
 
-			world = game->getGCM().get<Box2DGameComponent>()->addWorld(i3d::vec3d(0.0, -20.0, 0.0));
+			world = game->getGCM().get<Box2DGameComponent>()->addWorld(i3d::vec3d(0.0, -20.0, 0.0), m_scene);
 
 			player = std::make_shared<PlayerEntity>(world);
-			m_scene.add(player);
+			m_scene->add(player);
 			//box = std::make_shared<Entity>();
 			//box->setPosition(i3d::vec3d(5, 50, 0));
 			//box->addComponent<DrawableComponent>(std::make_shared<ProtagonistDrawable>(box));
@@ -94,25 +94,25 @@ namespace pxljm {
 			//player_phs->registerWithWorld(world);
 			//box->addComponent<B2PhysicsComponent>(player_phs);
 
-			auto ground = std::make_shared<Entity>();
+			auto ground = std::make_shared<Entity>(world);
 			ground->setPosition(i3d::vec3d(0, -20, 0));
 			auto gphs = std::make_shared<B2PhysicsStatic>(ground, 200, 1);
 			gphs->registerWithWorld(world);
 			ground->addComponent<B2PhysicsComponent>(gphs);
 
-			m_scene.add(ground);
+			m_scene->add(ground);
 
 			//shared_ptr<SteadyFocusCamera> cameraEntity(make_shared<SteadyFocusCamera>(player));
-			auto cameraEntity = std::make_shared<SteadyFocusCamera>(player);
-			m_scene.add(cameraEntity);
+			auto cameraEntity = std::make_shared<SteadyFocusCamera>(world, player);
+			m_scene->add(cameraEntity);
 
 			auto camera = std::make_shared<Camera>(cameraEntity);
 			//shared_ptr<Camera> camera(make_shared<Camera>(cameraEntity));
-			m_scene.setCamera(camera);
+			m_scene->setCamera(camera);
 
 			pxljm::LevelGenerator lg;
-			auto level = lg.getTestLevel();
-			level->load(m_scene, world);
+			auto level = lg.getTestLevel(world);
+			level->load(*m_scene, world);
 		}
 
 		virtual action_ptr updateForeground() override {
@@ -136,7 +136,7 @@ namespace pxljm {
 
 			auto delta = gecom::really_high_resolution_clock().now() - last_update;
 			last_update = gecom::really_high_resolution_clock().now();
-			m_scene.update(delta);
+			m_scene->update(delta);
 
 			return nullAction();
 		}
@@ -161,7 +161,7 @@ namespace pxljm {
 			glUniform1i(glGetUniformLocation(prog_bg, "sampler_bg"), 0);
 			draw_fullscreen();
 
-			draw_queue q = m_scene.makeDrawQueue(aabbd(vec3d(), vec3d::one() * 20), draw_type::standard);
+			draw_queue q = m_scene->makeDrawQueue(aabbd(vec3d(), vec3d::one() * 20), draw_type::standard);
 			q.execute(sz);
 
 

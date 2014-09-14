@@ -15,6 +15,7 @@
 namespace gecom {
 	class Entity;
 	class Scene;
+	class WorldProxy;
 
 	using entity_id_t = uint32_t;
 	
@@ -31,6 +32,8 @@ namespace gecom {
 	
 	class Entity : public std::enable_shared_from_this<Entity> {
 		// TODO physics data interpolation?
+		std::shared_ptr<gecom::WorldProxy> m_world;
+
 		i3d::vec3d m_position;
 		i3d::vec3d m_velocity;
 		double m_rotation;
@@ -43,11 +46,12 @@ namespace gecom {
 		std::vector< std::shared_ptr<Entity>> m_children;
 
 	public:
-		Entity() { m_ID = Entity::sm_ID.fetch_add(1); }
+		std::shared_ptr<gecom::WorldProxy>& getWorld() { return m_world; }
+		Entity(std::shared_ptr<gecom::WorldProxy> world) : m_world(world) { m_ID = Entity::sm_ID.fetch_add(1); }
 
 		entity_id_t getID() const { return m_ID; }
 
-		virtual void init(Scene& scene) { }
+		virtual void init() { }
 
 		virtual void update(gecom::really_high_resolution_clock::duration delta) {
 			for (auto cv : components) {
@@ -57,9 +61,7 @@ namespace gecom {
 			}
 		}
 
-		void addChild(std::shared_ptr<Entity>& i_child) {
-			m_children.push_back(i_child);
-		}
+		void addChild(std::shared_ptr<Entity>& i_child);
 
 		const std::vector< std::shared_ptr< Entity > > & getChildren() const {
 			return m_children;
@@ -106,6 +108,7 @@ namespace gecom {
 					rets.push_back(std::static_pointer_cast<T>(*c));
 				}
 			}
+
 			return rets;		
 		}
 	};

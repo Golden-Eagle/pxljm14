@@ -39,7 +39,7 @@ namespace pxljm {
 	public:
 		PlayerEntity(std::shared_ptr<gecom::WorldProxy>& proxy);
 
-		void init(gecom::Scene& s) override;
+		void init(gecom::Scene& s);
 		void setJumpAvailable(bool should_jump);
 		void update(gecom::really_high_resolution_clock::duration delta);
 	};

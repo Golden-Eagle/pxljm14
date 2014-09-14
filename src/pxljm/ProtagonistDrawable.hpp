@@ -131,6 +131,11 @@ namespace pxljm {
 			spAnimationState_addAnimationByName(m_state, 0, "idle", true, 0);
 		}
 
+		void startFireAnimation() {
+			spAnimationState_setAnimationByName(m_state, 0, "fire", false);
+			spAnimationState_addAnimationByName(m_state, 0, "idle", true, 0);
+		}
+
 		SpineDrawable(const std::string& n, const std::shared_ptr<gecom::Entity> parent) : gecom::DrawableComponent(parent) {
 			glGenVertexArrays(1, &vaoID);
 			glBindVertexArray(vaoID);
@@ -184,6 +189,9 @@ namespace pxljm {
 			spAnimationStateData_setMixByName(m_state_data, "run", "idle", 0.6f);
 			spAnimationStateData_setMixByName(m_state_data, "run", "jump", 0.6f);
 			spAnimationStateData_setMixByName(m_state_data, "jump", "run", 0.6f);
+			spAnimationStateData_setMixByName(m_state_data, "idle", "fire", 0.1f);
+			spAnimationStateData_setMixByName(m_state_data, "run", "fire", 0.1f);
+			spAnimationStateData_setMixByName(m_state_data, "fire", "run", 0.1f);
 
 			//spSkeletonDrawable* drawable = new spSkeletonDrawable(skeletonData, stateData);
 

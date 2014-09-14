@@ -15,14 +15,20 @@ void gecom::Game::run() {
 		// dispatch events
 		glfwPollEvents();
 
-		// update
-		ec_manager.update();
-		state_manager.update();
+		
+		try {
+			// update
+			ec_manager.update();
+			state_manager.update();
 
-		// draw
-
-		state_manager.draw();
-		win->swapBuffers();
+			// draw
+		
+			state_manager.draw();
+			win->swapBuffers();
+		}
+		catch (std::exception e) {
+			log("exception") << e.what();
+		}
 
 		n_frames++;
 		if (gecom::really_high_resolution_clock::now() - last_update >= std::chrono::seconds(1)) {
