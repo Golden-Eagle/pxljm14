@@ -23,7 +23,7 @@
 #include <gecom/Quadtree.hpp>
 
 #include "Level.hpp"
-#include "PlayerEntity.hpp"
+#include "Player.hpp"
 
 using namespace std;
 using namespace gecom;
@@ -87,6 +87,9 @@ namespace pxljm {
 
 			player = std::make_shared<PlayerEntity>(world);
 			m_scene->add(player);
+
+			auto drone = std::make_shared<DroneEntity>(world);
+			m_scene->add(drone);
 			//box = std::make_shared<Entity>();
 			//box->setPosition(i3d::vec3d(5, 50, 0));
 			//box->addComponent<DrawableComponent>(std::make_shared<ProtagonistDrawable>(box));

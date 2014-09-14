@@ -1,5 +1,5 @@
-#ifndef PXLJM_PE_HEADER
-#define PXLJM_PE_HEADER
+#ifndef PXLJM_PEA_HEADER
+#define PXLJM_PEA_HEADER
 
 #include <gecom/Chrono.hpp>
 #include <gecom/Entity.hpp>
@@ -64,7 +64,58 @@ namespace pxljm {
 
 	class ProjectileDrawable : public SpineDrawable {
 	public:
-		ProjectileDrawable(const std::shared_ptr<gecom::Entity> parent) : SpineDrawable(std::string("fireball"), parent) { }
+		ProjectileDrawable(const std::shared_ptr<gecom::Entity> parent) : SpineDrawable(std::string("fireball"), parent, 0.3) { }
+	};
+
+	class DronePhysics : public gecom::B2PhysicsComponent {
+	public:
+		DronePhysics(const std::shared_ptr<gecom::Entity>& parent)
+			: gecom::B2PhysicsComponent(parent) {}
+
+		inline virtual void registerWithWorld(std::shared_ptr<gecom::WorldProxy> world) {
+			B2PhysicsComponent::registerWithWorld(world);
+
+			b2BodyDef def;
+			def.type = b2_dynamicBody;
+			def.fixedRotation = true;
+			def.position.Set(getParent()->getPosition().x(), getParent()->getPosition().y() - 2);
+			def.linearDamping = 0.6f;
+
+			setBodyID(world->createBody(def, shared_from_this()));
+
+			auto bbb = std::make_shared<b2PolygonShape>();
+			bbb->SetAsBox(1, 1);
+
+			auto fix = std::make_shared<b2FixtureDef>();
+			fix->shape = bbb.get();
+			fix->density = 130;
+			fix->friction = 0.99f;
+
+			world->createFixture(getBodyID(), fix, bbb);
+		}
+	};
+
+	class DroneEntity : public gecom::Entity {
+		std::shared_ptr<PlayerPhysics> player_phs;
+		std::shared_ptr<ProtagonistDrawable> player_dw;
+
+		int m_health = 100;
+
+	public:
+		DroneEntity(std::shared_ptr<gecom::WorldProxy> word) : gecom::Entity(word) { }
+
+		void init(gecom::Scene* s) override {
+			gecom::Entity::init(s);
+			
+			setPosition(i3d::vec3d(20, 50, 0));
+			addComponent<gecom::DrawableComponent>(std::make_shared<DroneDrawable>(shared_from_this()));
+
+			auto phys = std::make_shared<DronePhysics>(shared_from_this());
+			phys->registerWithWorld(getWorld());
+			
+
+			addComponent<gecom::B2PhysicsComponent>(phys);
+		}
 	};
 
 	class ProjectileEntity : public gecom::Entity {
