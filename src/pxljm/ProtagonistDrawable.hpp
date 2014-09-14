@@ -41,8 +41,8 @@ namespace pxljm {
 			return gecom::Window::currentContext()->shaderManager()->program(spec);
 		}
 
-		virtual void update(GLuint prog, const gecom::Scene& scene, const i3d::mat4d &mv, const gecom::size2i &sz) override {
-			Technique::update(prog, scene, mv, sz);
+		virtual void update(GLuint prog, const gecom::draw_queue &q, const i3d::mat4d &mv, const gecom::size2i &sz) {
+			gecom::Technique::update(prog, q, mv, sz);
 		}
 
 		inline void bind() {

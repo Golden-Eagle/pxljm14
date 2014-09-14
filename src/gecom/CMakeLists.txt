@@ -9,7 +9,7 @@ SET(GECOM_SOURCES
 	Render.cpp
 	Entity.cpp
 	json11.cpp
-	perlin.cpp
+	Perlin.cpp
 	Box2D.cpp
 	Game.cpp
 )

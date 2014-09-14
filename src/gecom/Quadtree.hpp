@@ -366,7 +366,7 @@ namespace gecom {
 			aabb_t valuebb2 = sanitize(valuebb);
 			if (!m_root) m_root = new Node(valuebb2);
 			try {
-				m_root->insert(std::move(value), valuebb2);
+				return m_root->insert(std::move(value), valuebb2);
 			} catch (out_of_bounds &) {
 				// make new root
 				Node * const oldroot = m_root;
