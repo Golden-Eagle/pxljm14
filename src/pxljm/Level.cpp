@@ -201,13 +201,14 @@ namespace pxljm {
 		std::uniform_int_distribution<int> typeDistribution(0, 1);
 
 		int colHeight = 3;
+		BuildingHint hint(0.0, 0.1, 0.0, 0.0);
 
 		for (int i = 0; i < spaces.size()-1; ++i){
 			//int type = typeDistribution(generator);
 			int type = 0;
 			switch (type){
 			case 0:
-				colHeight = movingSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, BuildingHint(-0.2, 2.0, 0.0, 0.0));
+				colHeight = movingSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, hint);
 				break;
 			case 1:
 				//colHeight = jumpSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, BuildingHint());
@@ -286,9 +287,29 @@ namespace pxljm {
 
 	vector<int> LevelGenerator::getSpacing(int i_width, SpacingHint i_spaceHint, int i_avgSize){
 		vector<int> spaces;
-		for (int x = 0; x < i_width; x += i_avgSize){
-			spaces.push_back(x);
+		switch (i_spaceHint)
+		{
+		case SpacingHint::uniform:
+			for (int x = 0; x < i_width; x += i_avgSize){
+				spaces.push_back(x);
+			}
+			break;
+		case SpacingHint::swing:
+			for (int x = 0; x < i_width; x += i_avgSize){
+				spaces.push_back(3 * x / 4);
+				spaces.push_back(x / 4);
+			}
+			break;
+		case SpacingHint::random:
+		default:
+			std::default_random_engine generator;
+			std::uniform_int_distribution<int> random(i_avgSize / 4, 7 * i_avgSize / 8);
+			for (int x = 0; x < i_width; x += random(generator)){
+				spaces.push_back(x);
+			}
+			break;
 		}
+
 		return spaces;
 	}
 
@@ -302,7 +323,7 @@ namespace pxljm {
 
 		i_hint.deltaHeight;
 
-		std::default_random_engine generator;
+		std::mt19937 generator(uint64_t(i_start) | (uint64_t(i_end) << 32));
 		std::normal_distribution<double> deltaDistribution(i_hint.deltaHeight, i_hint.varience);
 		std::uniform_real_distribution<double> platformChance(0, 1);
 
