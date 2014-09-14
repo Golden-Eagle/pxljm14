@@ -7,6 +7,7 @@ SET(SHADERS
 	"shader/chunk_standard.glsl"
 	"shader/background.glsl"
 	"shader/spine.glsl"
+	"shader/hdr.glsl"
 )
 
 add_custom_target(

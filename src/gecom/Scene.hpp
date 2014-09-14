@@ -375,6 +375,34 @@ namespace gecom{
 		GLuint prog = 0;
 		glUseProgram(0);
 
+		// prep lights ubo data, std140 layout
+		GLuint ubo;
+		if (m_lights.size()) {
+			std::vector<GLuint> ubo_data(m_lights.size() * 8);
+			for (const auto &l : m_lights) {
+				i3d::vec3f intensity = l->getIntensity();
+				i3d::vec3f pos = l->getPosition();
+				float ir = intensity.x();
+				float ig = intensity.y();
+				float ib = intensity.z();
+				float px = pos.x();
+				float py = pos.y();
+				float pz = pos.z();
+				ubo_data.push_back(reinterpret_cast<GLuint &>(ir));
+				ubo_data.push_back(reinterpret_cast<GLuint &>(ig));
+				ubo_data.push_back(reinterpret_cast<GLuint &>(ib));
+				ubo_data.push_back(0);
+				ubo_data.push_back(reinterpret_cast<GLuint &>(px));
+				ubo_data.push_back(reinterpret_cast<GLuint &>(py));
+				ubo_data.push_back(reinterpret_cast<GLuint &>(pz));
+				ubo_data.push_back(0);
+			}
+
+			glGenBuffers(1, &ubo);
+			glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+			glBufferData(GL_UNIFORM_BUFFER, ubo_data.size() * sizeof(GLuint), &ubo_data[0], GL_STATIC_DRAW);
+		}
+
 		auto q = m_draw_calls;
 		auto worldView = m_scene->getCamera()->getEntity()->getModelWorldMatrix().inverse();
 
@@ -389,6 +417,13 @@ namespace gecom{
 				if (prog2 != prog) {
 					prog = prog2;
 					glUseProgram(prog);
+					GLint loc = glGetUniformLocation(prog, "num_lights");
+					if (loc >= 0 && m_lights.size()) {
+						glUniform1ui(loc, m_lights.size());
+						// bind UBO to shader
+						glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
+						glUniformBlockBinding(prog, glGetUniformBlockIndex(prog, "LightsBlock"), 0);
+					}
 				}
 				tech->bind();
 			}
@@ -401,6 +436,7 @@ namespace gecom{
 		if (tech) tech->unbind();
 
 		glUseProgram(0);
+		glDeleteBuffers(1, &ubo);
 
 	}
 
@@ -409,10 +445,6 @@ namespace gecom{
 		// TODO proper default projection?
 		glUniformMatrix4fv(glGetUniformLocation(prog, "projection_matrix"), 1, true, i3d::mat4f::scale(0.05 / sz.ratio(), 0.05, 0.001));
 		
-		if (glGetUniformLocation(prog, "num_lights") >= 0) {
-			// TODO upload lights to UBO
-
-		}
 	}
 }
 #endif
