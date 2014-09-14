@@ -139,12 +139,13 @@ namespace pxljm {
 		std::shared_ptr<Level> compileLevel(tile_grid i_tiles);
 
 		struct BuildingHint {
-			double deltaHeight;
-			double varience;
-			double smoothness;
-			double platformChance;
-			BuildingHint(double i_deltaHeight = 0.0, double i_varience = 0.0, double i_smoothness = 0.5, double i_platformChance = 0.0) :
-				deltaHeight(i_deltaHeight), varience(i_varience), smoothness(i_smoothness), platformChance(i_platformChance) {  }
+			double deltaHeight = 0.0;
+			double deltaVariance = 0.0;
+			double smoothness = 0.5;
+			double platformChance = 0.0;
+			double dangerChance = 0.0;
+			double pickupChance = 0.0;
+			BuildingHint() {  };
 		};
 
 		enum SpacingHint {
@@ -155,8 +156,8 @@ namespace pxljm {
 
 		std::vector<int> getSpacing(int i_width, SpacingHint i_spaceHint, int i_avgSize);
 
-		int movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, const BuildingHint &i_hint);
-		int jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, const BuildingHint &i_hint);
+		int movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint);
+		int jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint);
 
 
 

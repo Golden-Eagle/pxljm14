@@ -261,7 +261,7 @@ namespace gecom{
 	public:
 		SteadyFocusCamera(std::shared_ptr<Entity> i_focus) : Entity(), m_focus(i_focus) {}
 		i3d::mat4d getModelWorldMatrix() {
-			return i3d::mat4d::translate(m_focus->getPosition());
+			return i3d::mat4d::translate(m_focus->getPosition() + i3d::vec3d::j() * 5); //QUICK HACK
 		}
 	};
 
