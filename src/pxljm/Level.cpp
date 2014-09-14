@@ -170,7 +170,7 @@ namespace pxljm {
 		m_chunks.push_back(i_chunk);
 	}
 
-	void Level::addEntities(const vector<shared_ptr<Entity>> &i_entities){
+	void Level::addEntities(const vector<EntityPlaceholder> &i_entities){
 		m_entities.insert(m_entities.end(), i_entities.begin(), i_entities.end());
 	}
 
@@ -184,8 +184,18 @@ namespace pxljm {
 			scene.add(c);
 		}
 
-		for (shared_ptr<Entity> e : m_entities) {
-			scene.add(e);
+		for (EntityPlaceholder e : m_entities) {
+			switch (e.entityType)
+			{
+			case EntityPlaceholder::type::enemy:
+				break;
+			case EntityPlaceholder::type::collectable:
+				break;
+			case EntityPlaceholder::type::tree:
+				break;
+			default:
+				break;
+			}
 		}
 	}
 
@@ -205,12 +215,12 @@ namespace pxljm {
 
 	shared_ptr<Level> LevelGenerator::getTestLevel(const std::shared_ptr<gecom::WorldProxy>& world) {
 		int height = 128;
-		int width = 512;
+		int width = 1024;
 
 		tile_grid grid = makeTileGrid(width, height);
 
 
-		auto spaces = getSpacing(width, SpacingHint::uniform, 15);
+		auto spaces = getSpacing(width, SpacingHint::uniform, 32);
 		std::default_random_engine generator;
 		std::uniform_int_distribution<int> typeDistribution(0, 1);
 
@@ -218,7 +228,7 @@ namespace pxljm {
 		BuildingHint hint;
 		hint.deltaVariance = 0.3;
 
-		vector<shared_ptr<Entity>> entities;
+		vector<EntityPlaceholder> entities;
 
 		for (int i = 0; i < spaces.size()-1; ++i){
 			int type = typeDistribution(generator);
@@ -264,8 +274,7 @@ namespace pxljm {
 		return nullptr;
 	}
 
-	std::shared_ptr<Level> LevelGenerator::compileLevel(const std::shared_ptr<gecom::WorldProxy>& world, tile_grid i_tiles, vector<shared_ptr<Entity>> &i_entities)
-	{
+std::shared_ptr<Level> LevelGenerator::compileLevel(const std::shared_ptr<gecom::WorldProxy>& world, tile_grid i_tiles, vector<EntityPlaceholder> &i_entities){
 		shared_ptr<Level> level(new Level());
 
 		int gridXSize = i_tiles.size();
@@ -334,7 +343,7 @@ namespace pxljm {
 	double smoothness;
 	double platformChance;*/
 
-	int LevelGenerator::movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, vector<shared_ptr<Entity>> &io_entities, BuildingHint i_hint = BuildingHint()){
+	int LevelGenerator::movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, vector<EntityPlaceholder> &io_entities, BuildingHint i_hint = BuildingHint()){
 		//Flat walk
 
 		i_hint.deltaHeight;
@@ -367,7 +376,7 @@ namespace pxljm {
 		return int(last);
 	}
 
-	int LevelGenerator::jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, vector<shared_ptr<Entity>> &io_entities, BuildingHint i_hint = BuildingHint()){
+	int LevelGenerator::jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, vector<EntityPlaceholder> &io_entities, BuildingHint i_hint = BuildingHint()){
 		i_hint.deltaHeight;
 
 		std::mt19937 generator(uint64_t(i_start) | (uint64_t(i_end) << 32));
@@ -385,11 +394,11 @@ namespace pxljm {
 		int finishHeight = max(min(int(i_startHeight + delta * (i_end - i_start)), i_maxHeight-1), 0);
 
 
-		double jumpX = 4;
+		double jumpX = 5;
 		double jumpY = 3;
 
 		//gap
-		if (type < 0.6) {
+		if (type < 0.7) {
 
 			//work out distance
 			std::uniform_real_distribution<double> jumpDistance(0, 2*jumpX);
@@ -402,7 +411,7 @@ namespace pxljm {
 		}
 
 		//drop
-		else if (type < 0.8){
+		else if (type < 1.0){
 			//work out distance
 			std::uniform_real_distribution<double> jumpDistance(jumpX, 2 * jumpX);
 			int distance = min(i_end - 2, i_start + int(jumpDistance(generator)));

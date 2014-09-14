@@ -27,6 +27,18 @@ namespace pxljm {
 		inline bool isEmpty() const { return !solid && !inf && tileType == Tile::type::none; }
 	};
 
+	struct EntityPlaceholder {
+		enum type{
+			enemy,
+			collectable,
+			tree,
+			none
+		};
+		EntityPlaceholder::type entityType;
+		i3d::vec3d position;
+		EntityPlaceholder(EntityPlaceholder::type i_type = type::none) : entityType(i_type) {  }
+	};
+
 	using tile_column = std::vector<Tile>;
 	using tile_grid = std::vector<tile_column>;
 
@@ -123,12 +135,12 @@ namespace pxljm {
 	public:
 		Level();
 		void addChunk(std::shared_ptr<Chunk> i_chunk);
-		void addEntities(const std::vector<std::shared_ptr<gecom::Entity>> &i_entities);
+		void addEntities(const std::vector<EntityPlaceholder> &i_entities);
 		void load(gecom::Scene& scene, const std::shared_ptr<gecom::WorldProxy> world);
 		void unload(gecom::Scene &scene);
 	private:
 		std::vector<std::shared_ptr<Chunk>> m_chunks;
-		std::vector<std::shared_ptr<gecom::Entity>> m_entities;
+		std::vector<EntityPlaceholder> m_entities;
 	};
 
 	class LevelGenerator {
@@ -142,7 +154,8 @@ namespace pxljm {
 	private:
 		int m_chunkSize;
 
-std::shared_ptr<Level> compileLevel(const std::shared_ptr<gecom::WorldProxy>& world, tile_grid i_tiles, std::vector<std::shared_ptr<gecom::Entity>> &i_entities);
+		std::shared_ptr<Level> compileLevel(const std::shared_ptr<gecom::WorldProxy>& world, tile_grid i_tiles, std::vector<EntityPlaceholder> &i_entities);
+
 
 		struct BuildingHint {
 			double deltaHeight = 0.0;
@@ -162,8 +175,8 @@ std::shared_ptr<Level> compileLevel(const std::shared_ptr<gecom::WorldProxy>& wo
 
 		std::vector<int> getSpacing(int i_width, SpacingHint i_spaceHint, int i_avgSize);
 
-		int movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, std::vector<std::shared_ptr<gecom::Entity>> &io_entities, BuildingHint i_hint);
-		int jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, std::vector<std::shared_ptr<gecom::Entity>> &io_entities, BuildingHint i_hint);
+		int movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, std::vector<EntityPlaceholder> &io_entities, BuildingHint i_hint);
+		int jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, std::vector<EntityPlaceholder> &io_entities, BuildingHint i_hint);
 
 
 
