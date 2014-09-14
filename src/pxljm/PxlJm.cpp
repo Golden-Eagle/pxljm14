@@ -86,6 +86,7 @@ namespace pxljm {
 
 			player = std::make_shared<PlayerEntity>(world);
 			m_scene.add(player);
+			player->setPosition(player->getPosition() + i3d::vec3d::j() * 64);
 			//box = std::make_shared<Entity>();
 			//box->setPosition(i3d::vec3d(5, 50, 0));
 			//box->addComponent<DrawableComponent>(std::make_shared<ProtagonistDrawable>(box));
