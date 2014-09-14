@@ -64,7 +64,7 @@ namespace pxljm {
 
 	class ProjectileDrawable : public SpineDrawable {
 	public:
-		ProjectileDrawable(const std::shared_ptr<gecom::Entity> parent) : SpineDrawable(std::string("fireball"), parent, 0.3) { }
+		ProjectileDrawable(const std::shared_ptr<gecom::Entity> parent) : SpineDrawable(std::string("fireball"), parent, 0.003) { }
 	};
 
 	class DronePhysics : public gecom::B2PhysicsComponent {
