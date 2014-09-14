@@ -32,14 +32,13 @@ namespace pxljm {
 
 	class PlayerEntity : public gecom::Entity {
 		std::shared_ptr<PlayerPhysics> player_phs;
-		std::shared_ptr<gecom::WorldProxy> m_world;
 		std::shared_ptr<ProtagonistDrawable> player_dw;
 		bool is_running = false;
 		bool jump_available = true;
 	public:
 		PlayerEntity(std::shared_ptr<gecom::WorldProxy>& proxy);
 
-		void init(gecom::Scene& s) override;
+		void init(gecom::Scene* s) override;
 		void setJumpAvailable(bool should_jump);
 		void update(gecom::really_high_resolution_clock::duration delta);
 	};

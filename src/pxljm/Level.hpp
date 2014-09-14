@@ -44,7 +44,7 @@ namespace pxljm {
 
 	class Chunk : public gecom::Entity {
 	public:
-		Chunk(int i_xpos, int i_ypos, tile_grid i_grid);
+		Chunk(const std::shared_ptr<gecom::WorldProxy>& proxy, int i_xpos, int i_ypos, tile_grid i_grid);
 		const tile_grid &getTileGrid();
 	private:
 		tile_grid m_tileGrid;
@@ -80,6 +80,8 @@ namespace pxljm {
 			m_prog_spec.source("chunk_standard.glsl");
 
 			gecom::image img(gecom::image::type_png(), "./res/textures/atlas.png", false);
+
+			gecom::log("LEVEL") << int(img.data()[0]) << " " << int(img.data()[1]) << " " << int(img.data()[2]) << " " << int(img.data()[3]);
 
 			unsigned lod = 0;
 			while ((1 << lod) <= img.width() && (1 << lod) <= img.height()) lod++;
@@ -146,13 +148,14 @@ namespace pxljm {
 		LevelGenerator();
 		int getChunkSize();
 		void setChunkSize(int i_size);
-		std::shared_ptr<Level> getTestLevel();
+		std::shared_ptr<Level> getTestLevel(const std::shared_ptr<gecom::WorldProxy>& world);
 		std::shared_ptr<Level>  getLevel(/*something*/);
 
 	private:
 		int m_chunkSize;
 
-		std::shared_ptr<Level> compileLevel(tile_grid i_tiles, const std::vector<EntityPlaceholder> &i_entities);
+		std::shared_ptr<Level> compileLevel(const std::shared_ptr<gecom::WorldProxy>& world, tile_grid i_tiles, std::vector<EntityPlaceholder> &i_entities);
+
 
 		struct BuildingHint {
 			double deltaHeight = 0.0;
