@@ -162,7 +162,7 @@ namespace pxljm {
 
 
 		//Tile grid helper method
-		inline LevelGenerator::tile_grid LevelGenerator::makeTileGrid(int i_width, int i_height){
+		inline tile_grid LevelGenerator::makeTileGrid(int i_width, int i_height){
 			tile_grid grid;
 			for (int x = 0; x < i_width; x++){
 				tile_column col;
