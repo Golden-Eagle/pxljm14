@@ -25,7 +25,7 @@ void main() {
 	vec3 pos_v = (modelview_matrix * vec4(data1.xy + vec2(data2.xy), 0.0, 1.0)).xyz;
 	gl_Position = projection_matrix * vec4(pos_v, 1.0);
 	vertex_out.pos_v = pos_v;
-	vertex_out.uv = data1.xy;
+	vertex_out.uv = (data1.xy - 0.5) / 2.0 + 0.5;
 	vertex_out.data2 = data2;
 	vertex_out.id = uint(gl_InstanceID);
 }
@@ -50,9 +50,10 @@ void main() {
 
 	
 	uvp.x = float(vertex_in.data2.z % 4 + vertex_in.uv.x * 0.75 + 0.125) / 4.0;
-	uvp.y = float(vertex_in.data2.z / 4 + vertex_in.uv.y * 0.75 + 0.125) / 4.0;
+	uvp.y = float(vertex_in.data2.w / 4 - (vertex_in.uv.y * 0.75 + 0.125)) / 4.0;
 	
-	frag_color = texture(sampler_atlas, uvp).rgba;
+	frag_color = vec4(0.0, 0.0, 0.0, texture(sampler_atlas, uvp).a);
+
 }
 
 #endif

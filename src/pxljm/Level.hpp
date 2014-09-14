@@ -32,7 +32,7 @@ namespace pxljm {
 
 	class Chunk : public gecom::Entity {
 	public:
-		Chunk(int i_xpos, int i_ypos, tile_grid i_grid);
+		Chunk(const std::shared_ptr<gecom::WorldProxy>& proxy, int i_xpos, int i_ypos, tile_grid i_grid);
 		const tile_grid &getTileGrid();
 	private:
 		tile_grid m_tileGrid;
@@ -94,6 +94,8 @@ namespace pxljm {
 			glBindTexture(GL_TEXTURE_2D, m_tex_atlas);
 			glEnable(GL_BLEND);
 			glBlendEquation(GL_FUNC_ADD);
+			//glBlendEquation(GL_MIN);
+			//glBlendFunc(GL_ONE, GL_ONE);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 
@@ -120,11 +122,13 @@ namespace pxljm {
 	class Level {
 	public:
 		Level();
-		void addChunk(std::shared_ptr<Chunk>);
+		void addChunk(std::shared_ptr<Chunk> i_chunk);
+		void addEntities(const std::vector<std::shared_ptr<gecom::Entity>> &i_entities);
 		void load(gecom::Scene& scene, const std::shared_ptr<gecom::WorldProxy> world);
 		void unload(gecom::Scene &scene);
 	private:
 		std::vector<std::shared_ptr<Chunk>> m_chunks;
+		std::vector<std::shared_ptr<gecom::Entity>> m_entities;
 	};
 
 	class LevelGenerator {
@@ -132,21 +136,22 @@ namespace pxljm {
 		LevelGenerator();
 		int getChunkSize();
 		void setChunkSize(int i_size);
-		std::shared_ptr<Level> getTestLevel();
+		std::shared_ptr<Level> getTestLevel(const std::shared_ptr<gecom::WorldProxy>& world);
 		std::shared_ptr<Level>  getLevel(/*something*/);
 
 	private:
 		int m_chunkSize;
 
-		std::shared_ptr<Level> compileLevel(tile_grid i_tiles);
+std::shared_ptr<Level> compileLevel(const std::shared_ptr<gecom::WorldProxy>& world, tile_grid i_tiles, std::vector<std::shared_ptr<gecom::Entity>> &i_entities);
 
 		struct BuildingHint {
-			double deltaHeight;
-			double varience;
-			double smoothness;
-			double platformChance;
-			BuildingHint(double i_deltaHeight = 0.0, double i_varience = 0.0, double i_smoothness = 0.5, double i_platformChance = 0.0) :
-				deltaHeight(i_deltaHeight), varience(i_varience), smoothness(i_smoothness), platformChance(i_platformChance) {  }
+			double deltaHeight = 0.0;
+			double deltaVariance = 0.0;
+			double smoothness = 0.5;
+			double platformChance = 0.0;
+			double dangerChance = 0.0;
+			double pickupChance = 0.0;
+			BuildingHint() {  };
 		};
 
 		enum SpacingHint {
@@ -157,8 +162,8 @@ namespace pxljm {
 
 		std::vector<int> getSpacing(int i_width, SpacingHint i_spaceHint, int i_avgSize);
 
-		int movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, const BuildingHint &i_hint);
-		int jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, const BuildingHint &i_hint);
+		int movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, std::vector<std::shared_ptr<gecom::Entity>> &io_entities, BuildingHint i_hint);
+		int jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, std::vector<std::shared_ptr<gecom::Entity>> &io_entities, BuildingHint i_hint);
 
 
 
