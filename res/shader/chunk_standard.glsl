@@ -52,7 +52,8 @@ void main() {
 	uvp.x = float(vertex_in.data2.z % 4 + vertex_in.uv.x * 0.75 + 0.125) / 4.0;
 	uvp.y = float(vertex_in.data2.w / 4 - (vertex_in.uv.y * 0.75 + 0.125)) / 4.0;
 	
-	frag_color = texture(sampler_atlas, uvp).rgba;
+	frag_color = vec4(0.0, 0.0, 0.0, texture(sampler_atlas, uvp).a);
+
 }
 
 #endif
