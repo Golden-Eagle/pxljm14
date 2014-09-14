@@ -8,6 +8,7 @@
 #include <gecom/Chrono.hpp>
 #include <gecom/Window.hpp>
 #include <gecom/Scene.hpp>
+#include <gecom/UnitSquare.hpp>
 
 #include "ProtagonistDrawable.hpp"
 
@@ -28,6 +29,12 @@ namespace pxljm {
 	public:
 		PlayerPhysics(std::shared_ptr<PlayerEntity> parent);
 		inline virtual void registerWithWorld(std::shared_ptr<gecom::WorldProxy> world);
+	};
+
+	class ProjectileEntity : public gecom::Entity {
+		i3d::vec3d m_dir;
+	public:
+		ProjectileEntity(i3d::vec3d dir) : m_dir(dir) { }
 	};
 
 	class PlayerEntity : public gecom::Entity {

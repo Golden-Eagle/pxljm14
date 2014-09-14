@@ -2,12 +2,15 @@
 SET(PXLJM_SOURCES
 	PxlJm.cpp
 	Level.cpp
+	Player.cpp
+	ProtagonistDrawable.cpp
 )
 
 SET(PXLJM_HEADERS
 	Level.hpp
 	Collectable.hpp
-	PlayerEntity.hpp
+	Player.hpp
+	ProtagonistDrawable.hpp
 )
 
 add_executable(pxljm ${PXLJM_SOURCES} ${PXLJM_HEADERS})

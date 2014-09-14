@@ -1,0 +1,76 @@
+
+drone.png
+size: 1731,1731
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+drone-assets/body
+  rotate: false
+  xy: 2, 1102
+  size: 629, 629
+  orig: 629, 629
+  offset: 0, 0
+  index: -1
+drone-assets/cone
+  rotate: false
+  xy: 2, 671
+  size: 341, 429
+  orig: 341, 429
+  offset: 0, 0
+  index: -1
+drone-assets/eye
+  rotate: false
+  xy: 228, 606
+  size: 39, 63
+  orig: 39, 63
+  offset: 0, 0
+  index: -1
+drone-assets/fin1
+  rotate: false
+  xy: 633, 1320
+  size: 403, 150
+  orig: 403, 150
+  offset: 0, 0
+  index: -1
+drone-assets/fin2
+  rotate: true
+  xy: 345, 727
+  size: 373, 205
+  orig: 373, 205
+  offset: 0, 0
+  index: -1
+drone-assets/fin3
+  rotate: false
+  xy: 633, 1472
+  size: 442, 259
+  orig: 442, 259
+  offset: 0, 0
+  index: -1
+drone-assets/fin4
+  rotate: true
+  xy: 2, 305
+  size: 364, 224
+  orig: 364, 224
+  offset: 0, 0
+  index: -1
+drone-assets/fin5
+  rotate: true
+  xy: 2, 2
+  size: 301, 161
+  orig: 301, 161
+  offset: 0, 0
+  index: -1
+drone-assets/fin6
+  rotate: false
+  xy: 1077, 1611
+  size: 367, 120
+  orig: 367, 120
+  offset: 0, 0
+  index: -1
+drone-assets/hole
+  rotate: false
+  xy: 633, 1103
+  size: 138, 215
+  orig: 138, 215
+  offset: 0, 0
+  index: -1

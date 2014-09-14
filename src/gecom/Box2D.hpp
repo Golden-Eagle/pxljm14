@@ -11,6 +11,9 @@
 #include "Concurrent.hpp"
 #include "Entity.hpp"
 
+#define FOOT_SENSOR 1238123
+
+
 namespace gecom {
 	class PhysicsFrameData;
 	class WorldProxy;
@@ -55,41 +58,6 @@ namespace gecom {
 		return b2Vec2(i.x(), i.y());
 	}
 
-	const int FOOT_SENSOR = 1293132;
-
-	class MyContactListener : public b2ContactListener
-	{
-	public:
-		MyContactListener() { 
-			log("jump") << "Listening for shit, bro!";
-
-		}
-		void BeginContact(b2Contact* contact) {
-			//check if fixture A was the foot sensor
-			log("begincontact") << (int)contact->GetFixtureA()->GetUserData() << " " << (int)contact->GetFixtureA()->GetUserData();
-			void* fixtureUserData = contact->GetFixtureA()->GetUserData();
-			if ((int)fixtureUserData == FOOT_SENSOR)
-				log("jump") << "YES";
-
-			//check if fixture B was the foot sensor
-			fixtureUserData = contact->GetFixtureB()->GetUserData();
-			if ((int)fixtureUserData == FOOT_SENSOR)
-				log("jump") << "YES";
-		}
-
-		void EndContact(b2Contact* contact) {
-			log("endcontact") << (int)contact->GetFixtureA()->GetUserData() << " " << (int)contact->GetFixtureA()->GetUserData();
-			//check if fixture A was the foot sensor
-			void* fixtureUserData = contact->GetFixtureA()->GetUserData();
-			if ((int)fixtureUserData == FOOT_SENSOR)
-				log("jump") << "NO";
-
-			//check if fixture B was the foot sensor
-			fixtureUserData = contact->GetFixtureB()->GetUserData();
-			if ((int)fixtureUserData == FOOT_SENSOR)
-				log("jump") << "NO";
-		}
-	};
 
 	class Box2DGameComponent : public GameComponent, public std::enable_shared_from_this < Box2DGameComponent > {
 		std::thread m_worker;
@@ -130,6 +98,11 @@ namespace gecom {
 			bodies[n_body_id] = w;
 		}
 
+		void setContactListener(uint32_t n_world_id, b2ContactListener* f) {
+			worlds[n_world_id].first->SetContactListener(f);
+
+		}
+
 		void createShape(uint32_t w, uint32_t b, const std::shared_ptr<b2Shape>& def) {
 			bodies[b]->CreateFixture(def.get(), 0.0f);
 		}
@@ -156,7 +129,6 @@ namespace gecom {
 		inline std::shared_ptr<WorldProxy> addWorld(i3d::vec3d gravity) {
 			auto n_world_id = sm_world_id.fetch_add(1);
 			auto n_world = std::make_shared<b2World>(b2Vec2(gravity.x(), gravity.y()));
-			n_world->SetContactListener(new MyContactListener);
 			auto n_world_proxy = std::make_shared<WorldProxy>(shared_from_this(), n_world_id);
 			worlds[n_world_id] = std::make_pair(n_world, n_world_proxy);
 			return n_world_proxy;
@@ -179,7 +151,9 @@ namespace gecom {
 		void receivePFO(std::shared_ptr<PhysicsFrame> pfo);
 		void applyForce(const uint32_t b, const i3d::vec3d f);
 		void applyLinearImpulse(const uint32_t b, const i3d::vec3d f);
-
+		void setContactListener(b2ContactListener* f) {
+			AsyncExecutor::enqueue(m_master->getThreadID(), [=] { m_master->setContactListener(m_world_id, f); });
+		}
 		i3d::vec3d getLinearVelocity(uint32_t b) {
 			return from_b2Vec(m_master->bodies[b]->GetLinearVelocity());
 		}
@@ -200,6 +174,11 @@ namespace gecom {
 			
 		}
 
+		inline std::shared_ptr<WorldProxy> getWorld() { return m_world; }
+
+		inline void setBodyID(uint32_t nb) { m_b_id = nb; }
+		inline uint32_t getBodyID() { return m_b_id; }
+
 		i3d::vec3d getLinearVelocity() {
 			return m_world->getLinearVelocity(m_b_id);
 		}
@@ -208,43 +187,8 @@ namespace gecom {
 			return m_world->getMass(m_b_id);
 		}
 
-		virtual void registerWithWorld(std::shared_ptr<WorldProxy> world) {
+		virtual void registerWithWorld(std::shared_ptr<WorldProxy> world) {	
 			m_world = world;
-
-			b2BodyDef def;
-			def.type = b2_dynamicBody;
-			def.fixedRotation = true;
-			def.position.Set(getParent()->getPosition().x(), getParent()->getPosition().y());
-			def.linearDamping = 0.6f;
-			m_b_id = world->createBody(def, shared_from_this());
-
-			auto bbb = std::make_shared<b2PolygonShape>();
-			bbb->SetAsBox(1, 1.5);
-
-			auto fix = std::make_shared<b2FixtureDef>();
-			fix->shape = bbb.get();
-			fix->density = 130;
-			fix->friction = 0.99f;
-
-			auto feet_sensor = std::make_shared<b2PolygonShape>();
-			feet_sensor->SetAsBox(0.3, 0.2, b2Vec2(0, -1.25), 0);
-			
-			auto feet_sensor_fixture = std::make_shared<b2FixtureDef>();
-
-			feet_sensor_fixture->isSensor = true;
-			feet_sensor_fixture->shape = feet_sensor.get();
-
-			//auto bfeet = std::make_shared<b2PolygonShape>();
-			//bfeet->SetAsBox(1, 1, b2Vec2(0, -1), 0);
-			//
-			//auto ffix = std::make_shared<b2FixtureDef>();
-			//ffix->shape = bfeet.get();
-			//ffix->density = 100;
-			//ffix->friction = 0.6;
-
-			world->createFixture(m_b_id, fix, bbb);
-			world->createFixture(m_b_id, feet_sensor_fixture, feet_sensor);
-			//world->createFixture(m_b_id, ffix, bfeet);
 		}
 
 		void applyForce(i3d::vec3d f) {

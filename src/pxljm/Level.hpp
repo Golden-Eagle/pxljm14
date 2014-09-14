@@ -14,9 +14,17 @@
 namespace pxljm {
 
 	struct Tile {
+		enum type{
+			dirt = 0,
+			grass = 1,
+			none = 15
+		};
+
 		bool solid;
-		Tile() : solid(false) {}
-		inline bool isEmpty() { return !solid; }
+		bool inf;
+		Tile::type tileType;
+		Tile() : solid(false), inf(false), tileType(Tile::type::none){  }
+		inline bool isEmpty() const { return !solid && !inf && tileType == Tile::type::none; }
 	};
 
 	using tile_column = std::vector<Tile>;
@@ -131,7 +139,12 @@ namespace pxljm {
 		std::shared_ptr<Level> compileLevel(tile_grid i_tiles);
 
 		struct BuildingHint {
-			BuildingHint() {  }
+			double deltaHeight;
+			double varience;
+			double smoothness;
+			double platformChance;
+			BuildingHint(double i_deltaHeight = 0.0, double i_varience = 0.0, double i_smoothness = 0.5, double i_platformChance = 0.0) :
+				deltaHeight(i_deltaHeight), varience(i_varience), smoothness(i_smoothness), platformChance(i_platformChance) {  }
 		};
 
 		enum SpacingHint {
@@ -142,8 +155,8 @@ namespace pxljm {
 
 		std::vector<int> getSpacing(int i_width, SpacingHint i_spaceHint, int i_avgSize);
 
-		void movingSubpart(int i_height, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint);
-		void jumpSubpart(int i_height, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint);
+		int movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, const BuildingHint &i_hint);
+		int jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, const BuildingHint &i_hint);
 
 
 
