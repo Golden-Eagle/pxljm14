@@ -149,7 +149,7 @@ namespace pxljm {
 
 
 	//TODO
-	Chunk::Chunk(std::shared_ptr<gecom::WorldProxy>& prox, int i_xpos, int i_ypos, tile_grid i_grid) : gecom::Entity(prox), m_tileGrid(i_grid) {
+	Chunk::Chunk(const std::shared_ptr<gecom::WorldProxy>& prox, int i_xpos, int i_ypos, tile_grid i_grid) : gecom::Entity(prox), m_tileGrid(i_grid) {
 		setPosition(i3d::vec3d(double(i_xpos), double(i_ypos), 0.0));
 			}
 
@@ -165,7 +165,7 @@ namespace pxljm {
 		m_chunks.push_back(i_chunk);
 	}
 
-	void Level::load(gecom::Scene &scene, std::shared_ptr<gecom::WorldProxy> world){
+	void Level::load(gecom::Scene &scene, const std::shared_ptr<gecom::WorldProxy>& world){
 		log("level") << "Performing level load into scence";
 
 		for (shared_ptr<Chunk> c : m_chunks) {
@@ -190,7 +190,7 @@ namespace pxljm {
 		m_chunkSize = std::max(i_size, 1);
 	}
 
-	shared_ptr<Level> LevelGenerator::getTestLevel() {
+	shared_ptr<Level> LevelGenerator::getTestLevel(const std::shared_ptr<WorldProxy>& world) {
 		int height = 64;
 		int width = 128;
 
@@ -249,7 +249,7 @@ namespace pxljm {
 		return nullptr;
 	}
 
-	std::shared_ptr<Level> LevelGenerator::compileLevel(std::shared_ptr<gecom::WorldProxy>& prox, tile_grid i_tiles)
+	std::shared_ptr<Level> LevelGenerator::compileLevel(const std::shared_ptr<gecom::WorldProxy>& prox, tile_grid i_tiles)
 	{
 		shared_ptr<Level> level(new Level());
 
