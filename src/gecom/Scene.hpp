@@ -53,6 +53,8 @@ namespace gecom{
 			
 		}
 
+		virtual inline bool depthOrdered() { return true; }
+
 		virtual inline ~Technique() { }
 	};
 
@@ -131,9 +133,15 @@ namespace gecom{
 		}
 
 		inline bool operator<(const draw_call &rhs) const {
-			bool t1 = m_tech < rhs.m_tech;
-			bool t2 = m_tech == rhs.m_tech && m_prog < rhs.m_prog;
-			return t1 || t2;
+			// FIXME in the general case, we need the VIEW matrix to do depth sort here
+			double zl = (m_mw * i3d::vec3d()).z();
+			double zr = (rhs.m_mw * i3d::vec3d()).z();
+			bool zorder = m_tech->depthOrdered() || rhs.m_tech->depthOrdered();
+			// lower z => behind => draw first
+			bool t0 = zorder && (zl < zr);
+			bool t1 = !zorder && m_tech < rhs.m_tech;
+			bool t2 = !zorder && m_tech == rhs.m_tech && m_prog < rhs.m_prog;
+			return t0 || t1 || t2;
 		}
 
 		inline Technique * technique() const {

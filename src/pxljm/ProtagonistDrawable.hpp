@@ -5,8 +5,9 @@
 #include <spine/spine.h>
 #include <spine/extension.h>
 
-#include "PNG.hpp"
-#include "Entity.hpp"
+#include <gecom/PNG.hpp>
+#include <gecom/Entity.hpp>
+#include <gecom/Scene.hpp>
 
 	//class SkeletonDrawable : public sf::Drawable {
 	//public:
@@ -26,26 +27,10 @@
 	//	float* worldVertices;
 	//};
 
-	void _spAtlasPage_createTexture(spAtlasPage* self, const char* path){
-		gecom::image* texture = new gecom::image(gecom::image::type_png(), path, false);
-		
-		//if (!texture->loadFromFile(path)) return;
-		//texture->setSmooth(true);
-		self->rendererObject = texture;
-		self->width = texture->width();
-		self->height = texture->height();
-	}
+	
 
-	void _spAtlasPage_disposeTexture(spAtlasPage* self){
-		delete (gecom::image*)self->rendererObject;
-	}
-
-	char* _spUtil_readFile(const char* path, int* length){
-		return _readFile(path, length);
-	}
-
-namespace gecom {
-	class SpineTechnique : public Technique {
+namespace pxljm {
+	class SpineTechnique : public gecom::Technique {
 		gecom::shader_program_spec spec;
 	public:
 		SpineTechnique() {
@@ -56,22 +41,22 @@ namespace gecom {
 			return gecom::Window::currentContext()->shaderManager()->program(spec);
 		}
 
-		virtual void update(GLuint prog, const gecom::Scene& scene, const i3d::mat4d &mv, const size2i &sz) override {
+		virtual void update(GLuint prog, const gecom::Scene& scene, const i3d::mat4d &mv, const gecom::size2i &sz) override {
 			Technique::update(prog, scene, mv, sz);
 		}
 
-		virtual inline void bind() {
+		inline void bind() {
 			glEnable(GL_BLEND);
 			glBlendEquation(GL_FUNC_ADD);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 
-		virtual inline void unbind() {
+		inline void unbind() {
 			glDisable(GL_BLEND);
 		}
 	};
 
-	class SpineDrawable : public DrawableComponent, public std::enable_shared_from_this<SpineDrawable> {
+	class SpineDrawable : public gecom::DrawableComponent, public std::enable_shared_from_this<SpineDrawable> {
 		const int cm_time_scale = 1.8;
 		spSkeleton* m_skeleton;
 		spAnimationStateData* m_state_data;
@@ -107,12 +92,12 @@ namespace gecom {
 			fflush(stdout);
 		}
 
-		virtual void pushDrawCalls(draw_queue &q, unsigned dt) {
+		virtual void pushDrawCalls(gecom::draw_queue &q, unsigned dt) {
 			auto mat = i3d::mat4d();
 			switch (dt)
 			{
-			case draw_type::standard:
-				q.push(draw_call(Technique::singleton<SpineTechnique>(), mat, [=] (GLuint prog) {
+			case gecom::draw_type::standard:
+				q.push(gecom::draw_call(gecom::Technique::singleton<SpineTechnique>(), mat, [=] (GLuint prog) {
 					glActiveTexture(GL_TEXTURE0);
 					glBindTexture(GL_TEXTURE_2D, tex_id);
 					glUniform1i(glGetUniformLocation(prog, "sampler_thing"), 0);
@@ -129,6 +114,10 @@ namespace gecom {
 			m_skeleton->flipX = !is_left;
 		}
 
+		bool isLeft() {
+			return !m_skeleton->flipX;
+		}
+
 		void startRunAnimation() {
 			spAnimationState_setAnimationByName(m_state, 0, "run", true);
 		}
@@ -142,7 +131,7 @@ namespace gecom {
 			spAnimationState_addAnimationByName(m_state, 0, "idle", true, 0);
 		}
 
-		SpineDrawable(const std::string& n, const std::shared_ptr<Entity> parent) : DrawableComponent(parent) {
+		SpineDrawable(const std::string& n, const std::shared_ptr<gecom::Entity> parent) : gecom::DrawableComponent(parent) {
 			glGenVertexArrays(1, &vaoID);
 			glBindVertexArray(vaoID);
 
@@ -262,7 +251,7 @@ namespace gecom {
 			double deltaTime = std::chrono::duration_cast<std::chrono::duration<double>>(delta).count();
 			//log("spine") << "doing dat update: " << deltaTime;
 			m_skeleton->x = getParent()->getPosition().x();
-			m_skeleton->y = getParent()->getPosition().y() - 1.5;
+			m_skeleton->y = getParent()->getPosition().y() - 2.2;
 			spSkeletonBounds_update(m_bounds, m_skeleton, true);
 			spSkeleton_update(m_skeleton, deltaTime);
 			spAnimationState_update(m_state, deltaTime * cm_time_scale);
@@ -370,10 +359,10 @@ namespace gecom {
 					glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 					glBindVertexArray(0);
 				} else if (attachment->type == SP_ATTACHMENT_MESH) {
-					log("spine") << "attachment-mesh";
+					gecom::log("spine") << "attachment-mesh";
 				}
 				else if (attachment->type == SP_ATTACHMENT_SKINNED_MESH) {
-					log("spine") << "attachment-skinned-mesh";
+					gecom::log("spine") << "attachment-skinned-mesh";
 				}
 			}
 		}
@@ -381,7 +370,7 @@ namespace gecom {
 
 	class ProtagonistDrawable : public SpineDrawable {
 	public:
-		ProtagonistDrawable(const std::shared_ptr<Entity> parent) : SpineDrawable(std::string("protagonist"), parent) { }
+		ProtagonistDrawable(const std::shared_ptr<gecom::Entity> parent) : SpineDrawable(std::string("protagonist"), parent) { }
 	};
 }
 
