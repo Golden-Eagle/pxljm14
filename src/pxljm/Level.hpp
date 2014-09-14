@@ -69,6 +69,8 @@ namespace pxljm {
 
 			gecom::image img(gecom::image::type_png(), "./res/textures/atlas.png", false);
 
+			gecom::log("LEVEL") << int(img.data()[0]) << " " << int(img.data()[1]) << " " << int(img.data()[2]) << " " << int(img.data()[3]);
+
 			unsigned lod = 0;
 			while ((1 << lod) <= img.width() && (1 << lod) <= img.height()) lod++;
 
