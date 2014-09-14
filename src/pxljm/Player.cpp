@@ -98,7 +98,7 @@ void pxljm::PlayerEntity::setJumpAvailable(bool should_jump) {
 void pxljm::PlayerEntity::update(gecom::really_high_resolution_clock::duration delta) {
 	Entity::update(delta);
 
-	if (gecom::Window::currentContext()->pollKey(GLFW_KEY_UP) && jump_available) {
+	if (gecom::Window::currentContext()->pollKey(GLFW_KEY_W) && jump_available) {
 		// intent -> registerIntent([=] { player_phs->applyLinearImpulse(..); }, 1000);
 		jump_available = false;
 		player_phs->applyLinearImpulse(i3d::vec3d(0, 10000, 0));
@@ -125,12 +125,16 @@ void pxljm::PlayerEntity::update(gecom::really_high_resolution_clock::duration d
 		});
 	}
 
-	if (gecom::Window::currentContext()->getKey(GLFW_KEY_RIGHT)) {
+	if (gecom::Window::currentContext()->getKey(GLFW_KEY_DELETE)) {
+		kill();
+	}
+
+	if (gecom::Window::currentContext()->getKey(GLFW_KEY_D)) {
 		player_phs->applyLinearImpulse(i3d::vec3d(30000.0 * std::chrono::duration_cast<std::chrono::duration<double>>(delta).count(), 0, 0));
 		player_dw->setLeft(true);
 		should_be_running = true;
 	}
-	else if (gecom::Window::currentContext()->getKey(GLFW_KEY_LEFT)) {
+	else if (gecom::Window::currentContext()->getKey(GLFW_KEY_A)) {
 		player_phs->applyLinearImpulse(i3d::vec3d(-30000.0 * std::chrono::duration_cast<std::chrono::duration<double>>(delta).count(), 0, 0));
 		player_dw->setLeft(false);
 		should_be_running = true;
@@ -151,6 +155,7 @@ void pxljm::PlayerEntity::kill() {
 	// reset health
 	m_health = 100;
 
+	player_dw->startDeathAnimation();
 	// reset position
 	//player_phs->
 

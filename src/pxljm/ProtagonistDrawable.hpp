@@ -69,6 +69,8 @@ namespace pxljm {
 		GLuint uvVBO;
 		GLuint tex_id;
 
+		double m_scale;
+
 	public:
 		static void callback(spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount) {
 			spTrackEntry* entry = spAnimationState_getCurrent(state, trackIndex);
@@ -131,7 +133,11 @@ namespace pxljm {
 			spAnimationState_addAnimationByName(m_state, 0, "idle", true, 0);
 		}
 
-		SpineDrawable(const std::string& n, const std::shared_ptr<gecom::Entity> parent) : gecom::DrawableComponent(parent) {
+		void startDeathAnimation() {
+			spAnimationState_setAnimationByName(m_state, 0, "die", false);
+		}
+
+		SpineDrawable(const std::string& n, const std::shared_ptr<gecom::Entity> parent, double scale) : gecom::DrawableComponent(parent), m_scale(scale) {
 			glGenVertexArrays(1, &vaoID);
 			glBindVertexArray(vaoID);
 
@@ -169,7 +175,7 @@ namespace pxljm {
 
 
 			spSkeletonJson* json = spSkeletonJson_create(atlas);
-			json->scale = 0.015f;
+			json->scale = m_scale;
 			spSkeletonData *skeletonData = spSkeletonJson_readSkeletonDataFile(json, (std::string("res/spine/") + n + "/" + n + ".json").c_str());
 
 			if (!skeletonData) {
@@ -185,6 +191,9 @@ namespace pxljm {
 			spAnimationStateData_setMixByName(m_state_data, "run", "idle", 0.6f);
 			spAnimationStateData_setMixByName(m_state_data, "run", "jump", 0.6f);
 			spAnimationStateData_setMixByName(m_state_data, "jump", "run", 0.6f);
+			spAnimationStateData_setMixByName(m_state_data, "idle", "die", 0.5f);
+			spAnimationStateData_setMixByName(m_state_data, "run", "die", 0.5f);
+			spAnimationStateData_setMixByName(m_state_data, "die", "run", 1.0f);
 
 			//spSkeletonDrawable* drawable = new spSkeletonDrawable(skeletonData, stateData);
 
@@ -371,12 +380,12 @@ namespace pxljm {
 
 	class ProtagonistDrawable : public SpineDrawable {
 	public:
-		ProtagonistDrawable(const std::shared_ptr<gecom::Entity> parent) : SpineDrawable(std::string("protagonist"), parent) { }
+		ProtagonistDrawable(const std::shared_ptr<gecom::Entity> parent) : SpineDrawable(std::string("protagonist"), parent, 0.015) { }
 	};
 
 	class DroneDrawable : public SpineDrawable {
 	public:
-		DroneDrawable(const std::shared_ptr<gecom::Entity> parent) : SpineDrawable(std::string("drone"), parent) { }
+		DroneDrawable(const std::shared_ptr<gecom::Entity> parent) : SpineDrawable(std::string("drone"), parent, 0.005) { }
 	};
 }
 
