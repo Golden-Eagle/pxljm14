@@ -33,18 +33,33 @@ namespace pxljm {
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 4, GL_FLOAT, false, 0, nullptr);
 
-		vector<GLuint> tileTypeArray;
-		unsigned x = 0;
+		vector<GLint> tileTypeArray;
+		int x = 0;
 		for (const tile_column &col : i_chunk->getTileGrid()) {
-			unsigned y = 0;
+			int y = 0;
 			for (Tile tile : col) {
-				if (!tile.isEmpty()) {
+				if (tile.tileType != Tile::type::none){
+
+					GLint tileTexture = tile.tileType;
+
+					if (tile.inf) {
+						for (int i = 0; i < 100; ++i) {
 					tileTypeArray.push_back(x);
+							tileTypeArray.push_back(y - i);
+							tileTypeArray.push_back(tileTexture);
+							tileTypeArray.push_back(0);
+
+							++m_instances;
+						}
+					}
+					else {
+						tileTypeArray.push_back(x);
 					tileTypeArray.push_back(y);
-					tileTypeArray.push_back(0);
+						tileTypeArray.push_back(tileTexture);
 					tileTypeArray.push_back(0);
 
 					++m_instances;
+				}
 				}
 				++y;
 			}
@@ -52,9 +67,9 @@ namespace pxljm {
 		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo_t);
-		glBufferData(GL_ARRAY_BUFFER, tileTypeArray.size() * sizeof(GLuint), &tileTypeArray[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, tileTypeArray.size() * sizeof(GLint), &tileTypeArray[0], GL_STATIC_DRAW);
 		glEnableVertexAttribArray(1);
-		glVertexAttribIPointer(1, 4, GL_UNSIGNED_INT, 0, nullptr);
+		glVertexAttribIPointer(1, 4, GL_INT, 0, nullptr);
 
 		glVertexAttribDivisor(1,1);
 
@@ -89,35 +104,35 @@ namespace pxljm {
 
 	void B2ChunkPhysicsComponent::registerWithWorld(std::shared_ptr<gecom::WorldProxy> world) {
 		b2Filter ground_filter;
-		//METHOD NEEDS SERIOUS OPTIMISATIONS
-		tile_grid grid = std::static_pointer_cast<Chunk>(getParent())->getTileGrid();
-		for (int x = 0; x < grid.size(); ++x) {
-			tile_column col = grid[x];
-			auto get_tile = [&](int x, int y) -> Tile {
-				// clamp to edge of heightmap
-				if (y < 0) y = 0;
-				if (y >= col.size()) y = col.size()-1;
-				if (x < 0) x = 0;
-				if (x >= grid.size()) x = grid.size()-1;
-				return grid[x][y];
-			};
 
-			for (int y = 0; y < col.size(); ++y) {
+		tile_grid grid = std::static_pointer_cast<Chunk>(getParent())->getTileGrid();
+		for (int y = 0; y < grid[0].size(); ++y) {
+		for (int x = 0; x < grid.size(); ++x) {
+
 				if (grid[x][y].solid) {
-					if (!get_tile(x, y + 1).solid ||
-						!get_tile(x, y - 1).solid ||
-						!get_tile(x + 1, y).solid ||
-						!get_tile(x - 1, y).solid){
+					i3d::vec3d min = getParent()->getPosition() + i3d::vec3d(x, y, 0);
+					i3d::vec3d max = min + i3d::vec3d(1, 1, 0);
+
+					bool isInf = grid[x][y].inf;
+					if (isInf){
+						min.y() -= 100;
+					}
+
+					while (x < grid.size()-1 && grid[x+1][y].solid && grid[x+1][y].inf == isInf){
+						max.x() += 1;
+						++x;
+					}
+
 						//make physics
 						b2BodyDef nbodydef;
 						nbodydef.type = b2_staticBody;
-						auto body_pos = getParent()->getPosition() + i3d::vec3d(x + 0.5, y + 0.5, 0);
+					auto half_size = (max - min) / 2;
+					auto body_pos = min + half_size;
 						nbodydef.position.Set(body_pos.x(), body_pos.y());
 						uint32_t nbody = world->createBody(nbodydef, shared_from_this());
 
-						
 						auto rs = std::make_shared<b2PolygonShape>();
-						rs->SetAsBox(0.6, 0.5);
+					rs->SetAsBox(half_size.x(), half_size.y());
 
 						auto rf = std::make_shared<b2FixtureDef>();
 						rf->filter = ground_filter;
@@ -131,31 +146,12 @@ namespace pxljm {
 
 			}
 		}
-	}
 
 
 	//TODO
 	Chunk::Chunk(std::shared_ptr<gecom::WorldProxy>& prox, int i_xpos, int i_ypos, tile_grid i_grid) : gecom::Entity(prox), m_tileGrid(i_grid) {
 		setPosition(i3d::vec3d(double(i_xpos), double(i_ypos), 0.0));
-		// e->addComponent<B2PhysicsComponent>(std::make_shared<B2PhysicsComponent>(e));
-
-		//iterate over the grid and create bounds for the grid
-
-		//fillGrid and compute bounding everything
-		//TODO
-
-		//0-0-32-32
-		//addComponent(make_shared<B2PhysicsStatic>());
-		/*int x = 0;
-		for (tile_column col : m_tileGrid) {
-			for (int y = 0; y < col.size(); ++y) {
-				addComponent(make_shared<B2PhysicsStatic>());
 			}
-			++x;
-		}*/
-
-
-	}
 
 	const tile_grid & Chunk::getTileGrid(){
 		return m_tileGrid;
@@ -194,30 +190,32 @@ namespace pxljm {
 		m_chunkSize = std::max(i_size, 1);
 	}
 
-	shared_ptr<Level> LevelGenerator::getTestLevel(std::shared_ptr<gecom::WorldProxy>& world) {
-		int height = 32;
+	shared_ptr<Level> LevelGenerator::getTestLevel() {
+		int height = 64;
 		int width = 128;
 
 		tile_grid grid = makeTileGrid(width, height);
 
 
-		auto spaces = getSpacing(width, SpacingHint::uniform, 6);
+		auto spaces = getSpacing(width, SpacingHint::uniform, 20);
 		std::default_random_engine generator;
 		std::uniform_int_distribution<int> typeDistribution(0, 1);
 
-		int colHeight = 5;
+		int colHeight = 3;
+		BuildingHint hint(0.0, 0.1, 0.0, 0.0);
 
 		for (int i = 0; i < spaces.size()-1; ++i){
-			int type = typeDistribution(generator);
+			//int type = typeDistribution(generator);
+			int type = 0;
 			switch (type){
 			case 0:
-				movingSubpart(colHeight, spaces[i], spaces[i + 1], grid, BuildingHint());
+				colHeight = movingSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, hint);
 				break;
 			case 1:
-				jumpSubpart(colHeight, spaces[i], spaces[i + 1], grid, BuildingHint());
+				//colHeight = jumpSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, BuildingHint());
 				break;
 			default:
-				movingSubpart(colHeight, spaces[i], spaces[i + 1], grid, BuildingHint());
+				//colHeight = movingSubpart(colHeight, height, spaces[i], spaces[i + 1], grid, BuildingHint());
 				break;
 			}
 		}
@@ -290,28 +288,78 @@ namespace pxljm {
 
 	vector<int> LevelGenerator::getSpacing(int i_width, SpacingHint i_spaceHint, int i_avgSize){
 		vector<int> spaces;
+		switch (i_spaceHint)
+		{
+		case SpacingHint::uniform:
+			for (int x = 0; x < i_width; x += i_avgSize){
+				spaces.push_back(x);
+			}
+			break;
+		case SpacingHint::swing:
 		for (int x = 0; x < i_width; x += i_avgSize){
+				spaces.push_back(3 * x / 4);
+				spaces.push_back(x / 4);
+			}
+			break;
+		case SpacingHint::random:
+		default:
+			std::default_random_engine generator;
+			std::uniform_int_distribution<int> random(i_avgSize / 4, 7 * i_avgSize / 8);
+			for (int x = 0; x < i_width; x += random(generator)){
 			spaces.push_back(x);
 		}
+			break;
+		}
+
 		return spaces;
 	}
 
-	void LevelGenerator::movingSubpart(int i_height, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint = BuildingHint()){
+  /*int deltaHeight;
+	int varience;
+	double smoothness;
+	double platformChance;*/
+
+	int LevelGenerator::movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, const BuildingHint &i_hint = BuildingHint()){
 		//Flat walk
-		for (int x = i_start; x < i_end; ++x){
-			for (int y = 0; y < i_height-1; ++y){
-				io_grid[x][y].solid = true;
-			}
+
+		i_hint.deltaHeight;
+
+		std::mt19937 generator(uint64_t(i_start) | (uint64_t(i_end) << 32));
+		std::normal_distribution<double> deltaDistribution(i_hint.deltaHeight, i_hint.varience);
+		std::uniform_real_distribution<double> platformChance(0, 1);
+
+		vector<int> platformStarts;
+		double delta = deltaDistribution(generator);
+		double last = i_startHeight;
+
+		//Platform
+		if (platformChance(generator) < i_hint.platformChance) {
+			for (int x = i_start; x < i_end; ++x) {
+				io_grid[x][int(last)].tileType = Tile::type::dirt;
+				io_grid[x][int(last)].solid = true;
 		}
 	}
 
-	void LevelGenerator::jumpSubpart(int i_height, int i_start, int i_end, tile_grid &io_grid, BuildingHint i_hint = BuildingHint()){
-		//Flat Jump
-		for (int x = min(i_start + 3, i_end-1); x < i_end; ++x){
-			for (int y = 0; y < i_height; ++y){
-				io_grid[x][y].solid = true;
+		//no Platform
+		else {
+			for (int x = i_start; x < i_end; ++x) {
+				last = min(max(last + delta, 0.0), double(i_maxHeight-1));
+				io_grid[x][int(last)].tileType = Tile::type::dirt;
+				io_grid[x][int(last)].solid = true;
+				io_grid[x][int(last)].inf = true;
 			}
+			}
+		return int(last);
 		}
+
+	int LevelGenerator::jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, const BuildingHint &i_hint = BuildingHint()){
+		////Flat Jump
+		//for (int x = min(i_start + 3, i_end-1); x < i_end; ++x){
+		//	for (int y = 0; y < i_height; ++y){
+		//		io_grid[x][y].solid = true;
+		//	}
+		//}
+		return i_startHeight;
 	}
 }
 

@@ -12,12 +12,12 @@ uniform sampler2D sampler_atlas;
 #ifdef _VERTEX_
 
 layout(location = 0) in vec4 data1; //positionX, positionY, depth1, depth2
-layout(location = 1) in uvec4 data2; //localpotiionX, localPositionY, texture location1, textureLocation2
+layout(location = 1) in ivec4 data2; //localpotiionX, localPositionY, texture location1, textureLocation2
 
 out VertexData {
 	vec3 pos_v;
 	vec2 uv;
-	flat uvec4 data2;
+	flat ivec4 data2;
 	flat uint id;
 } vertex_out;
 
@@ -37,7 +37,7 @@ void main() {
 in VertexData {
 	vec3 pos_v;
 	vec2 uv;
-	flat uvec4 data2;
+	flat ivec4 data2;
 	flat uint id;
 } vertex_in;
 
