@@ -93,13 +93,13 @@ public:
 		//player_phs->registerWithWorld(world);
 		//box->addComponent<B2PhysicsComponent>(player_phs);
 
-		auto ground = std::make_shared<Entity>();
-		ground->setPosition(i3d::vec3d(0, -20, 0));
-		auto gphs = std::make_shared<B2PhysicsStatic>(ground, 200, 1);
-		gphs->registerWithWorld(world);
-		ground->addComponent<B2PhysicsComponent>(gphs);
+		//auto ground = std::make_shared<Entity>();
+		//ground->setPosition(i3d::vec3d(0, -20, 0));
+		//auto gphs = std::make_shared<B2PhysicsStatic>(ground, 200, 1);
+		//gphs->registerWithWorld(world);
+		//ground->addComponent<B2PhysicsComponent>(gphs);
 
-		m_scene.add(ground);
+		//m_scene.add(ground);
 
 		//shared_ptr<SteadyFocusCamera> cameraEntity(make_shared<SteadyFocusCamera>(player));
 		auto cameraEntity = std::make_shared<SteadyFocusCamera>(player);
