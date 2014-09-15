@@ -67,7 +67,7 @@ namespace pxljm {
 	public:
 		ChunkDrawableComponent(std::shared_ptr<Chunk> i_chunk);
 		virtual void draw();
-		virtual void ChunkDrawableComponent::pushDrawCalls(gecom::draw_queue &q, unsigned dt);
+		virtual void pushDrawCalls(gecom::draw_queue &q, unsigned dt);
 	};
 
 	class ChunkStandardTechnique : public gecom::Technique {
@@ -84,7 +84,7 @@ namespace pxljm {
 			gecom::log("LEVEL") << int(img.data()[0]) << " " << int(img.data()[1]) << " " << int(img.data()[2]) << " " << int(img.data()[3]);
 
 			unsigned lod = 0;
-			while ((1 << lod) <= img.width() && (1 << lod) <= img.height()) lod++;
+			while ((1u << lod) <= img.width() && (1u << lod) <= img.height()) lod++;
 
 			glGenTextures(1, &m_tex_atlas);
 			glBindTexture(GL_TEXTURE_2D, m_tex_atlas);
@@ -182,7 +182,7 @@ namespace pxljm {
 
 
 		//Tile grid helper method
-		inline tile_grid LevelGenerator::makeTileGrid(int i_width, int i_height){
+		inline tile_grid makeTileGrid(int i_width, int i_height){
 			tile_grid grid;
 			for (int x = 0; x < i_width; x++){
 				tile_column col;

@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <mutex>
 #include <utility>
+#include <vector>
 #include <chrono>
 
 #include "Entity.hpp"
@@ -190,9 +191,9 @@ namespace gecom{
 
 		inline draw_queue(Scene *scene_) : m_scene(scene_) { }
 
-		inline draw_queue(const draw_queue &other) : m_draw_calls(other.m_draw_calls), m_scene(other.m_scene) { }
+		inline draw_queue(const draw_queue &other) : m_scene(other.m_scene), m_draw_calls(other.m_draw_calls) { }
 
-		inline draw_queue(draw_queue &&other) : m_draw_calls(std::move(other.m_draw_calls)), m_scene(other.m_scene) { }
+		inline draw_queue(draw_queue &&other) : m_scene(other.m_scene), m_draw_calls(std::move(other.m_draw_calls)) { }
 
 		inline draw_queue & operator=(const draw_queue &other) {
 			m_draw_calls = other.m_draw_calls;
@@ -273,7 +274,7 @@ namespace gecom{
 		virtual void addStatic(std::shared_ptr<gecom::Entity> i_entity) { add(i_entity); }
 		virtual std::shared_ptr<Camera> getCamera() { return m_camera; }
 		virtual void setCamera(std::shared_ptr<Camera> i_camera) { m_camera = i_camera; }
-		virtual std::vector<std::shared_ptr<gecom::Entity>>& get_all() = 0;
+		virtual std::vector<std::shared_ptr<gecom::Entity>> get_all() const = 0;
 		virtual void update(gecom::really_high_resolution_clock::duration) = 0;
 		virtual draw_queue makeDrawQueue(const aabbd &bb, unsigned dt) = 0;
 		virtual ~Scene() { }
@@ -328,8 +329,8 @@ namespace gecom{
 			}
 		}
 
-		std::vector<std::shared_ptr<gecom::Entity>>& get_all() {
-			std::vector<std::shared_ptr<gecom::Entity>> allEntities(m_dynamicEntities);
+		std::vector<std::shared_ptr<gecom::Entity>> get_all() const {
+            std::vector<std::shared_ptr<gecom::Entity>> allEntities(m_dynamicEntities);
 			auto staticEntites = m_staticEntities.search(aabbd(i3d::vec3d(), i3d::vec3d::one() * i3d::math::inf<double>()));
 			allEntities.insert(allEntities.end(), staticEntites.begin(), staticEntites.end());
 			return allEntities;

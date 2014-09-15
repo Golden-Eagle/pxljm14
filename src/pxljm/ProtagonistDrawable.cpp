@@ -1,19 +1,14 @@
+#include <gecom/SpineDrawable.hpp>
+
 #include "ProtagonistDrawable.hpp"
+#include "Player.hpp"
 
-void _spAtlasPage_createTexture(spAtlasPage* self, const char* path){
-	gecom::image* texture = new gecom::image(gecom::image::type_png(), path, false);
-
-	//if (!texture->loadFromFile(path)) return;
-	//texture->setSmooth(true);
-	self->rendererObject = texture;
-	self->width = texture->width();
-	self->height = texture->height();
-}
-
-void _spAtlasPage_disposeTexture(spAtlasPage* self){
-	delete (gecom::image*)self->rendererObject;
-}
-
-char* _spUtil_readFile(const char* path, int* length){
-	return _readFile(path, length);
-}
+//void pxljm::ProtagonistDrawable::callback(spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount) const {
+//    auto parent_prot = std::static_pointer_cast<PlayerEntity>(getParent());
+//    spTrackEntry *entry = spAnimationState_getCurrent(state, trackIndex);
+//    const char *animationName = (entry && entry->animation) ? entry->animation->name : 0;
+//
+//    if(strcmp(animationName, "jump") == 0 && type == SP_ANIMATION_COMPLETE) {
+//        parent_prot->finishJumping();
+//    }
+//}

@@ -43,9 +43,6 @@ namespace pxljm {
 			int y = 0;
 			for (Tile tile : col) {
 				if (tile.tileType != Tile::type::none){
-
-					GLint tileTexture = tile.tileType;
-
 					if (tile.inf) {
 						for (int i = 0; i < 100; ++i) {
 							int random = texture(generator);
@@ -112,8 +109,8 @@ namespace pxljm {
 		b2Filter ground_filter;
 
 		tile_grid grid = std::static_pointer_cast<Chunk>(getParent())->getTileGrid();
-		for (int y = 0; y < grid[0].size(); ++y) {
-			for (int x = 0; x < grid.size(); ++x) {
+		for (size_t y = 0; y < grid[0].size(); ++y) {
+			for (size_t x = 0; x < grid.size(); ++x) {
 
 				if (grid[x][y].solid) {
 					i3d::vec3d min = getParent()->getPosition() + i3d::vec3d(x, y, 0);
@@ -135,7 +132,7 @@ namespace pxljm {
 					auto half_size = (max - min) / 2;
 					auto body_pos = min + half_size;
 					nbodydef.position.Set(body_pos.x(), body_pos.y());
-					uint32_t nbody = world->createBody(nbodydef, shared_from_this());
+					auto nbody = world->createBody(nbodydef, shared_from_this());
 
 					auto rs = std::make_shared<b2PolygonShape>();
 					rs->SetAsBox(half_size.x(), half_size.y());
@@ -230,7 +227,7 @@ namespace pxljm {
 
 		vector<EntityPlaceholder> entities;
 
-		for (int i = 0; i < spaces.size()-1; ++i){
+		for (size_t i = 0; i < spaces.size()-1; ++i){
 			int type = typeDistribution(generator);
 			switch (type){
 			case 0:
@@ -346,7 +343,7 @@ std::shared_ptr<Level> LevelGenerator::compileLevel(const std::shared_ptr<gecom:
 	int LevelGenerator::movingSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, vector<EntityPlaceholder> &io_entities, BuildingHint i_hint = BuildingHint()){
 		//Flat walk
 
-		i_hint.deltaHeight;
+		//i_hint.deltaHeight;
 
 		std::mt19937 generator(uint64_t(i_start) | (uint64_t(i_end) << 32));
 		std::normal_distribution<double> deltaDistribution(i_hint.deltaHeight, i_hint.deltaVariance);
@@ -377,12 +374,12 @@ std::shared_ptr<Level> LevelGenerator::compileLevel(const std::shared_ptr<gecom:
 	}
 
 	int LevelGenerator::jumpSubpart(int i_startHeight, int i_maxHeight, int i_start, int i_end, tile_grid &io_grid, vector<EntityPlaceholder> &io_entities, BuildingHint i_hint = BuildingHint()){
-		i_hint.deltaHeight;
+		// i_hint.deltaHeight; // Statement with no effect, lol josh!
 
 		std::mt19937 generator(uint64_t(i_start) | (uint64_t(i_end) << 32));
-		double delta = 0.0;
-		std::normal_distribution<double> deltaDistribution(i_hint.deltaHeight, i_hint.deltaVariance);
-		delta = deltaDistribution(generator);
+
+//		std::normal_distribution<double> deltaDistribution(i_hint.deltaHeight, i_hint.deltaVariance);
+//        double delta = deltaDistribution(generator);
 
 		std::uniform_real_distribution<double> jumpTypeChance(0, 4);
 		double type = jumpTypeChance(generator);
@@ -391,8 +388,7 @@ std::shared_ptr<Level> LevelGenerator::compileLevel(const std::shared_ptr<gecom:
 		int startPadHeight = i_startHeight;
 		int startPadPosition = i_start;
 
-		int finishHeight = max(min(int(i_startHeight + delta * (i_end - i_start)), i_maxHeight-1), 0);
-
+		//int finishHeight = max(min(int(i_startHeight + delta * (i_end - i_start)), i_maxHeight-1), 0);
 
 		double jumpX = 5;
 		double jumpY = 3;

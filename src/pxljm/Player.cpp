@@ -7,19 +7,19 @@ pxljm::JumpContactListener::JumpContactListener(std::shared_ptr<PlayerEntity> e)
 
 void pxljm::JumpContactListener::BeginContact(b2Contact* contact) {
 	//check if fixture A was the foot sensor
-	gecom::log("begincontact") << (int)contact->GetFixtureA()->GetUserData() << " " << (int)contact->GetFixtureA()->GetUserData();
-	void* fixtureUserData = contact->GetFixtureA()->GetUserData();
+	//gecom::log("begincontact") << (int)contact->GetFixtureA()->GetUserData() << " " << (int)contact->GetFixtureA()->GetUserData();
+	//void* fixtureUserData = contact->GetFixtureA()->GetUserData();
 	//if ((int)fixtureUserData == FOOT_SENSOR)
 	//	m_e->startFeetOnGround();
 
 	//check if fixture B was the foot sensor
-	fixtureUserData = contact->GetFixtureB()->GetUserData();
+	//fixtureUserData = contact->GetFixtureB()->GetUserData();
 	//if ((int)fixtureUserData == FOOT_SENSOR)
 		//m_e->star
 }
 
 void pxljm::JumpContactListener::EndContact(b2Contact* contact) {
-	gecom::log("endcontact") << (int)contact->GetFixtureA()->GetUserData() << " " << (int)contact->GetFixtureA()->GetUserData();
+	//gecom::log("endcontact") << (int)contact->GetFixtureA()->GetUserData() << " " << (int)contact->GetFixtureA()->GetUserData();
 	////check if fixture A was the foot sensor
 	//void* fixtureUserData = contact->GetFixtureA()->GetUserData();
 	//if ((int)fixtureUserData == FOOT_SENSOR)
@@ -44,7 +44,7 @@ inline void pxljm::PlayerPhysics::registerWithWorld(std::shared_ptr<gecom::World
 	def.position.Set(getParent()->getPosition().x(), getParent()->getPosition().y());
 	def.linearDamping = 0.6f;
 
-	setBodyID(getWorld()->createBody(def, shared_from_this()));
+    setB2Body(getWorld()->createBody(def, shared_from_this()));
 
 	auto bbb = std::make_shared<b2PolygonShape>();
 	bbb->SetAsBox(0.5, 2.2);
@@ -72,7 +72,7 @@ inline void pxljm::PlayerPhysics::registerWithWorld(std::shared_ptr<gecom::World
 
 	world->createFixture(getBodyID(), fix, bbb);
 	world->createFixture(getBodyID(), feet_sensor_fixture, feet_sensor);
-	//world->createFixture(m_b_id, ffix, bfeet);
+	//world->createFixture(m_body, ffix, bfeet);
 }
 
 pxljm::PlayerEntity::PlayerEntity(std::shared_ptr<gecom::WorldProxy>& proxy) : gecom::Entity(proxy), norm_dist(0, 0.1) { }
@@ -153,4 +153,14 @@ void pxljm::PlayerEntity::kill() {
 	//player_phs->
 
 	// set to idle animation
+}
+
+void pxljm::PlayerEntity::finishJumping() {
+    jump_available = true;
+}
+
+void pxljm::PlayerEntity::startJumping() {
+    jump_available = false;
+    player_phs->applyLinearImpulse(i3d::vec3d(0, 10000, 0));
+    player_dw->startJumpAnimation();
 }

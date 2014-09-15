@@ -23,7 +23,7 @@ namespace gecom {
 		std::shared_ptr<Entity> m_parent;
 	public:
 		EntityComponent(std::shared_ptr<Entity> parent) : m_parent(parent) { }
-		std::shared_ptr<Entity>& getParent() { return m_parent; }
+		const std::shared_ptr<Entity>& getParent() const { return m_parent; }
 		virtual void update(gecom::really_high_resolution_clock::duration delta) {
 
 		}

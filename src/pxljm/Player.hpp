@@ -9,13 +9,13 @@
 #include <gecom/Window.hpp>
 #include <gecom/Scene.hpp>
 #include <gecom/UnitSquare.hpp>
+#include <gecom/SpineDrawable.hpp>
 #include <random>
 
 #include "ProtagonistDrawable.hpp"
 
 namespace pxljm {
-
-	class PlayerEntity;
+    class PlayerEntity;
 
 	class JumpContactListener : public b2ContactListener
 	{
@@ -48,7 +48,7 @@ namespace pxljm {
 			def.position.Set(getParent()->getPosition().x(), getParent()->getPosition().y());
 			def.linearDamping = 0.6f;
 
-			setBodyID(world->createBody(def, shared_from_this()));
+            setB2Body(world->createBody(def, shared_from_this()));
 
 			auto bbb = std::make_shared<b2PolygonShape>();
 			bbb->SetAsBox(m_half_width, m_half_height);
@@ -62,9 +62,9 @@ namespace pxljm {
 		}
 	};
 
-	class ProjectileDrawable : public SpineDrawable {
+	class ProjectileDrawable : public gecom::SpineDrawable {
 	public:
-		ProjectileDrawable(const std::shared_ptr<gecom::Entity> parent) : SpineDrawable(std::string("fireball"), parent, 0.003) { }
+        ProjectileDrawable(const std::shared_ptr<gecom::Entity> parent) : SpineDrawable(std::string("fireball"), parent, 0.003) { }
 	};
 
 	class DronePhysics : public gecom::B2PhysicsComponent {
@@ -81,7 +81,7 @@ namespace pxljm {
 			def.position.Set(getParent()->getPosition().x(), getParent()->getPosition().y() - 2);
 			def.linearDamping = 0.6f;
 
-			setBodyID(world->createBody(def, shared_from_this()));
+            setB2Body(world->createBody(def, shared_from_this()));
 
 			auto bbb = std::make_shared<b2PolygonShape>();
 			bbb->SetAsBox(1, 1);
@@ -148,26 +148,14 @@ namespace pxljm {
 		std::normal_distribution<double> norm_dist;
 
 		int m_health = 100;
-
-
 	public:
 		PlayerEntity(std::shared_ptr<gecom::WorldProxy>& proxy);
-
 		void init(gecom::Scene* s) override;
-		void setJumpAvailable(bool should_jump);
-		void startJumping() {
-			jump_available = false;
-			player_phs->applyLinearImpulse(i3d::vec3d(0, 10000, 0));
-			player_dw->startJumpAnimation();
-		}
-
-		void finishJumping() {
-			jump_available = true;
-		}
-		void update(gecom::really_high_resolution_clock::duration delta);
+		void startJumping();
+		void finishJumping();
+		void update(gecom::really_high_resolution_clock::duration delta) override;
 		void kill();
 	};
-
 }
 
 #endif

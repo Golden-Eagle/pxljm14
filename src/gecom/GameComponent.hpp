@@ -12,8 +12,8 @@ namespace gecom {
 	public:
 		GameComponent(Game &g) : active_game(g) { }
 
-		inline virtual void init() = 0;
-		inline virtual void update() = 0;
+		virtual void init() = 0;
+		virtual void update() = 0;
 	};
 
 	class GameComponentManager {

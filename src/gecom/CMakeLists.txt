@@ -12,6 +12,7 @@ SET(GECOM_SOURCES
 	Perlin.cpp
 	Box2D.cpp
 	Game.cpp
+	SpineDrawable.cpp
 )
 
 SET(GECOM_HEADERS
@@ -38,6 +39,7 @@ SET(GECOM_HEADERS
 	Scene.hpp
 	json11.hpp
 	Perlin.hpp
+	SpineDrawable.hpp
 )
 
 add_library(gecom ${GECOM_SOURCES} ${GECOM_HEADERS})
