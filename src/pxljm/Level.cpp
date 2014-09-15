@@ -143,7 +143,7 @@ namespace pxljm {
 					auto rf = std::make_shared<b2FixtureDef>();
 					rf->filter = ground_filter;
 					rf->shape = rs.get();
-					rf->friction = 1.0f;
+					rf->friction = 0.99f;
 					rf->density = 0.0f;
 
 					world->createFixture(nbody, rf, rs);

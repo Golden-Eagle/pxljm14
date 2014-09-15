@@ -72,7 +72,7 @@ namespace pxljm {
 		double m_scale;
 
 	public:
-		static void callback(spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount) {
+		void callback(spAnimationState* state, int trackIndex, spEventType type, spEvent* event, int loopCount) {
 			spTrackEntry* entry = spAnimationState_getCurrent(state, trackIndex);
 			const char* animationName = (entry && entry->animation) ? entry->animation->name : 0;
 
@@ -84,6 +84,9 @@ namespace pxljm {
 				printf("%d end: %s\n", trackIndex, animationName);
 				break;
 			case SP_ANIMATION_COMPLETE:
+				if(animationName == "jump") {
+					std::static_pointer_cast<PlayerEntity>(getParent())->finishJumping();
+				}
 				printf("%d complete: %s, %d\n", trackIndex, animationName, loopCount);
 				break;
 			case SP_ANIMATION_EVENT:
@@ -211,7 +214,7 @@ namespace pxljm {
 
 			//spSlot* headSlot = spSkeleton_findSlot(m_skeleton, "head");
 
-			m_state->listener = callback;
+			m_state->listener = (spAnimationStateListener)&(this->callback);
 			/*if (false) {
 				spAnimationState_setAnimationByName(m_state, 0, "test", true);
 				}

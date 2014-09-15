@@ -155,6 +155,15 @@ namespace pxljm {
 
 		void init(gecom::Scene* s) override;
 		void setJumpAvailable(bool should_jump);
+		void startJumping() {
+			jump_available = false;
+			player_phs->applyLinearImpulse(i3d::vec3d(0, 10000, 0));
+			player_dw->startJumpAnimation();
+		}
+
+		void finishJumping() {
+			jump_available = true;
+		}
 		void update(gecom::really_high_resolution_clock::duration delta);
 		void kill();
 	};

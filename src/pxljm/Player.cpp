@@ -9,13 +9,13 @@ void pxljm::JumpContactListener::BeginContact(b2Contact* contact) {
 	//check if fixture A was the foot sensor
 	gecom::log("begincontact") << (int)contact->GetFixtureA()->GetUserData() << " " << (int)contact->GetFixtureA()->GetUserData();
 	void* fixtureUserData = contact->GetFixtureA()->GetUserData();
-	if ((int)fixtureUserData == FOOT_SENSOR)
-		m_e->setJumpAvailable(true);
+	//if ((int)fixtureUserData == FOOT_SENSOR)
+	//	m_e->startFeetOnGround();
 
 	//check if fixture B was the foot sensor
 	fixtureUserData = contact->GetFixtureB()->GetUserData();
-	if ((int)fixtureUserData == FOOT_SENSOR)
-		m_e->setJumpAvailable(true);
+	//if ((int)fixtureUserData == FOOT_SENSOR)
+		//m_e->star
 }
 
 void pxljm::JumpContactListener::EndContact(b2Contact* contact) {
@@ -52,7 +52,7 @@ inline void pxljm::PlayerPhysics::registerWithWorld(std::shared_ptr<gecom::World
 	auto fix = std::make_shared<b2FixtureDef>();
 	fix->shape = bbb.get();
 	fix->density = 130;
-	fix->friction = 0.99f;
+	fix->friction = 1.0f;
 
 	auto feet_sensor = std::make_shared<b2PolygonShape>();
 	feet_sensor->SetAsBox(0.5, 0.5, b2Vec2(0, -2.2), 0);
@@ -90,19 +90,12 @@ void pxljm::PlayerEntity::init(gecom::Scene* sc) {
 	addComponent<gecom::B2PhysicsComponent>(player_phs);
 }
 
-void pxljm::PlayerEntity::setJumpAvailable(bool should_jump) {
-	jump_available = should_jump;
-
-}
-
 void pxljm::PlayerEntity::update(gecom::really_high_resolution_clock::duration delta) {
 	Entity::update(delta);
 
 	if (gecom::Window::currentContext()->pollKey(GLFW_KEY_W) && jump_available) {
 		// intent -> registerIntent([=] { player_phs->applyLinearImpulse(..); }, 1000);
-		jump_available = false;
-		player_phs->applyLinearImpulse(i3d::vec3d(0, 10000, 0));
-		player_dw->startJumpAnimation();
+		startJumping();
 	}
 
 	bool should_be_running = false;// std::abs(player_phs->getLinearVelocity().x()) > 0.0;
@@ -130,22 +123,22 @@ void pxljm::PlayerEntity::update(gecom::really_high_resolution_clock::duration d
 	}
 
 	if (gecom::Window::currentContext()->getKey(GLFW_KEY_D)) {
-		player_phs->applyLinearImpulse(i3d::vec3d(30000.0 * std::chrono::duration_cast<std::chrono::duration<double>>(delta).count(), 0, 0));
+		player_phs->applyLinearImpulse(i3d::vec3d(20000.0 * std::chrono::duration_cast<std::chrono::duration<double>>(delta).count(), 0, 0));
 		player_dw->setLeft(true);
 		should_be_running = true;
 	}
 	else if (gecom::Window::currentContext()->getKey(GLFW_KEY_A)) {
-		player_phs->applyLinearImpulse(i3d::vec3d(-30000.0 * std::chrono::duration_cast<std::chrono::duration<double>>(delta).count(), 0, 0));
+		player_phs->applyLinearImpulse(i3d::vec3d(-20000.0 * std::chrono::duration_cast<std::chrono::duration<double>>(delta).count(), 0, 0));
 		player_dw->setLeft(false);
 		should_be_running = true;
 	}
 
-	if (should_be_running && !is_running) {
+	if (should_be_running && !is_running && jump_available) {
 		// start run animation
 		player_dw->startRunAnimation();
 		is_running = true;
 	}
-	else if (!should_be_running && is_running) {
+	else if (!should_be_running && is_running && jump_available) {
 		player_dw->stopRunAnimation();
 		is_running = false;
 	}
