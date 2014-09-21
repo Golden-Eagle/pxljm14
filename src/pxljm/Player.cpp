@@ -8,9 +8,12 @@ pxljm::JumpContactListener::JumpContactListener(std::shared_ptr<PlayerEntity> e)
 void pxljm::JumpContactListener::BeginContact(b2Contact* contact) {
 	//check if fixture A was the foot sensor
 	//gecom::log("begincontact") << (int)contact->GetFixtureA()->GetUserData() << " " << (int)contact->GetFixtureA()->GetUserData();
-	//void* fixtureUserData = contact->GetFixtureA()->GetUserData();
-	//if ((int)fixtureUserData == FOOT_SENSOR)
-	//	m_e->startFeetOnGround();
+	void* fix = contact->GetFixtureA()->GetUserData();
+    int fixtureUserData = 0;
+    if(fix != nullptr)
+        fixtureUserData = *((int*)fix);
+	if (fixtureUserData == FOOT_SENSOR)
+		m_e->startFeetOnGround();
 
 	//check if fixture B was the foot sensor
 	//fixtureUserData = contact->GetFixtureB()->GetUserData();
@@ -93,9 +96,12 @@ void pxljm::PlayerEntity::init(gecom::Scene* sc) {
 void pxljm::PlayerEntity::update(gecom::really_high_resolution_clock::duration delta) {
 	Entity::update(delta);
 
+    gecom::log("player-pos") << getPosition();
+
 	if (gecom::Window::currentContext()->pollKey(GLFW_KEY_W) && jump_available) {
 		// intent -> registerIntent([=] { player_phs->applyLinearImpulse(..); }, 1000);
 		startJumping();
+        //jump_available = true;
 	}
 
 	bool should_be_running = false;// std::abs(player_phs->getLinearVelocity().x()) > 0.0;
@@ -163,4 +169,15 @@ void pxljm::PlayerEntity::startJumping() {
     jump_available = false;
     player_phs->applyLinearImpulse(i3d::vec3d(0, 10000, 0));
     player_dw->startJumpAnimation();
+}
+
+
+void pxljm::DroneEntity::update(gecom::really_high_resolution_clock::duration delta) {
+    gecom::Entity::update(delta);
+
+    i3d::vec3d diff = (player->getPosition() + i3d::vec3d(0, 10, 0)) - getPosition();
+    double len = diff.mag();
+    diff = diff / len;
+
+    phys->applyForce(diff * 0.5 * (1000.0f / delta.count()));
 }

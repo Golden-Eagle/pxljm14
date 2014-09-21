@@ -78,44 +78,54 @@ namespace pxljm {
 			b2BodyDef def;
 			def.type = b2_dynamicBody;
 			def.fixedRotation = true;
-			def.position.Set(getParent()->getPosition().x(), getParent()->getPosition().y() - 2);
-			def.linearDamping = 0.6f;
+			def.position.Set(getParent()->getPosition().x(), getParent()->getPosition().y());
+			def.linearDamping = 0.1f;
+            def.gravityScale = 0;
 
             setB2Body(world->createBody(def, shared_from_this()));
 
 			auto bbb = std::make_shared<b2PolygonShape>();
-			bbb->SetAsBox(1, 1);
+			bbb->SetAsBox(0.001f, 0.001f);
 
 			auto fix = std::make_shared<b2FixtureDef>();
 			fix->shape = bbb.get();
-			fix->density = 130;
-			fix->friction = 0.99f;
+			fix->density = 100;
+			fix->friction = 0.0f;
 
 			world->createFixture(getBodyID(), fix, bbb);
 		}
+
+        void recieveFrame(gecom::PhysicsFrameData pfd) override {
+            // TODO pass by reference more often neo
+            // TODO - NOT THIS
+
+            getParent()->setPosition(pfd.getPos() + i3d::vec3d(0, 2, 0));
+            getParent()->setRotation(pfd.getRot());
+        }
 	};
 
 	class DroneEntity : public gecom::Entity {
-		std::shared_ptr<PlayerPhysics> player_phs;
-		std::shared_ptr<ProtagonistDrawable> player_dw;
-
+		std::shared_ptr<DronePhysics> phys;
+        std::shared_ptr<PlayerEntity> player;
+        i3d::vec3d direction;
 		int m_health = 100;
 
 	public:
-		DroneEntity(std::shared_ptr<gecom::WorldProxy> word) : gecom::Entity(word) { }
+		DroneEntity(std::shared_ptr<gecom::WorldProxy> word, std::shared_ptr<gecom::Entity> pl) : gecom::Entity(word), player(std::static_pointer_cast<pxljm::PlayerEntity>(pl)), direction(0.2f, 0, 0) { }
 
 		void init(gecom::Scene* s) override {
 			gecom::Entity::init(s);
 			
-			setPosition(i3d::vec3d(20, 50, 0));
+			setPosition(i3d::vec3d(20, 30, 0));
 			addComponent<gecom::DrawableComponent>(std::make_shared<DroneDrawable>(shared_from_this()));
 
-			auto phys = std::make_shared<DronePhysics>(shared_from_this());
+			phys = std::make_shared<DronePhysics>(shared_from_this());
 			phys->registerWithWorld(getWorld());
-			
 
 			addComponent<gecom::B2PhysicsComponent>(phys);
 		}
+
+        void update(gecom::really_high_resolution_clock::duration delta) override;
 	};
 
 	class ProjectileEntity : public gecom::Entity {
@@ -153,6 +163,9 @@ namespace pxljm {
 		void init(gecom::Scene* s) override;
 		void startJumping();
 		void finishJumping();
+        void startFeetOnGround() {
+            jump_available = true;
+        }
 		void update(gecom::really_high_resolution_clock::duration delta) override;
 		void kill();
 	};

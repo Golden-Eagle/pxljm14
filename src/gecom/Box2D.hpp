@@ -100,7 +100,7 @@ namespace gecom {
 		void createBody(uint32_t n_world_id, const std::shared_ptr<B2BodyProxy>& body, const b2BodyDef& def) {
 
 			//log("phys::createBody") << "got here!" << std::endl;
-			b2Body* w = worlds[body->getBodyID()].first->CreateBody(&def);
+			b2Body* w = worlds[n_world_id].first->CreateBody(&def);
 			w->SetUserData((void*)body.get());
 			bodies[body->getBodyID()] = w;
 		}
@@ -119,7 +119,7 @@ namespace gecom {
 			auto fixture = bodies[b->getBodyID()]->CreateFixture(def.get());
 			if (def->isSensor) {
 				fixture->SetSensor(true);
-				fixture->SetUserData((void*)FOOT_SENSOR);
+				fixture->SetUserData((void*)new int(FOOT_SENSOR));
 			}
 		}
 
@@ -135,7 +135,7 @@ namespace gecom {
 
 		void init() override { m_worker = std::thread{ [this]() { this->dowork(); } }; }
 
-		inline std::shared_ptr<WorldProxy> addWorld(i3d::vec3d gravity) {
+		std::shared_ptr<WorldProxy> addWorld(i3d::vec3d gravity) {
 			auto n_world_id = sm_world_id.fetch_add(1);
 			auto n_world = std::make_shared<b2World>(b2Vec2(gravity.x(), gravity.y()));
 			auto n_world_proxy = std::make_shared<WorldProxy>(shared_from_this(), n_world_id);

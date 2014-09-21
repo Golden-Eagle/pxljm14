@@ -144,7 +144,7 @@ namespace pxljm {
 			m_scene->add(player);
 			player->setPosition(player->getPosition() + i3d::vec3d::j() * 64);
 
-			auto drone = std::make_shared<DroneEntity>(world);
+			auto drone = std::make_shared<DroneEntity>(world, player);
 			m_scene->add(drone);
 
 			//box = std::make_shared<Entity>();
